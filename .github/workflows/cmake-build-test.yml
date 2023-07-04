@@ -9,6 +9,7 @@ on:
 
 jobs:
   build:
+    name: CMake-Build-Test
     runs-on: ubuntu-latest
     container: ngama75/spqlios-ci:latest
 
