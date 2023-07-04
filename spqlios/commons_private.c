@@ -1,8 +1,23 @@
 #include "commons_private.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "commons.h"
 
-uint32_t log2m(uint32_t m) {
+EXPORT void* spqlios_error(const char* error) {
+  fputs(error, stderr);
+  abort();
+  return nullptr;
+}
+EXPORT void* spqlios_keep_or_free(void* ptr, void* ptr2) {
+  if (!ptr2) {
+    free(ptr);
+  }
+  return ptr2;
+}
+
+EXPORT uint32_t log2m(uint32_t m) {
   uint32_t a = m - 1;
   if (m & a) FATAL_ERROR("m must be a power of two");
   a = (a & 0x55555555u) + ((a >> 1) & 0x55555555u);
@@ -12,4 +27,4 @@ uint32_t log2m(uint32_t m) {
   return (a & 0x0000FFFFu) + ((a >> 16) & 0x0000FFFFu);
 }
 
-uint64_t is_not_pow2_double(void* doublevalue) { return (*(uint64_t*)doublevalue) & 0x7FFFFFFFFFFFFUL; }
+EXPORT uint64_t is_not_pow2_double(void* doublevalue) { return (*(uint64_t*)doublevalue) & 0x7FFFFFFFFFFFFUL; }
