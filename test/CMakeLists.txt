@@ -28,8 +28,13 @@ endif()
 
 # main unittest file
 message(STATUS "${gtest_libs}")
-add_executable(spqlios-test spqlios_test.cpp)
+add_executable(spqlios-test spqlios_test.cpp spqlios_cplx_test.cpp)
 target_link_libraries(spqlios-test spqlios-fft ${gtest_libs})
 target_include_directories(spqlios-test PRIVATE ${test_incs})
 add_test(NAME spqlios-test COMMAND spqlios-test)
 
+
+# benchmarks
+add_executable(spqlios-cplx-fft-bench spqlios_cplx_fft_bench.cpp)
+target_link_libraries(spqlios-cplx-fft-bench spqlios-fft benchmark pthread)
+target_include_directories(spqlios-cplx-fft-bench PRIVATE ../)

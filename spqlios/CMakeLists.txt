@@ -4,6 +4,8 @@ enable_language(ASM)
 set(SRCS_GENERIC
         commons.c 
         commons_private.c 
+        cplx/cplx_common.c
+        cplx/cplx_ifft_ref.c
         )
 # C or assembly source files compiled only on x86 targets
 set(SRCS_X86
@@ -14,6 +16,8 @@ set(SRCS_AARCH64
 
 # C or assembly source files compiled only on x86: avx, avx2, fma targets
 set(SRCS_FMA
+        cplx/cplx_ifft_avx2_fma.c
+        cplx/cplx_ifft16_avx_fma.s
         )
 set_source_files_properties(${SRCS_FMA} PROPERTIES COMPILE_OPTIONS "-mfma;-mavx;-mavx2")
 
@@ -47,6 +51,8 @@ set(HEADERSPUBLIC
 # H header files containing the private API (these headers are used internally)
 set(HEADERSPRIVATE
         commons_private.h
+        cplx/cplx_fft.h
+        cplx/cplx_fft_private.h
         )
 
 set(SPQLIOSSOURCES
