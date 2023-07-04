@@ -9,6 +9,7 @@ on:
 
 jobs:
   build:
+    name: CMake-Build-Test-Arm64
     runs-on: self-hosted-arm64
 
     steps:
