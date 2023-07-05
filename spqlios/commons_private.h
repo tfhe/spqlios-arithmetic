@@ -42,6 +42,7 @@ EXPORT void* spqlios_keep_or_free(void* ptr, void* ptr2);
 #define CPU_SUPPORTS(xxxx) 0
 #endif
 
+/** @brief returns the n bits of value in reversed order */
 uint32_t revbits(uint32_t nbits, uint32_t value);
 
 /**
