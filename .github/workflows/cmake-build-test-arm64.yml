@@ -11,7 +11,7 @@ on:
 jobs:
   build:
     name: CMake-Build-Test-Arm64
-    if: contains(github.event.pull_request.labels.*.name, 'check-on-arm64')
+    if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'check-on-arm64')
     runs-on: self-hosted-arm64
 
     steps:
