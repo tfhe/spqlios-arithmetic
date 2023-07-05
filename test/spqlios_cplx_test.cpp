@@ -3,6 +3,8 @@
 #include "../spqlios/cplx/cplx_fft.h"
 #include "../spqlios/cplx.h"
 
+#include <cmath>
+
 #ifdef __x86_64__
 TEST(fft, ifft16_fma_vs_ref) {
   CPLX data[16];

@@ -3,6 +3,17 @@
 
 #include "commons.h"
 
+#ifdef __cplusplus
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
+#else
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#define nullptr 0x0;
+#endif
+
 /** @brief log2 of a power of two (UB if m is not a power of two) */
 uint32_t log2m(uint32_t m);
 

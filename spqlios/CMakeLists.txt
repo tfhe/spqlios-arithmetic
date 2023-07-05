@@ -12,6 +12,7 @@ set(SRCS_X86
         )
 # C or assembly source files compiled only on aarch64 targets
 set(SRCS_AARCH64
+        cplx/cplx_fallbacks_aarch64.c
         )
 
 # C or assembly source files compiled only on x86: avx, avx2, fma targets
