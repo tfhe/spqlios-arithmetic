@@ -28,3 +28,24 @@ EXPORT uint32_t log2m(uint32_t m) {
 }
 
 EXPORT uint64_t is_not_pow2_double(void* doublevalue) { return (*(uint64_t*)doublevalue) & 0x7FFFFFFFFFFFFUL; }
+
+uint32_t revbits(uint32_t nbits, uint32_t value) {
+  uint32_t res = 0;
+  for (uint32_t i = 0; i < nbits; ++i) {
+    res = (res << 1) + (value & 1);
+    value >>= 1;
+  }
+  return res;
+}
+
+/**
+ * @brief this computes the sequence: 0,1/2,1/4,3/4,1/8,5/8,3/8,7/8,...
+ * essentially: the bits of (i+1) in lsb order on the basis (1/2^k) mod 1*/
+double fracrevbits(uint32_t i) {
+  if (i == 0) return 0;
+  if (i == 1) return 0.5;
+  if (i % 2 == 0)
+    return fracrevbits(i / 2) / 2.;
+  else
+    return fracrevbits((i - 1) / 2) / 2. + 0.5;
+}
