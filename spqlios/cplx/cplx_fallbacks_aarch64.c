@@ -1,3 +1,4 @@
+#include "../commons_private.h"
 #include "cplx_fft.h"
 #include "cplx_fft_private.h"
 
