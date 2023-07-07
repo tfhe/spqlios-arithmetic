@@ -1,16 +1,17 @@
-#include "gtest/gtest.h"
-
-#include "../spqlios/cplx/cplx_fft.h"
-#include "../spqlios/cplx.h"
-
 #include <cmath>
+
+#include "gtest/gtest.h"
+#include "spqlios/commons_private.h"
+#include "spqlios/cplx.h"
+#include "spqlios/cplx/cplx_fft.h"
+#include "spqlios/cplx/cplx_fft_private.h"
 
 #ifdef __x86_64__
 TEST(fft, ifft16_fma_vs_ref) {
   CPLX data[16];
   CPLX omega[8];
-  for (uint64_t i=0; i<32; ++i) ((double*)data)[i]= 2*i+1; //(rand()%100)-50;
-  for (uint64_t i=0; i<16; ++i) ((double*)omega)[i]= i+1; //(rand()%100)-50;
+  for (uint64_t i = 0; i < 32; ++i) ((double*)data)[i] = 2 * i + 1;  //(rand()%100)-50;
+  for (uint64_t i = 0; i < 16; ++i) ((double*)omega)[i] = i + 1;     //(rand()%100)-50;
   CPLX copydata[16];
   CPLX copyomega[8];
   memcpy(copydata, data, sizeof(copydata));
@@ -18,9 +19,9 @@ TEST(fft, ifft16_fma_vs_ref) {
   cplx_ifft16_avx_fma(data, omega);
   cplx_ifft16_ref(copydata, copyomega);
   double distance = 0;
-  for (uint64_t i=0; i<16; ++i) {
-    double d1 =  fabs(data[i][0]-copydata[i][0]);
-    double d2 =  fabs(data[i][0]-copydata[i][0]);
+  for (uint64_t i = 0; i < 16; ++i) {
+    double d1 = fabs(data[i][0] - copydata[i][0]);
+    double d2 = fabs(data[i][0] - copydata[i][0]);
     if (d1>distance) distance=d1;
     if (d2>distance) distance=d2;
   }
@@ -41,5 +42,291 @@ TEST(fft, ifft16_fma_vs_ref) {
   }
   */
   ASSERT_EQ(distance, 0);
+}
+
+#endif
+
+void cplx_zero(CPLX r) { r[0] = r[1] = 0; }
+void cplx_addmul(CPLX r, const CPLX a, const CPLX b) {
+  double re = r[0] + a[0] * b[0] - a[1] * b[1];
+  double im = r[1] + a[0] * b[1] + a[1] * b[0];
+  r[0] = re;
+  r[1] = im;
+}
+
+void halfcfft_eval(CPLX res, uint32_t nn, uint32_t k, const CPLX* coeffs, const CPLX* powomegas) {
+  const uint32_t N = nn / 2;
+  cplx_zero(res);
+  for (uint64_t i = 0; i < N; ++i) {
+    cplx_addmul(res, coeffs[i], powomegas[(k * i) % (2 * nn)]);
+  }
+}
+void halfcfft_naive(uint32_t nn, CPLX* data) {
+  const uint32_t N = nn / 2;
+  CPLX* in = (CPLX*)malloc(N * sizeof(CPLX));
+  CPLX* powomega = (CPLX*)malloc(2 * nn * sizeof(CPLX));
+  for (uint64_t i = 0; i < (2 * nn); ++i) {
+    powomega[i][0] = cos((M_PI * i) / nn);
+    powomega[i][1] = sin((M_PI * i) / nn);
+  }
+  memcpy(in, data, N * sizeof(CPLX));
+  for (uint64_t j = 0; j < N; ++j) {
+    uint64_t p = rint(log2(N)) + 2;
+    uint64_t k = revbits(p, j) + 1;
+    halfcfft_eval(data[j], nn, k, in, powomega);
+  }
+  free(powomega);
+  free(in);
+}
+
+#ifdef __x86_64__
+TEST(fft, fft16_fma_vs_ref) {
+  CPLX data[16];
+  CPLX omega[8];
+  for (uint64_t i = 0; i < 32; ++i) ((double*)data)[i] = rand() % 1000;
+  for (uint64_t i = 0; i < 16; ++i) ((double*)omega)[i] = rand() % 1000;
+  CPLX copydata[16];
+  CPLX copyomega[8];
+  memcpy(copydata, data, sizeof(copydata));
+  memcpy(copyomega, omega, sizeof(copyomega));
+  cplx_fft16_avx_fma(data, omega);
+  cplx_fft16_ref(copydata, omega);
+  double distance = 0;
+  for (uint64_t i = 0; i < 16; ++i) {
+    double d1 = fabs(data[i][0] - copydata[i][0]);
+    double d2 = fabs(data[i][0] - copydata[i][0]);
+    if (d1 > distance) distance = d1;
+    if (d2 > distance) distance = d2;
+  }
+  ASSERT_EQ(distance, 0);
+}
+#endif
+
+TEST(fft, citwiddle_then_invcitwiddle) {
+  CPLX om;
+  CPLX ombar;
+  CPLX data[2];
+  CPLX copydata[2];
+  om[0] = cos(3);
+  om[1] = sin(3);
+  ombar[0] = om[0];
+  ombar[1] = -om[1];
+  data[0][0] = 47;
+  data[0][1] = 23;
+  data[1][0] = -12;
+  data[1][1] = -9;
+  memcpy(copydata, data, sizeof(copydata));
+  citwiddle(data[0], data[1], om);
+  invcitwiddle(data[0], data[1], ombar);
+  double distance = 0;
+  for (uint64_t i = 0; i < 2; ++i) {
+    double d1 = fabs(data[i][0] - 2 * copydata[i][0]);
+    double d2 = fabs(data[i][1] - 2 * copydata[i][1]);
+    if (d1 > distance) distance = d1;
+    if (d2 > distance) distance = d2;
+  }
+  ASSERT_LE(distance, 1e-9);
+}
+
+TEST(fft, ctwiddle_then_invctwiddle) {
+  CPLX om;
+  CPLX ombar;
+  CPLX data[2];
+  CPLX copydata[2];
+  om[0] = cos(3);
+  om[1] = sin(3);
+  ombar[0] = om[0];
+  ombar[1] = -om[1];
+  data[0][0] = 47;
+  data[0][1] = 23;
+  data[1][0] = -12;
+  data[1][1] = -9;
+  memcpy(copydata, data, sizeof(copydata));
+  ctwiddle(data[0], data[1], om);
+  invctwiddle(data[0], data[1], ombar);
+  double distance = 0;
+  for (uint64_t i = 0; i < 2; ++i) {
+    double d1 = fabs(data[i][0] - 2 * copydata[i][0]);
+    double d2 = fabs(data[i][1] - 2 * copydata[i][1]);
+    if (d1 > distance) distance = d1;
+    if (d2 > distance) distance = d2;
+  }
+  ASSERT_LE(distance, 1e-9);
+}
+
+TEST(fft, fft16_then_ifft16_ref) {
+  CPLX full_omegas[64];
+  CPLX full_omegabars[64];
+  for (uint64_t i = 0; i < 64; ++i) {
+    full_omegas[i][0] = cos(M_PI * i / 32.);
+    full_omegas[i][1] = sin(M_PI * i / 32.);
+    full_omegabars[i][0] = full_omegas[i][0];
+    full_omegabars[i][1] = -full_omegas[i][1];
+  }
+  CPLX omega[8];
+  CPLX omegabar[8];
+  cplx_set(omega[0], full_omegas[8]);         // j
+  cplx_set(omega[1], full_omegas[4]);         // k
+  cplx_set(omega[2], full_omegas[2]);         // l
+  cplx_set(omega[3], full_omegas[10]);        // lj
+  cplx_set(omega[4], full_omegas[1]);         // n
+  cplx_set(omega[5], full_omegas[9]);         // nj
+  cplx_set(omega[6], full_omegas[5]);         // nk
+  cplx_set(omega[7], full_omegas[13]);        // njk
+  cplx_set(omegabar[0], full_omegabars[1]);   // n
+  cplx_set(omegabar[1], full_omegabars[9]);   // nj
+  cplx_set(omegabar[2], full_omegabars[5]);   // nk
+  cplx_set(omegabar[3], full_omegabars[13]);  // njk
+  cplx_set(omegabar[4], full_omegabars[2]);   // l
+  cplx_set(omegabar[5], full_omegabars[10]);  // lj
+  cplx_set(omegabar[6], full_omegabars[4]);   // k
+  cplx_set(omegabar[7], full_omegabars[8]);   // j
+  CPLX data[16];
+  CPLX copydata[16];
+  for (uint64_t i = 0; i < 32; ++i) ((double*)data)[i] = rand() % 1000;
+  memcpy(copydata, data, sizeof(copydata));
+  cplx_fft16_ref(data, omega);
+  cplx_ifft16_ref(data, omegabar);
+  double distance = 0;
+  for (uint64_t i = 0; i < 16; ++i) {
+    double d1 = fabs(data[i][0] - 16 * copydata[i][0]);
+    double d2 = fabs(data[i][0] - 16 * copydata[i][0]);
+    if (d1 > distance) distance = d1;
+    if (d2 > distance) distance = d2;
+  }
+  ASSERT_LE(distance, 1e-9);
+}
+
+TEST(fft, halfcfft_ref_vs_naive) {
+  for (uint64_t nn : {4, 8, 16, 64, 256, 8192}) {
+    uint64_t m = nn / 2;
+    CPLX_FFT_PRECOMP* tables = new_cplx_fft_precomp(m, 0);
+    CPLX* a = (CPLX*)aligned_alloc(32, m * sizeof(CPLX));
+    CPLX* a1 = (CPLX*)aligned_alloc(32, m * sizeof(CPLX));
+    CPLX* a2 = (CPLX*)aligned_alloc(32, m * sizeof(CPLX));
+    int64_t p = 1 << 16;
+    for (uint32_t i = 0; i < m; i++) {
+      a[i][0] = (rand() % p) - p / 2;  // between -p/2 and p/2
+      a[i][1] = (rand() % p) - p / 2;
+    }
+    memcpy(a1, a, m * sizeof(CPLX));
+    memcpy(a2, a, m * sizeof(CPLX));
+
+    halfcfft_naive(nn, a1);
+    cplx_fft_naive(m, 0.25, a2);
+
+    double d = 0;
+    for (uint32_t i = 0; i < nn / 2; i++) {
+      double dre = fabs(a1[i][0] - a2[i][0]);
+      double dim = fabs(a1[i][1] - a2[i][1]);
+      if (dre > d) d = dre;
+      if (dim > d) d = dim;
+    }
+    ASSERT_LE(d, 1e-7);
+    free(a);
+    free(a1);
+    free(a2);
+    delete_cplx_fft_precomp(tables);
+  }
+}
+
+#ifdef __x86_64__
+TEST(fft, halfcfft_fma_vs_ref) {
+  typedef void (*FFTF)(const CPLX_FFT_PRECOMP*, void* data);
+  for (FFTF fft : {cplx_fft_ref, cplx_fft_avx2_fma}) {
+    for (uint64_t nn : {8, 16, 32, 64, 1024, 8192, 65536}) {
+      uint64_t m = nn / 2;
+      CPLX_FFT_PRECOMP* tables = new_cplx_fft_precomp(m, 0);
+      CPLX* a = (CPLX*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
+      CPLX* a1 = (CPLX*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
+      CPLX* a2 = (CPLX*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
+      int64_t p = 1 << 16;
+      for (uint32_t i = 0; i < nn / 2; i++) {
+        a[i][0] = (rand() % p) - p / 2;  // between -p/2 and p/2
+        a[i][1] = (rand() % p) - p / 2;
+      }
+      memcpy(a1, a, nn / 2 * sizeof(CPLX));
+      memcpy(a2, a, nn / 2 * sizeof(CPLX));
+      cplx_fft_naive(m, 0.25, a2);
+      fft(tables, a1);
+      double d = 0;
+      for (uint32_t i = 0; i < nn / 2; i++) {
+        double dre = fabs(a1[i][0] - a2[i][0]);
+        double dim = fabs(a1[i][1] - a2[i][1]);
+        if (dre > d) d = dre;
+        if (dim > d) d = dim;
+      }
+      ASSERT_LE(d, 1e-8);
+      free(a);
+      free(a1);
+      free(a2);
+      delete_cplx_fft_precomp(tables);
+    }
+  }
+}
+#endif
+
+TEST(fft, halfcfft_then_ifft_ref) {
+  for (uint64_t nn : {4, 8, 16, 32, 64, 1024, 8192, 65536}) {
+    uint64_t m = nn / 2;
+    CPLX_FFT_PRECOMP* tables = new_cplx_fft_precomp(m, 0);
+    CPLX_IFFT_PRECOMP* itables = new_cplx_ifft_precomp(m, 0);
+    CPLX* a = (CPLX*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
+    CPLX* a1 = (CPLX*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
+    int64_t p = 1 << 16;
+    for (uint32_t i = 0; i < nn / 2; i++) {
+      a[i][0] = (rand() % p) - p / 2;  // between -p/2 and p/2
+      a[i][1] = (rand() % p) - p / 2;
+    }
+    memcpy(a1, a, nn / 2 * sizeof(CPLX));
+    cplx_fft_ref(tables, a1);
+    cplx_ifft_ref(itables, a1);
+    double d = 0;
+    for (uint32_t i = 0; i < nn / 2; i++) {
+      double dre = fabs(a[i][0] - a1[i][0] / (nn / 2));
+      double dim = fabs(a[i][1] - a1[i][1] / (nn / 2));
+      if (dre > d) d = dre;
+      if (dim > d) d = dim;
+    }
+    ASSERT_LE(d, 1e-8);
+    free(a);
+    free(a1);
+    delete_cplx_fft_precomp(tables);
+    delete_cplx_ifft_precomp(itables);
+  }
+}
+
+#ifdef __x86_64__
+TEST(fft, halfcfft_ifft_fma_vs_ref) {
+  for (IFFT_FUNCTION ifft : {cplx_ifft_ref, cplx_ifft_avx2_fma}) {
+    for (uint64_t nn : {8, 16, 32, 1024, 4096, 8192, 65536}) {
+      uint64_t m = nn / 2;
+      CPLX_IFFT_PRECOMP* itables = new_cplx_ifft_precomp(m, 0);
+      CPLX* a = (CPLX*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
+      CPLX* a1 = (CPLX*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
+      CPLX* a2 = (CPLX*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
+      int64_t p = 1 << 16;
+      for (uint32_t i = 0; i < nn / 2; i++) {
+        a[i][0] = (rand() % p) - p / 2;  // between -p/2 and p/2
+        a[i][1] = (rand() % p) - p / 2;
+      }
+      memcpy(a1, a, nn / 2 * sizeof(CPLX));
+      memcpy(a2, a, nn / 2 * sizeof(CPLX));
+      cplx_ifft_naive(m, 0.25, a2);
+      ifft(itables, a1);
+      double d = 0;
+      for (uint32_t i = 0; i < nn / 2; i++) {
+        double dre = fabs(a1[i][0] - a2[i][0]);
+        double dim = fabs(a1[i][1] - a2[i][1]);
+        if (dre > d) d = dre;
+        if (dim > d) d = dim;
+      }
+      ASSERT_LE(d, 1e-8);
+      free(a);
+      free(a1);
+      free(a2);
+      delete_cplx_ifft_precomp(itables);
+    }
+  }
 }
 #endif
