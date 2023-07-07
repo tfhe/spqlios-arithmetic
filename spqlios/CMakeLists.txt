@@ -7,6 +7,7 @@ set(SRCS_GENERIC
         cplx/cplx_common.c
         cplx/cplx_ifft_ref.c
         cplx/cplx_fft_ref.c
+        cplx/cplx_conversions.c
         )
 # C or assembly source files compiled only on x86 targets
 set(SRCS_X86
@@ -22,6 +23,7 @@ set(SRCS_FMA
         cplx/cplx_ifft16_avx_fma.s
         cplx/cplx_fft_avx2_fma.c
         cplx/cplx_fft16_avx_fma.s
+        cplx/cplx_conversions_avx2_fma.c
         )
 set_source_files_properties(${SRCS_FMA} PROPERTIES COMPILE_OPTIONS "-mfma;-mavx;-mavx2")
 

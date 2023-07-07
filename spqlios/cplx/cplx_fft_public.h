@@ -13,6 +13,10 @@ typedef struct cplx_innerprod_precomp CPLX_FFTVEC_INNERPROD_PRECOMP;
 typedef struct cplx_from_znx32_precomp CPLX_FROM_ZNX32_PRECOMP;
 typedef struct cplx_from_tnx32_precomp CPLX_FROM_TNX32_PRECOMP;
 typedef struct cplx_to_tnx32_precomp CPLX_TO_TNX32_PRECOMP;
+typedef struct cplx_to_znx32_precomp CPLX_TO_ZNX32_PRECOMP;
+typedef struct cplx_from_rnx64_precomp CPLX_FROM_RNX64_PRECOMP;
+typedef struct cplx_to_rnx64_precomp CPLX_TO_RNX64_PRECOMP;
+typedef struct cplx_round_to_rnx64_precomp CPLX_ROUND_TO_RNX64_PRECOMP;
 
 /**
  * @brief precomputes fft tables.
@@ -131,6 +135,22 @@ EXPORT CPLX_TO_TNX32_PRECOMP* new_cplx_to_tnx32_precomp(uint32_t m, double divis
 EXPORT void cplx_to_tnx32(const CPLX_TO_TNX32_PRECOMP* tables, int32_t* r, const void* a);
 #define delete_cplx_to_tnx32_precomp free
 
+EXPORT CPLX_TO_ZNX32_PRECOMP* new_cplx_to_znx32_precomp(uint32_t m, double divisor);
+EXPORT void cplx_to_znx32(const CPLX_TO_ZNX32_PRECOMP* precomp, int32_t* r, const void* x);
+#define delete_cplx_to_znx32_simple free
+
+EXPORT CPLX_FROM_RNX64_PRECOMP* new_cplx_from_rnx64_simple(uint32_t m);
+EXPORT void cplx_from_rnx64(const CPLX_FROM_RNX64_PRECOMP* precomp, void* r, const double* x);
+#define delete_cplx_from_rnx64_simple free
+
+EXPORT CPLX_TO_RNX64_PRECOMP* new_cplx_to_rnx64(uint32_t m, double divisor);
+EXPORT void cplx_to_rnx64(const CPLX_TO_RNX64_PRECOMP* precomp, double* r, const void* x);
+#define delete_cplx_round_to_rnx64_simple free
+
+EXPORT CPLX_ROUND_TO_RNX64_PRECOMP* new_cplx_round_to_rnx64(uint32_t m, double divisor, uint32_t log2bound);
+EXPORT void cplx_round_to_rnx64(const CPLX_ROUND_TO_RNX64_PRECOMP* precomp, double* r, const void* x);
+#define delete_cplx_round_to_rnx64_simple free
+
 /**
  * @brief Simpler API for the fft function.
  * For each dimension, the precomputed tables for this dimension are generated automatically.
@@ -167,5 +187,43 @@ EXPORT void cplx_from_tnx32_simple(uint32_t m, void* r, const int32_t* x);
  * For each dimension, the precomputed tables for this dimension are generated automatically the first time.
  * It is advised to do one dry-run call per desired dimension before using in a multithread environment */
 EXPORT void cplx_to_tnx32_simple(uint32_t m, double divisor, uint32_t log2overhead, int32_t* r, const void* x);
+
+/**
+ * @brief converts, divides and round from cplx to znx32 (simple API)
+ * @param m the complex dimension
+ * @param divisor the divisor: a power of two, often m after an ifft
+ * @param r the result: must be a double array of size 2m. r must be distinct from x
+ * @param x the input: must hold m complex numbers.
+ */
+EXPORT void cplx_to_znx32_simple(uint32_t m, double divisor, int32_t* r, const void* x);
+
+/**
+ * @brief converts from rnx64 to cplx (simple API)
+ * The bound on the output is assumed to be within ]2^-31,2^31[.
+ * Any coefficient that would fall outside this range is undefined behaviour.
+ * @param m the complex dimension
+ * @param r the result: must be an array of m complex numbers. r must be distinct from x
+ * @param x the input: must be an array of 2m doubles.
+ */
+EXPORT void cplx_from_rnx64_simple(uint32_t m, void* r, const double* x);
+
+/**
+ * @brief converts, divides from cplx to rnx64 (simple API)
+ * @param m the complex dimension
+ * @param divisor the divisor: a power of two, often m after an ifft
+ * @param r the result: must be a double array of size 2m. r must be distinct from x
+ * @param x the input: must hold m complex numbers.
+ */
+EXPORT void cplx_to_rnx64_simple(uint32_t m, double divisor, double* r, const void* x);
+
+/**
+ * @brief converts, divides and round to integer from cplx to rnx32 (simple API)
+ * @param m the complex dimension
+ * @param divisor the divisor: a power of two, often m after an ifft
+ * @param log2bound a guarantee on the log2bound of the output. log2bound<=48 will use a more efficient algorithm.
+ * @param r the result: must be a double array of size 2m. r must be distinct from x
+ * @param x the input: must hold m complex numbers.
+ */
+EXPORT void cplx_round_to_rnx64_simple(uint32_t m, double divisor, uint32_t log2bound, double* r, const void* x);
 
 #endif  // SPQLIOS_CPLX_FFT_PUBLIC_H

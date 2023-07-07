@@ -85,4 +85,28 @@ EXPORT void ctwiddle(CPLX a, CPLX b, const CPLX om);
 EXPORT void invctwiddle(CPLX a, CPLX b, const CPLX ombar);
 EXPORT void invcitwiddle(CPLX a, CPLX b, const CPLX ombar);
 
+// CONVERSIONS
+
+/** @brief r = x from ZnX (coeffs as signed int32_t's ) to double */
+EXPORT void cplx_from_znx32_ref(const CPLX_FROM_ZNX32_PRECOMP* precomp, void* r, const int32_t* x);
+EXPORT void cplx_from_znx32_avx2_fma(const CPLX_FROM_ZNX32_PRECOMP* precomp, void* r, const int32_t* x);
+/** @brief r = x to ZnX (coeffs as signed int32_t's ) to double */
+EXPORT void cplx_to_znx32_ref(const CPLX_TO_ZNX32_PRECOMP* precomp, int32_t* r, const void* x);
+EXPORT void cplx_to_znx32_avx2_fma(const CPLX_TO_ZNX32_PRECOMP* precomp, int32_t* r, const void* x);
+/** @brief r = x mod 1 from TnX (coeffs as signed int32_t's) to double */
+EXPORT void cplx_from_tnx32_ref(const CPLX_FROM_TNX32_PRECOMP* precomp, void* r, const int32_t* x);
+EXPORT void cplx_from_tnx32_avx2_fma(const CPLX_FROM_TNX32_PRECOMP* precomp, void* r, const int32_t* x);
+/** @brief r = x mod 1 from TnX (coeffs as signed int32_t's) */
+EXPORT void cplx_to_tnx32_ref(const CPLX_TO_TNX32_PRECOMP* precomp, int32_t* x, const void* c);
+EXPORT void cplx_to_tnx32_avx2_fma(const CPLX_TO_TNX32_PRECOMP* precomp, int32_t* x, const void* c);
+/** @brief r = x from RnX (coeffs as doubles ) to double */
+EXPORT void cplx_from_rnx64_ref(const CPLX_FROM_RNX64_PRECOMP* precomp, void* r, const double* x);
+EXPORT void cplx_from_rnx64_avx2_fma(const CPLX_FROM_RNX64_PRECOMP* precomp, void* r, const double* x);
+/** @brief r = x to RnX (coeffs as doubles ) to double */
+EXPORT void cplx_to_rnx64_ref(const CPLX_TO_RNX64_PRECOMP* precomp, double* r, const void* x);
+EXPORT void cplx_to_rnx64_avx2_fma(const CPLX_TO_RNX64_PRECOMP* precomp, double* r, const void* x);
+/** @brief r = x to integers in RnX (coeffs as doubles ) to double */
+EXPORT void cplx_round_to_rnx64_ref(const CPLX_ROUND_TO_RNX64_PRECOMP* precomp, double* r, const void* x);
+EXPORT void cplx_round_to_rnx64_avx2_fma(const CPLX_ROUND_TO_RNX64_PRECOMP* precomp, double* r, const void* x);
+
 #endif  // SPQLIOS_CPLX_FFT_H
