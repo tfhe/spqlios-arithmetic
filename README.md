@@ -1,8 +1,8 @@
-# SPQLIOS
+# SPQLIOS-FFT
 
 ## Description
 
-The SPQLIOS library aims at providing capabilities for computing the Fast Fourier Transform (FTT/NTT) in the anticyclic ring $\mathbb{Z}[X]/(X^N +1)$ for N a power of 2. It uses AVX, AVX2 and FMA assembly vectorization instructions. This library was inspired by the [Project Nayuki](https://www.nayuki.io/page/fast-fourier-transform-in-x86-assembly) and was originally provided as part of the [TFHE: Fast Fully Homomorphic Encryption Library over the Torus](https://github.com/tfhe/tfhe) library. It is now provided as an independent library with extended features and optimizations. 
+The SPQLIOS-FFT library aims at providing capabilities for computing the Fast Fourier Transform (FTT/NTT) in the anticyclic ring $\mathbb{Z}[X]/(X^N +1)$ for N a power of 2. It uses AVX, AVX2 and FMA assembly vectorization instructions. This library was inspired by the [Project Nayuki](https://www.nayuki.io/page/fast-fourier-transform-in-x86-assembly) and was originally provided as part of the [TFHE: Fast Fully Homomorphic Encryption Library over the Torus](https://github.com/tfhe/tfhe) library. It is now provided as an independent library with extended features and optimizations. 
 
 The library provides the following functionalities:
 * Implementation of the FFT in the complex realm with a 64-bit representation of complex coefficients.
@@ -18,7 +18,7 @@ not only source but also binary distributions of the library via standard packag
 
 ## Dependencies 
 
-SPQLIOS library is a C library that can be compiled with a standard C compiler, and depends only on libc and libm. The API 
+The SPQLIOS-FFT library is a C library that can be compiled with a standard C compiler, and depends only on libc and libm. The API 
 interface can be used in a regular C code, and any other language via classical foreign APIs. 
 
 The unittests and integration tests are in an optional part of the code, and are written in C++.  These tests rely on 
