@@ -30,7 +30,7 @@ extend the compatibility to other compilers, platforms and operating systems.
 
 ## Installation
 
-To build the library with the default options, create a ```build``` folder in the top level directory and run ```make``` from inside it. This assumes that the standard tool cmake is already installed on the system, and an up-to-date c++ compiler (i.e. g++ >=11.3.0) as well.
+The library uses a classical ```cmake``` build mechanism: use ```cmake``` to create a ```build``` folder in the top level directory and run ```make``` from inside it. This assumes that the standard tool cmake is already installed on the system, and an up-to-date c++ compiler (i.e. g++ >=11.3.0) as well.
 
 It will compile the shared library in optimized mode, and ```make install``` install it to the desired prefix folder (by default ```/usr/local/lib```).
 
@@ -57,6 +57,8 @@ The available options are the following:
 
 The complex FFT handles polynomials with complex coefficients `C[X] mod X^M-i`, each one represented by two consecutive doubles `(real,imag)`. Note that a real polynomial $$\sum_{j=0}^{N-1} p_j\cdot X^j \mathtt{ mod } X^N+1$$ corresponds to the complex polynomial of half degree `M=N/2`: 
 $$\sum_{j=0}^{M-1} (p_{j} + i.p_{j+M}) \cdot X^j \mathtt{ mod } X^M-i$$
+
+In both cases, the FFT of the polynomial is the vector of its (complex) evaluations on the $M$ roots of $X^M -i$.
 
 For a complex polynomial $C(X) = \sum c_i \cdot X^i$ of degree $M-1$ or a real polynomial $A(X) = \sum a_i \cdot X^i$ of degree N, the library handles multiple layouts, as each layout is more efficient for a specific operation. Next we describe the different layouts and then show how to use them in the next section.
 
