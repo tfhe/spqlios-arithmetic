@@ -18,7 +18,7 @@ not only source but also binary distributions of the library via standard packag
 
 ## Dependencies 
 
-Spqlios-library is a C library that can be compiled with a standard C compiler, and depends only on libc and libm. The API 
+SPQLIOS library is a C library that can be compiled with a standard C compiler, and depends only on libc and libm. The API 
 interface can be used in a regular C code, and any other language via classical foreign APIs. 
 
 The unittests and integration tests are in an optional part of the code, and are written in C++.  These tests rely on 
