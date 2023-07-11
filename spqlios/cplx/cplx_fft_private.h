@@ -13,6 +13,9 @@ typedef void (*TO_TNX32_FUNCTION)(const CPLX_TO_TNX32_PRECOMP*, int32_t*, const 
 typedef void (*FROM_RNX64_FUNCTION)(const CPLX_FROM_RNX64_PRECOMP* precomp, void* r, const double* x);
 typedef void (*TO_RNX64_FUNCTION)(const CPLX_TO_RNX64_PRECOMP* precomp, double* r, const void* x);
 typedef void (*ROUND_TO_RNX64_FUNCTION)(const CPLX_ROUND_TO_RNX64_PRECOMP* precomp, double* r, const void* x);
+// fftvec operations
+typedef void (*FFTVEC_MUL_FUNCTION)(const CPLX_FFTVEC_MUL_PRECOMP*, void*, const void*, const void*);
+typedef void (*FFTVEC_ADDMUL_FUNCTION)(const CPLX_FFTVEC_ADDMUL_PRECOMP*, void*, const void*, const void*);
 
 struct cplx_ifft_precomp {
   IFFT_FUNCTION function;
@@ -67,5 +70,15 @@ struct cplx_round_to_rnx64_precomp {
   double divisor;
   uint32_t log2bound;
 };
+
+typedef struct cplx_mul_precomp {
+  FFTVEC_MUL_FUNCTION function;
+  int64_t m;
+} CPLX_FFTVEC_MUL_PRECOMP;
+
+typedef struct cplx_addmul_precomp {
+  FFTVEC_ADDMUL_FUNCTION function;
+  int64_t m;
+} CPLX_FFTVEC_ADDMUL_PRECOMP;
 
 #endif  // SPQLIOS_CPLX_FFT_PRIVATE_H
