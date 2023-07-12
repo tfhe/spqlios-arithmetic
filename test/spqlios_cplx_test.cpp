@@ -330,3 +330,167 @@ TEST(fft, halfcfft_ifft_fma_vs_ref) {
   }
 }
 #endif
+
+// test the reference and simple implementations of mul on all dimensions
+TEST(fftvec, cplx_fftvec_mul_ref) {
+  for (uint64_t nn : {2, 4, 8, 16, 32, 1024, 4096, 8192, 65536}) {
+    uint64_t m = nn / 2;
+    CPLX_FFTVEC_MUL_PRECOMP* precomp = new_cplx_fftvec_mul_precomp(m);
+    CPLX* a = new CPLX[m];
+    CPLX* b = new CPLX[m];
+    CPLX* r0 = new CPLX[m];
+    CPLX* r1 = new CPLX[m];
+    CPLX* r2 = new CPLX[m];
+    int64_t p = 1 << 16;
+    for (uint32_t i = 0; i < m; i++) {
+      a[i][0] = (rand() % p) - p / 2;  // between -p/2 and p/2
+      a[i][1] = (rand() % p) - p / 2;
+      b[i][0] = (rand() % p) - p / 2;  // between -p/2 and p/2
+      b[i][1] = (rand() % p) - p / 2;
+      r2[i][0] = r1[i][0] = r0[i][0] = (rand() % p) - p / 2;  // between -p/2 and p/2
+      r2[i][1] = r1[i][1] = r0[i][1] = (rand() % p) - p / 2;
+    }
+    cplx_fftvec_mul_simple(m, r0, a, b);
+    cplx_fftvec_mul_ref(precomp, r1, a, b);
+    for (uint32_t i = 0; i < m; i++) {
+      r2[i][0] = a[i][0] * b[i][0] - a[i][1] * b[i][1];
+      r2[i][1] = a[i][0] * b[i][1] + a[i][1] * b[i][0];
+      ASSERT_LE(fabs(r1[i][0] - r2[i][0]) + fabs(r1[i][1] - r2[i][1]), 1e-8);
+      ASSERT_LE(fabs(r0[i][0] - r2[i][0]) + fabs(r0[i][1] - r2[i][1]), 1e-8);
+    }
+    delete[] a;
+    delete[] b;
+    delete[] r0;
+    delete[] r1;
+    delete[] r2;
+    delete_cplx_fftvec_mul_precomp(precomp);
+  }
+}
+
+// test the reference and simple implementations of addmul on all dimensions
+TEST(fftvec, cplx_fftvec_addmul_ref) {
+  for (uint64_t nn : {2, 4, 8, 16, 32, 1024, 4096, 8192, 65536}) {
+    uint64_t m = nn / 2;
+    CPLX_FFTVEC_ADDMUL_PRECOMP* precomp = new_cplx_fftvec_addmul_precomp(m);
+    CPLX* a = new CPLX[m];
+    CPLX* b = new CPLX[m];
+    CPLX* r0 = new CPLX[m];
+    CPLX* r1 = new CPLX[m];
+    CPLX* r2 = new CPLX[m];
+    int64_t p = 1 << 16;
+    for (uint32_t i = 0; i < m; i++) {
+      a[i][0] = (rand() % p) - p / 2;  // between -p/2 and p/2
+      a[i][1] = (rand() % p) - p / 2;
+      b[i][0] = (rand() % p) - p / 2;  // between -p/2 and p/2
+      b[i][1] = (rand() % p) - p / 2;
+      r2[i][0] = r1[i][0] = r0[i][0] = (rand() % p) - p / 2;  // between -p/2 and p/2
+      r2[i][1] = r1[i][1] = r0[i][1] = (rand() % p) - p / 2;
+    }
+    cplx_fftvec_addmul_simple(m, r0, a, b);
+    cplx_fftvec_addmul_ref(precomp, r1, a, b);
+    for (uint32_t i = 0; i < m; i++) {
+      r2[i][0] += a[i][0] * b[i][0] - a[i][1] * b[i][1];
+      r2[i][1] += a[i][0] * b[i][1] + a[i][1] * b[i][0];
+      ASSERT_LE(fabs(r1[i][0] - r2[i][0]) + fabs(r1[i][1] - r2[i][1]), 1e-8);
+      ASSERT_LE(fabs(r0[i][0] - r2[i][0]) + fabs(r0[i][1] - r2[i][1]), 1e-8);
+    }
+    delete[] a;
+    delete[] b;
+    delete[] r0;
+    delete[] r1;
+    delete[] r2;
+    delete_cplx_fftvec_addmul_precomp(precomp);
+  }
+}
+
+// comparative tests between mul ref vs. optimized (only relevant dimensions)
+TEST(fftvec, cplx_fftvec_mul_ref_vs_optim) {
+  struct totest {
+    FFTVEC_MUL_FUNCTION f;
+    uint64_t min_m;
+    totest(FFTVEC_MUL_FUNCTION f, uint64_t min_m) : f(f), min_m(min_m) {}
+  };
+  std::vector<totest> totestset;
+  totestset.emplace_back(cplx_fftvec_mul, 1);
+#ifdef __x86_64__
+  totestset.emplace_back(cplx_fftvec_mul_fma, 8);
+#endif
+  for (uint64_t m : {1, 2, 4, 8, 16, 1024, 4096, 8192, 65536}) {
+    CPLX_FFTVEC_MUL_PRECOMP* precomp = new_cplx_fftvec_mul_precomp(m);
+    for (const totest& t : totestset) {
+      if (t.min_m > m) continue;
+      CPLX* a = new CPLX[m];
+      CPLX* b = new CPLX[m];
+      CPLX* r1 = new CPLX[m];
+      CPLX* r2 = new CPLX[m];
+      int64_t p = 1 << 16;
+      for (uint32_t i = 0; i < m; i++) {
+        a[i][0] = (rand() % p) - p / 2;  // between -p/2 and p/2
+        a[i][1] = (rand() % p) - p / 2;
+        b[i][0] = (rand() % p) - p / 2;  // between -p/2 and p/2
+        b[i][1] = (rand() % p) - p / 2;
+        r2[i][0] = r1[i][0] = (rand() % p) - p / 2;  // between -p/2 and p/2
+        r2[i][1] = r1[i][1] = (rand() % p) - p / 2;
+      }
+      t.f(precomp, r1, a, b);
+      cplx_fftvec_mul_ref(precomp, r2, a, b);
+      for (uint32_t i = 0; i < m; i++) {
+        double dre = fabs(r1[i][0] - r2[i][0]);
+        double dim = fabs(r1[i][1] - r2[i][1]);
+        ASSERT_LE(dre, 1e-8);
+        ASSERT_LE(dim, 1e-8);
+      }
+      delete[] a;
+      delete[] b;
+      delete[] r1;
+      delete[] r2;
+    }
+    delete_cplx_fftvec_mul_precomp(precomp);
+  }
+}
+
+// comparative tests between addmul ref vs. optimized (only relevant dimensions)
+TEST(fftvec, cplx_fftvec_addmul_ref_vs_optim) {
+  struct totest {
+    FFTVEC_ADDMUL_FUNCTION f;
+    uint64_t min_m;
+    totest(FFTVEC_ADDMUL_FUNCTION f, uint64_t min_m) : f(f), min_m(min_m) {}
+  };
+  std::vector<totest> totestset;
+  totestset.emplace_back(cplx_fftvec_addmul, 1);
+#ifdef __x86_64__
+  totestset.emplace_back(cplx_fftvec_addmul_fma, 8);
+#endif
+  for (uint64_t m : {1, 2, 4, 8, 16, 1024, 4096, 8192, 65536}) {
+    CPLX_FFTVEC_ADDMUL_PRECOMP* precomp = new_cplx_fftvec_addmul_precomp(m);
+    for (const totest& t : totestset) {
+      if (t.min_m > m) continue;
+      CPLX* a = new CPLX[m];
+      CPLX* b = new CPLX[m];
+      CPLX* r1 = new CPLX[m];
+      CPLX* r2 = new CPLX[m];
+      int64_t p = 1 << 16;
+      for (uint32_t i = 0; i < m; i++) {
+        a[i][0] = (rand() % p) - p / 2;  // between -p/2 and p/2
+        a[i][1] = (rand() % p) - p / 2;
+        b[i][0] = (rand() % p) - p / 2;  // between -p/2 and p/2
+        b[i][1] = (rand() % p) - p / 2;
+        r2[i][0] = r1[i][0] = (rand() % p) - p / 2;  // between -p/2 and p/2
+        r2[i][1] = r1[i][1] = (rand() % p) - p / 2;
+      }
+      t.f(precomp, r1, a, b);
+      cplx_fftvec_addmul_ref(precomp, r2, a, b);
+      for (uint32_t i = 0; i < m; i++) {
+        double dre = fabs(r1[i][0] - r2[i][0]);
+        double dim = fabs(r1[i][1] - r2[i][1]);
+        ASSERT_LE(dre, 1e-8);
+        ASSERT_LE(dim, 1e-8);
+      }
+      delete[] a;
+      delete[] b;
+      delete[] r1;
+      delete[] r2;
+    }
+    delete_cplx_fftvec_addmul_precomp(precomp);
+  }
+}
