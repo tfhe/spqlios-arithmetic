@@ -331,7 +331,7 @@ TEST(fft, halfcfft_ifft_fma_vs_ref) {
 }
 #endif
 
-// test the reference implementation on all dimensions
+// test the reference and simple implementations of mul on all dimensions
 TEST(fftvec, cplx_fftvec_mul_ref) {
   for (uint64_t nn : {2, 4, 8, 16, 32, 1024, 4096, 8192, 65536}) {
     uint64_t m = nn / 2;
@@ -367,7 +367,7 @@ TEST(fftvec, cplx_fftvec_mul_ref) {
   }
 }
 
-// test the simple and reference implementation on all dimensions
+// test the reference and simple implementations of addmul on all dimensions
 TEST(fftvec, cplx_fftvec_addmul_ref) {
   for (uint64_t nn : {2, 4, 8, 16, 32, 1024, 4096, 8192, 65536}) {
     uint64_t m = nn / 2;
@@ -403,7 +403,7 @@ TEST(fftvec, cplx_fftvec_addmul_ref) {
   }
 }
 
-// comparative tests between re vs. optimized (only relevant dimensions)
+// comparative tests between mul ref vs. optimized (only relevant dimensions)
 TEST(fftvec, cplx_fftvec_mul_ref_vs_optim) {
   struct totest {
     FFTVEC_MUL_FUNCTION f;
@@ -449,7 +449,7 @@ TEST(fftvec, cplx_fftvec_mul_ref_vs_optim) {
   }
 }
 
-// test the reference implementation on all dimensions
+// comparative tests between addmul ref vs. optimized (only relevant dimensions)
 TEST(fftvec, cplx_fftvec_addmul_ref_vs_optim) {
   struct totest {
     FFTVEC_ADDMUL_FUNCTION f;
