@@ -24,7 +24,7 @@ set(SRCS_FMA
         cplx/cplx_fft_avx2_fma.c
         cplx/cplx_fft16_avx_fma.s
         cplx/cplx_conversions_avx2_fma.c
-        cplx/cplx_fftvec_fma.c)
+        cplx/cplx_fftvec_fma.c
         reim/reim_ifft_avx2_fma.s
         reim/reim_fft_avx2_fma.s
         reim/reim_fftvec_addmul_fma.s
