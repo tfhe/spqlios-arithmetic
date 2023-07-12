@@ -25,6 +25,10 @@ set(SRCS_FMA
         cplx/cplx_fft16_avx_fma.s
         cplx/cplx_conversions_avx2_fma.c
         cplx/cplx_fftvec_fma.c)
+        reim/reim_ifft_avx2_fma.s
+        reim/reim_fft_avx2_fma.s
+        reim/reim_fftvec_addmul_fma.s
+        )
 set_source_files_properties(${SRCS_FMA} PROPERTIES COMPILE_OPTIONS "-mfma;-mavx;-mavx2")
 
 # C or assembly source files compiled only on x86: avx512f/vl/dq + fma targets

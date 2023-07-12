@@ -11,4 +11,6 @@
 #define EXPORT_DECL extern
 #endif
 
+EXPORT void* spqlios_error(const char* error);
+
 #endif  // SPQLIOS_COMMONS_H
