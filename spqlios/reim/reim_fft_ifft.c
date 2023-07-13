@@ -379,6 +379,5 @@ EXPORT void reim_fft_ref(const REIM_FFT_PRECOMP* tables, double* data) {
   }
 }
 
-
 EXPORT void reim_fft(const REIM_FFT_PRECOMP* tables, double* data) { tables->function(tables, data); }
 EXPORT void reim_ifft(const REIM_IFFT_PRECOMP* tables, double* data) { tables->function(tables, data); }
