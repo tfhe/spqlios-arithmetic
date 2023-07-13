@@ -28,7 +28,7 @@ endif()
 
 # main unittest file
 message(STATUS "${gtest_libs}")
-add_executable(spqlios-test spqlios_test.cpp spqlios_cplx_test.cpp spqlios_cplx_conversions_test.cpp)
+add_executable(spqlios-test spqlios_test.cpp spqlios_cplx_test.cpp spqlios_reim_test.cpp spqlios_cplx_conversions_test.cpp)
 target_link_libraries(spqlios-test spqlios-fft ${gtest_libs})
 target_include_directories(spqlios-test PRIVATE ${test_incs})
 add_test(NAME spqlios-test COMMAND spqlios-test)

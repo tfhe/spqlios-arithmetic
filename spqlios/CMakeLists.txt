@@ -8,13 +8,18 @@ set(SRCS_GENERIC
         cplx/cplx_ifft_ref.c
         cplx/cplx_fft_ref.c
         cplx/cplx_conversions.c
-        cplx/cplx_fftvec_ref.c)
+        cplx/cplx_fftvec_ref.c
+        reim/reim_conversions.c
+        reim/reim_fft_ifft.c
+        reim/reim_fft_ref.c
+        reim/reim_fftvec_addmul_ref.c)
 # C or assembly source files compiled only on x86 targets
 set(SRCS_X86
         )
 # C or assembly source files compiled only on aarch64 targets
 set(SRCS_AARCH64
         cplx/cplx_fallbacks_aarch64.c
+        reim/reim_fallbacks_aarch64.c
         )
 
 # C or assembly source files compiled only on x86: avx, avx2, fma targets
@@ -51,11 +56,9 @@ set(SRCS_F128
 set(HEADERSPUBLIC
         cplx.h
         reim.h
-        reim4.h
         commons.h
         cplx/cplx_fft_public.h
         reim/reim_fft_public.h
-        reim4/reim4_fftvec_public.h
         )
 
 # H header files containing the private API (these headers are used internally)
@@ -63,6 +66,8 @@ set(HEADERSPRIVATE
         commons_private.h
         cplx/cplx_fft.h
         cplx/cplx_fft_private.h
+        reim/reim_fft.h
+        reim/reim_fft_private.h
         )
 
 set(SPQLIOSSOURCES
