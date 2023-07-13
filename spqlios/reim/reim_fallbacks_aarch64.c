@@ -1,4 +1,5 @@
 #include "reim_fft_private.h"
+#include "../commons_private.h"
 
 EXPORT void reim_fftvec_addmul_fma(const REIM_FFTVEC_ADDMUL_PRECOMP* precomp, double* r, const double* a,
                                    const double* b) {
