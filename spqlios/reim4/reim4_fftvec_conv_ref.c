@@ -56,10 +56,10 @@ EXPORT void reim4_to_cplx_ref(const REIM4_TO_CPLX_PRECOMP* tables, void* r, cons
   }
 }
 
-void* init_reim4_from_cplx_precomp(REIM4_FROM_CPLX_PRECOMP* res, uint32_t nn) {
-  res->m = nn / 2;
+void* init_reim4_from_cplx_precomp(REIM4_FROM_CPLX_PRECOMP* res, uint32_t m) {
+  res->m = m;
   if (CPU_SUPPORTS("fma")) {
-    if (nn >= 4) {
+    if (m >= 4) {
       res->function = reim4_from_cplx_fma;
     } else {
       res->function = reim4_from_cplx_ref;
@@ -73,7 +73,7 @@ void* init_reim4_from_cplx_precomp(REIM4_FROM_CPLX_PRECOMP* res, uint32_t nn) {
 void* init_reim4_to_cplx_precomp(REIM4_TO_CPLX_PRECOMP* res, uint32_t m) {
   res->m = m;
   if (CPU_SUPPORTS("fma")) {
-    if (m >= 2) {
+    if (m >= 4) {
       res->function = reim4_to_cplx_fma;
     } else {
       res->function = reim4_to_cplx_ref;

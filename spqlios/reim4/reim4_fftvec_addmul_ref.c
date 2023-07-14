@@ -10,7 +10,7 @@
 void* init_reim4_fftvec_addmul_precomp(REIM4_FFTVEC_ADDMUL_PRECOMP* res, uint32_t m) {
   res->m = m;
   if (CPU_SUPPORTS("fma")) {
-    if (m >= 2) {
+    if (m >= 4) {
       res->function = reim4_fftvec_addmul_fma;
     } else {
       res->function = reim4_fftvec_addmul_ref;
