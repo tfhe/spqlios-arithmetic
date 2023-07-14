@@ -12,7 +12,9 @@ set(SRCS_GENERIC
         reim/reim_conversions.c
         reim/reim_fft_ifft.c
         reim/reim_fft_ref.c
-        reim/reim_fftvec_addmul_ref.c)
+        reim/reim_fftvec_addmul_ref.c
+        reim4/reim4_fftvec_addmul_ref.c
+        reim4/reim4_fftvec_conv_ref.c)
 # C or assembly source files compiled only on x86 targets
 set(SRCS_X86
         )
@@ -20,6 +22,7 @@ set(SRCS_X86
 set(SRCS_AARCH64
         cplx/cplx_fallbacks_aarch64.c
         reim/reim_fallbacks_aarch64.c
+        reim4/reim4_fallbacks_aarch64.c
         )
 
 # C or assembly source files compiled only on x86: avx, avx2, fma targets
@@ -33,6 +36,8 @@ set(SRCS_FMA
         reim/reim_ifft_avx2_fma.s
         reim/reim_fft_avx2_fma.s
         reim/reim_fftvec_addmul_fma.s
+        reim4/reim4_fftvec_addmul_fma.s
+        reim4/reim4_fftvec_conv_fma.s
         )
 set_source_files_properties(${SRCS_FMA} PROPERTIES COMPILE_OPTIONS "-mfma;-mavx;-mavx2")
 
@@ -59,6 +64,7 @@ set(HEADERSPUBLIC
         commons.h
         cplx/cplx_fft_public.h
         reim/reim_fft_public.h
+        reim4/reim4_fftvec_public.h
         )
 
 # H header files containing the private API (these headers are used internally)
@@ -68,6 +74,9 @@ set(HEADERSPRIVATE
         cplx/cplx_fft_private.h
         reim/reim_fft.h
         reim/reim_fft_private.h
+        reim4/reim4_fftvec.h
+        reim4/reim4_fftvec_private.h
+        reim4/reim4_fftvec_public.h
         )
 
 set(SPQLIOSSOURCES
