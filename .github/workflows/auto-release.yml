@@ -1,0 +1,34 @@
+name: CMake-Build-Test
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    name: Auto-Release
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: main~1
+        path: oldv
+        sparse-checkout: manifest.yaml
+
+    - uses: actions/checkout@v3
+      with: 
+        sparse-checkout: manifest.yaml
+
+    - run: |
+        export oldversion=$(grep '^version:' oldv/manifest.yaml | cut '-d ' -f2)
+        export version=$(grep '^version:' manifest.yaml | cut '-d ' -f2)
+        echo "Versions: $oldversion --> $version"
+        if [ "v$oldversion" = "v$version" ]; then
+          echo "Same version - nothing to do"; exit 0;
+        fi
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git tag -a "v$version" -m "Version $version"
+        git push origin "v$version"
