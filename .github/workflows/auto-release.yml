@@ -1,0 +1,30 @@
+name: Auto-Release
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    name: Auto-Release
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 3 
+        sparse-checkout: manifest.yaml
+
+    - run: |
+        changes=$(git diff HEAD~1..HEAD -- manifest.yaml | grep 'version:')
+        oldversion=$(echo "$changes" | grep '^-version:' | cut '-d ' -f2)
+        version=$(echo "$changes" | grep '^+version:' | cut '-d ' -f2)
+        echo "Versions: $oldversion --> $version"
+        if [ "v$oldversion" = "v$version" ]; then
+          echo "Same version - nothing to do"; exit 0;
+        fi
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git tag -a "v$version" -m "Version $version"
+        git push origin "v$version"
