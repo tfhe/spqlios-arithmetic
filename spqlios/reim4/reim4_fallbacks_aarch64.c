@@ -1,5 +1,4 @@
 #include "reim4_fftvec_private.h"
-#include "../commons_private.h"
 
 EXPORT void reim4_fftvec_mul_fma(const REIM4_FFTVEC_MUL_PRECOMP* tables, double* r, const double* a,
                                  const double* b){UNDEFINED()}

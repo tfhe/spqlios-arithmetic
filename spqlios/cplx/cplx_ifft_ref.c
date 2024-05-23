@@ -2,8 +2,8 @@
 
 #include "../commons_private.h"
 #include "cplx_fft.h"
+#include "cplx_fft_internal.h"
 #include "cplx_fft_private.h"
-#include "cplx_fft_public.h"
 
 /** @brief (a,b) <- (a+b,omegabar.(a-b)) */
 void invctwiddle(CPLX a, CPLX b, const CPLX ombar) {
@@ -145,7 +145,9 @@ void cplx_ifft_ref_bfs_2(CPLX* dat, const CPLX** omg, uint32_t m) {
 }
 
 void cplx_ifft_ref_bfs_16(CPLX* dat, const CPLX** omg, uint32_t m) {
+  const uint64_t log2m = log2(m);
   CPLX* const dend = dat + m;
+  // h=1,2,4,8 use the 16-dim macroblock
   for (CPLX* d = dat; d < dend; d += 16) {
     cplx_ifft16_ref(d, *omg);
     *omg += 8;
@@ -157,11 +159,19 @@ void cplx_ifft_ref_bfs_16(CPLX* dat, const CPLX** omg, uint32_t m) {
   }
   printf("\n");
 #endif
-  const int32_t Ms2 = m / 2;
-  for (int32_t h = 16; h <= Ms2; h <<= 1) {
+  int32_t h = 16;
+  if (log2m % 2 != 0) {
+    // if parity needs it, uses one regular twiddle
     for (CPLX* d = dat; d < dend; d += 2 * h) {
-      if (memcmp((*omg)[0], (*omg)[1], 8) != 0) abort();
       cplx_split_fft_ref(h, d, **omg);
+      *omg += 1;
+    }
+    h = 32;
+  }
+  // h=16,...,2*floor(Ms2/2) use the bitwiddle
+  for (; h < m; h <<= 2) {
+    for (CPLX* d = dat; d < dend; d += 4 * h) {
+      cplx_bisplit_fft_ref(h, d, *omg);
       *omg += 2;
     }
 #if 0
@@ -175,6 +185,7 @@ void cplx_ifft_ref_bfs_16(CPLX* dat, const CPLX** omg, uint32_t m) {
 }
 
 void fill_cplx_ifft_omegas_bfs_16(const double entry_pwr, CPLX** omg, uint32_t m) {
+  const uint64_t log2m = log2(m);
   double pwr = entry_pwr * 16. / m;
   {
     // h=8
@@ -182,13 +193,23 @@ void fill_cplx_ifft_omegas_bfs_16(const double entry_pwr, CPLX** omg, uint32_t m
       cplx_ifft16_precomp(pwr + fracrevbits(i), omg);
     }
   }
-  for (int32_t h = 16; h <= m / 2; h <<= 1) {
+  int32_t h = 16;
+  if (log2m % 2 != 0) {
+    // if parity needs it, uses one regular twiddle
     for (uint32_t i = 0; i < m / (2 * h); i++) {
       cplx_set_e2pimx(omg[0][0], pwr + fracrevbits(i) / 2.);
-      cplx_set(omg[0][1], omg[0][0]);
-      *omg += 2;
+      *omg += 1;
     }
     pwr *= 2.;
+    h = 32;
+  }
+  for (; h < m; h <<= 2) {
+    for (uint32_t i = 0; i < m / (2 * h); i+=2) {
+      cplx_set_e2pimx(omg[0][0], pwr + fracrevbits(i) / 2.);
+      cplx_set_e2pimx(omg[0][1], 2.*pwr + fracrevbits(i));
+      *omg += 2;
+    }
+    pwr *= 4.;
   }
 }
 
@@ -247,14 +268,16 @@ EXPORT void cplx_ifft_ref(const CPLX_IFFT_PRECOMP* precomp, void* d) {
 }
 
 EXPORT CPLX_IFFT_PRECOMP* new_cplx_ifft_precomp(uint32_t m, uint32_t num_buffers) {
-  const uint64_t OMG_SPACE = 2 * m * sizeof(CPLX);
-  void* reps = malloc(sizeof(CPLX_IFFT_PRECOMP) + 32    // padding
-                      + OMG_SPACE                       // tables //TODO 16?
-                      + num_buffers * m * sizeof(CPLX)  // buffers
+  const uint64_t OMG_SPACE = ceilto64b(2 * m * sizeof(CPLX));
+  const uint64_t BUF_SIZE = ceilto64b(m * sizeof(CPLX));
+  void* reps = malloc(sizeof(CPLX_IFFT_PRECOMP) + 63    // padding
+                      + OMG_SPACE                       // tables
+                      + num_buffers * BUF_SIZE  // buffers
   );
-  uint64_t aligned_addr = (uint64_t)(reps + sizeof(CPLX_IFFT_PRECOMP) + 31) & (-32UL);
+  uint64_t aligned_addr = ceilto64b((uint64_t) reps + sizeof(CPLX_IFFT_PRECOMP));
   CPLX_IFFT_PRECOMP* r = (CPLX_IFFT_PRECOMP*)reps;
   r->m = m;
+  r->buf_size = BUF_SIZE;
   r->powomegas = (double*)aligned_addr;
   r->aligned_buffers = (void*)(aligned_addr + OMG_SPACE);
   // fill in powomegas
@@ -276,7 +299,7 @@ EXPORT CPLX_IFFT_PRECOMP* new_cplx_ifft_precomp(uint32_t m, uint32_t num_buffers
 }
 
 EXPORT void* cplx_ifft_precomp_get_buffer(const CPLX_IFFT_PRECOMP* itables, uint32_t buffer_index) {
-  return ((CPLX*)itables->aligned_buffers) + buffer_index * itables->m;
+  return (uint8_t*) itables->aligned_buffers + buffer_index * itables->buf_size;
 }
 
 EXPORT void cplx_ifft(const CPLX_IFFT_PRECOMP* itables, void* data) {
@@ -289,3 +312,4 @@ EXPORT void cplx_ifft_simple(uint32_t m, void* data) {
   if (!*f) *f = new_cplx_ifft_precomp(m, 0);
   (*f)->function(*f, data);
 }
+

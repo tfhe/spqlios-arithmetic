@@ -2,8 +2,8 @@
 
 #include "gtest/gtest.h"
 #include "spqlios/commons_private.h"
-#include "spqlios/cplx.h"
 #include "spqlios/cplx/cplx_fft.h"
+#include "spqlios/cplx/cplx_fft_internal.h"
 #include "spqlios/cplx/cplx_fft_private.h"
 
 #ifdef __x86_64__

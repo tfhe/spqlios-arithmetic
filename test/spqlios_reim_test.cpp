@@ -1,13 +1,10 @@
 #include <cmath>
 
 #include "gtest/gtest.h"
-#include "spqlios/reim.h"
-#include "spqlios/reim/reim_fft_private.h"
-#include "spqlios/reim/reim_fft.h"
-#include "spqlios/cplx/cplx_fft.h"
 #include "spqlios/commons_private.h"
-
-
+#include "spqlios/cplx/cplx_fft_internal.h"
+#include "spqlios/reim/reim_fft_internal.h"
+#include "spqlios/reim/reim_fft_private.h"
 
 #ifdef __x86_64__
 TEST(fft, reim_fft_avx2_vs_fft_reim_ref) {
@@ -161,3 +158,317 @@ TEST(fft, reim_vecfft_mul_fma_vs_ref) {
   }
 }
 #endif
+
+typedef void (*FILL_REIM_FFT_OMG_F)(const double entry_pwr, double **omg);
+typedef void (*REIM_FFT_F)(double *dre, double *dim, const void *omega);
+
+// template to test a fixed-dimension fft vs. naive
+template<uint64_t N>
+void test_reim_fft_ref_vs_naive(
+    FILL_REIM_FFT_OMG_F fill_omega_f,
+    REIM_FFT_F reim_fft_f
+    ) {
+  double om[N];
+  double data[2*N];
+  double datacopy[2*N];
+  double* omg = om;
+  fill_omega_f(0.25, &omg);
+  ASSERT_EQ(omg - om, N); // it may depend on N
+  for (uint64_t i = 0; i < N; ++i) {
+    datacopy[i] = data[i] = (rand() % 100) - 50;
+    datacopy[N + i] = data[N + i] = (rand() % 100) - 50;
+  }
+  reim_fft_f(datacopy, datacopy + N, om);
+  reim_naive_fft(N, 0.25, data, data + N);
+  double d = 0;
+  for (uint64_t i = 0; i < 2*N; ++i) {
+    d += fabs(datacopy[i] - data[i]);
+  }
+  ASSERT_LE(d, 1e-7);
+}
+
+template<uint64_t N>
+void test_reim_fft_ref_vs_accel(
+    REIM_FFT_F reim_fft_ref_f,
+    REIM_FFT_F reim_fft_accel_f) {
+  double om[N];
+  double data[2*N];
+  double datacopy[2*N];
+  for (uint64_t i = 0; i < N; ++i) {
+    om[i] = (rand() % 100) - 50;
+    datacopy[i] = data[i] = (rand() % 100) - 50;
+    datacopy[N + i] = data[N + i] = (rand() % 100) - 50;
+  }
+  reim_fft_ref_f(datacopy, datacopy + N, om);
+  reim_fft_accel_f(data, data + N, om);
+  double d = 0;
+  for (uint64_t i = 0; i < 2*N; ++i) {
+    d += fabs(datacopy[i] - data[i]);
+  }
+  if (d > 1e-15) {
+    for (uint64_t i = 0; i < N; ++i) {
+      printf("%ld %lf %lf %lf %lf\n", i, data[i], data[N + i], datacopy[i], datacopy[N + i]);
+    }
+    ASSERT_LE(d, 0);
+  }
+}
+
+TEST(fft, reim_fft16_ref_vs_naive) {
+  test_reim_fft_ref_vs_naive<16>(fill_reim_fft16_omegas, reim_fft16_ref);
+}
+
+#ifdef __x86_64__
+TEST(fft, reim_fft16_ref_vs_fma) {
+  test_reim_fft_ref_vs_accel<16>(reim_fft16_ref, reim_fft16_avx_fma);
+}
+#endif
+
+TEST(fft, reim_fft8_ref_vs_naive) {
+  test_reim_fft_ref_vs_naive<8>(fill_reim_fft8_omegas, reim_fft8_ref);
+}
+
+#ifdef __x86_64__
+TEST(fft, reim_fft8_ref_vs_fma) {
+  test_reim_fft_ref_vs_accel<8>(reim_fft8_ref, reim_fft8_avx_fma);
+}
+#endif
+
+TEST(fft, reim_fft4_ref_vs_naive) {
+  test_reim_fft_ref_vs_naive<4>(fill_reim_fft4_omegas, reim_fft4_ref);
+}
+
+#ifdef __x86_64__
+TEST(fft, reim_fft4_ref_vs_fma) {
+  test_reim_fft_ref_vs_accel<4>(reim_fft4_ref, reim_fft4_avx_fma);
+}
+#endif
+
+TEST(fft, reim_fft2_ref_vs_naive) {
+  test_reim_fft_ref_vs_naive<2>(fill_reim_fft2_omegas, reim_fft2_ref);
+}
+
+TEST(fft, reim_fft_bfs_16_ref_vs_naive) {
+  for (const uint64_t m : {16, 32, 64, 128, 256, 512, 1024, 2048}) {
+    std::vector<double> om(2 * m);
+    std::vector<double> data(2 * m);
+    std::vector<double> datacopy(2 * m);
+    double* omg = om.data();
+    fill_reim_fft_bfs_16_omegas(m, 0.25, &omg);
+    ASSERT_LE(omg - om.data(), 2 * m);  // it may depend on m
+    for (uint64_t i = 0; i < m; ++i) {
+      datacopy[i] = data[i] = (rand() % 100) - 50;
+      datacopy[m + i] = data[m + i] = (rand() % 100) - 50;
+    }
+    omg = om.data();
+    reim_fft_bfs_16_ref(m, datacopy.data(), datacopy.data() + m, &omg);
+    reim_naive_fft(m, 0.25, data.data(), data.data() + m);
+    double d = 0;
+    for (uint64_t i = 0; i < 2 * m; ++i) {
+      d += fabs(datacopy[i] - data[i]);
+    }
+    ASSERT_LE(d, 1e-7);
+  }
+}
+
+TEST(fft, reim_fft_rec_16_ref_vs_naive) {
+  for (const uint64_t m : {2048, 4096, 8192, 32768, 65536}) {
+    std::vector<double> om(2 * m);
+    std::vector<double> data(2 * m);
+    std::vector<double> datacopy(2 * m);
+    double* omg = om.data();
+    fill_reim_fft_rec_16_omegas(m, 0.25, &omg);
+    ASSERT_LE(omg - om.data(), 2 * m);  // it may depend on m
+    for (uint64_t i = 0; i < m; ++i) {
+      datacopy[i] = data[i] = (rand() % 100) - 50;
+      datacopy[m + i] = data[m + i] = (rand() % 100) - 50;
+    }
+    omg = om.data();
+    reim_fft_rec_16_ref(m, datacopy.data(), datacopy.data() + m, &omg);
+    reim_naive_fft(m, 0.25, data.data(), data.data() + m);
+    double d = 0;
+    for (uint64_t i = 0; i < 2 * m; ++i) {
+      d += fabs(datacopy[i] - data[i]);
+    }
+    ASSERT_LE(d, 1e-5);
+  }
+}
+
+TEST(fft, reim_fft_ref_vs_naive) {
+  for (const uint64_t m : {1,2,4,8,16,32,64,128,256,512,1024,2048, 4096, 8192, 32768, 65536}) {
+    std::vector<double> om(2 * m);
+    std::vector<double> data(2 * m);
+    std::vector<double> datacopy(2 * m);
+    REIM_FFT_PRECOMP* precomp = new_reim_fft_precomp(m, 0);
+    for (uint64_t i = 0; i < m; ++i) {
+      datacopy[i] = data[i] = (rand() % 100) - 50;
+      datacopy[m + i] = data[m + i] = (rand() % 100) - 50;
+    }
+    reim_fft_ref(precomp, datacopy.data());
+    reim_naive_fft(m, 0.25, data.data(), data.data() + m);
+    double d = 0;
+    for (uint64_t i = 0; i < 2 * m; ++i) {
+      d += fabs(datacopy[i] - data[i]);
+    }
+    ASSERT_LE(d, 1e-5) << m;
+    delete_reim_fft_precomp(precomp);
+  }
+}
+
+
+typedef void (*FILL_REIM_IFFT_OMG_F)(const double entry_pwr, double **omg);
+typedef void (*REIM_IFFT_F)(double *dre, double *dim, const void *omega);
+
+// template to test a fixed-dimension fft vs. naive
+template<uint64_t N>
+void test_reim_ifft_ref_vs_naive(
+    FILL_REIM_IFFT_OMG_F fill_omega_f,
+    REIM_IFFT_F reim_ifft_f
+) {
+  double om[N];
+  double data[2*N];
+  double datacopy[2*N];
+  double* omg = om;
+  fill_omega_f(0.25, &omg);
+  ASSERT_EQ(omg - om, N); // it may depend on N
+  for (uint64_t i = 0; i < N; ++i) {
+    datacopy[i] = data[i] = (rand() % 100) - 50;
+    datacopy[N + i] = data[N + i] = (rand() % 100) - 50;
+  }
+  reim_ifft_f(datacopy, datacopy + N, om);
+  reim_naive_ifft(N, 0.25, data, data + N);
+  double d = 0;
+  for (uint64_t i = 0; i < 2*N; ++i) {
+    d += fabs(datacopy[i] - data[i]);
+  }
+  ASSERT_LE(d, 1e-7);
+}
+
+template<uint64_t N>
+void test_reim_ifft_ref_vs_accel(
+    REIM_IFFT_F reim_ifft_ref_f,
+    REIM_IFFT_F reim_ifft_accel_f) {
+  double om[N];
+  double data[2*N];
+  double datacopy[2*N];
+  for (uint64_t i = 0; i < N; ++i) {
+    om[i] = (rand() % 100) - 50;
+    datacopy[i] = data[i] = (rand() % 100) - 50;
+    datacopy[N + i] = data[N + i] = (rand() % 100) - 50;
+  }
+  reim_ifft_ref_f(datacopy, datacopy + N, om);
+  reim_ifft_accel_f(data, data + N, om);
+  double d = 0;
+  for (uint64_t i = 0; i < 2*N; ++i) {
+    d += fabs(datacopy[i] - data[i]);
+  }
+  if (d > 1e-15) {
+    for (uint64_t i = 0; i < N; ++i) {
+      printf("%ld %lf %lf %lf %lf\n", i, data[i], data[N + i], datacopy[i], datacopy[N + i]);
+    }
+    ASSERT_LE(d, 0);
+  }
+}
+
+TEST(fft, reim_ifft16_ref_vs_naive) {
+  test_reim_ifft_ref_vs_naive<16>(fill_reim_ifft16_omegas, reim_ifft16_ref);
+}
+
+#ifdef __x86_64__
+TEST(fft, reim_ifft16_ref_vs_fma) {
+  test_reim_ifft_ref_vs_accel<16>(reim_ifft16_ref, reim_ifft16_avx_fma);
+}
+#endif
+
+TEST(fft, reim_ifft8_ref_vs_naive) {
+  test_reim_ifft_ref_vs_naive<8>(fill_reim_ifft8_omegas, reim_ifft8_ref);
+}
+
+#ifdef __x86_64__
+TEST(fft, reim_ifft8_ref_vs_fma) {
+  test_reim_ifft_ref_vs_accel<8>(reim_ifft8_ref, reim_ifft8_avx_fma);
+}
+#endif
+
+TEST(fft, reim_ifft4_ref_vs_naive) {
+  test_reim_ifft_ref_vs_naive<4>(fill_reim_ifft4_omegas, reim_ifft4_ref);
+}
+
+#ifdef __x86_64__
+TEST(fft, reim_ifft4_ref_vs_fma) {
+  test_reim_ifft_ref_vs_accel<4>(reim_ifft4_ref, reim_ifft4_avx_fma);
+}
+#endif
+
+TEST(fft, reim_ifft2_ref_vs_naive) {
+  test_reim_ifft_ref_vs_naive<2>(fill_reim_ifft2_omegas, reim_ifft2_ref);
+}
+
+TEST(fft, reim_ifft_bfs_16_ref_vs_naive) {
+  for (const uint64_t m : {16, 32, 64, 128, 256, 512, 1024, 2048}) {
+    std::vector<double> om(2 * m);
+    std::vector<double> data(2 * m);
+    std::vector<double> datacopy(2 * m);
+    double* omg = om.data();
+    fill_reim_ifft_bfs_16_omegas(m, 0.25, &omg);
+    ASSERT_LE(omg - om.data(), 2 * m);  // it may depend on m
+    for (uint64_t i = 0; i < m; ++i) {
+      datacopy[i] = data[i] = (rand() % 100) - 50;
+      datacopy[m + i] = data[m + i] = (rand() % 100) - 50;
+    }
+    omg = om.data();
+    reim_ifft_bfs_16_ref(m, datacopy.data(), datacopy.data() + m, &omg);
+    reim_naive_ifft(m, 0.25, data.data(), data.data() + m);
+    double d = 0;
+    for (uint64_t i = 0; i < 2 * m; ++i) {
+      d += fabs(datacopy[i] - data[i]);
+    }
+    ASSERT_LE(d, 1e-7);
+  }
+}
+
+TEST(fft, reim_ifft_rec_16_ref_vs_naive) {
+  for (const uint64_t m : {2048, 4096, 8192, 32768, 65536}) {
+    std::vector<double> om(2 * m);
+    std::vector<double> data(2 * m);
+    std::vector<double> datacopy(2 * m);
+    double* omg = om.data();
+    fill_reim_ifft_rec_16_omegas(m, 0.25, &omg);
+    ASSERT_LE(omg - om.data(), 2 * m);  // it may depend on m
+    for (uint64_t i = 0; i < m; ++i) {
+      datacopy[i] = data[i] = (rand() % 100) - 50;
+      datacopy[m + i] = data[m + i] = (rand() % 100) - 50;
+    }
+    omg = om.data();
+    reim_ifft_rec_16_ref(m, datacopy.data(), datacopy.data() + m, &omg);
+    reim_naive_ifft(m, 0.25, data.data(), data.data() + m);
+    double d = 0;
+    for (uint64_t i = 0; i < 2 * m; ++i) {
+      d += fabs(datacopy[i] - data[i]);
+    }
+    ASSERT_LE(d, 1e-5);
+  }
+}
+
+TEST(fft, reim_ifft_ref_vs_naive) {
+  for (const uint64_t m : {1,2,4,8,16,32,64,128,256,512,1024,2048, 4096, 8192, 32768, 65536}) {
+    std::vector<double> om(2 * m);
+    std::vector<double> data(2 * m);
+    std::vector<double> datacopy(2 * m);
+    REIM_IFFT_PRECOMP* precomp = new_reim_ifft_precomp(m, 0);
+    for (uint64_t i = 0; i < m; ++i) {
+      datacopy[i] = data[i] = (rand() % 100) - 50;
+      datacopy[m + i] = data[m + i] = (rand() % 100) - 50;
+    }
+    reim_ifft_ref(precomp, datacopy.data());
+    reim_naive_ifft(m, 0.25, data.data(), data.data() + m);
+    double d = 0;
+    for (uint64_t i = 0; i < 2 * m; ++i) {
+      d += fabs(datacopy[i] - data[i]);
+    }
+    ASSERT_LE(d, 1e-5) << m;
+    delete_reim_ifft_precomp(precomp);
+  }
+}
+
+
+

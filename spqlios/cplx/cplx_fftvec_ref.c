@@ -1,5 +1,7 @@
+#include <string.h>
+
 #include "../commons_private.h"
-#include "cplx_fft.h"
+#include "cplx_fft_internal.h"
 #include "cplx_fft_private.h"
 
 EXPORT void cplx_fftvec_addmul_ref(const CPLX_FFTVEC_ADDMUL_PRECOMP* precomp, void* r, const void* a, const void* b) {
@@ -62,13 +64,6 @@ EXPORT CPLX_FFTVEC_ADDMUL_PRECOMP* new_cplx_fftvec_addmul_precomp(uint32_t m) {
 EXPORT CPLX_FFTVEC_MUL_PRECOMP* new_cplx_fftvec_mul_precomp(uint32_t m) {
   CPLX_FFTVEC_MUL_PRECOMP* r = malloc(sizeof(CPLX_FFTVEC_MUL_PRECOMP));
   return spqlios_keep_or_free(r, init_cplx_fftvec_mul_precomp(r, m));
-}
-
-EXPORT void cplx_fftvec_mul(const CPLX_FFTVEC_MUL_PRECOMP* tables, void* r, const void* a, const void* b) {
-  tables->function(tables, r, a, b);
-}
-EXPORT void cplx_fftvec_addmul(const CPLX_FFTVEC_ADDMUL_PRECOMP* tables, void* r, const void* a, const void* b) {
-  tables->function(tables, r, a, b);
 }
 
 EXPORT void cplx_fftvec_mul_simple(uint32_t m, void* r, const void* a, const void* b) {

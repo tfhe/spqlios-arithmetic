@@ -1,7 +1,5 @@
-#include "reim_fft.h"
+#include "reim_fft_internal.h"
 #include "reim_fft_private.h"
-
-#include "../commons_private.h"
 
 EXPORT void reim_fftvec_addmul_ref(const REIM_FFTVEC_ADDMUL_PRECOMP* precomp, double* r, const double* a,
                                    const double* b) {
@@ -24,12 +22,11 @@ EXPORT void reim_fftvec_mul_ref(const REIM_FFTVEC_MUL_PRECOMP* precomp, double* 
   }
 }
 
-
 EXPORT REIM_FFTVEC_ADDMUL_PRECOMP* new_reim_fftvec_addmul_precomp(uint32_t m) {
   REIM_FFTVEC_ADDMUL_PRECOMP* reps = malloc(sizeof(REIM_FFTVEC_ADDMUL_PRECOMP));
   reps->m = m;
   if (CPU_SUPPORTS("fma")) {
-    if (m >= 2) {
+    if (m >= 4) {
       reps->function = reim_fftvec_addmul_fma;
     } else {
       reps->function = reim_fftvec_addmul_ref;
@@ -44,7 +41,7 @@ EXPORT REIM_FFTVEC_MUL_PRECOMP* new_reim_fftvec_mul_precomp(uint32_t m) {
   REIM_FFTVEC_MUL_PRECOMP* reps = malloc(sizeof(REIM_FFTVEC_MUL_PRECOMP));
   reps->m = m;
   if (CPU_SUPPORTS("fma")) {
-    if (m >= 2) {
+    if (m >= 4) {
       reps->function = reim_fftvec_mul_fma;
     } else {
       reps->function = reim_fftvec_mul_ref;
@@ -54,3 +51,4 @@ EXPORT REIM_FFTVEC_MUL_PRECOMP* new_reim_fftvec_mul_precomp(uint32_t m) {
   }
   return reps;
 }
+

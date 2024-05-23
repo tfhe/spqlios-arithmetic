@@ -1,9 +1,10 @@
 #include <errno.h>
+#include <malloc.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "../commons_private.h"
-#include "reim4_fftvec.h"
+#include "reim4_fftvec_internal.h"
 #include "reim4_fftvec_private.h"
 
 EXPORT void reim4_from_cplx_ref(const REIM4_FROM_CPLX_PRECOMP* tables, double* r, const void* a) {
@@ -31,6 +32,35 @@ EXPORT void reim4_from_cplx_ref(const REIM4_FROM_CPLX_PRECOMP* tables, double* r
   }
 }
 
+void* init_reim4_from_cplx_precomp(REIM4_FROM_CPLX_PRECOMP* res, uint32_t nn) {
+  res->m = nn / 2;
+  if (CPU_SUPPORTS("fma")) {
+    if (nn >= 4) {
+      res->function = reim4_from_cplx_fma;
+    } else {
+      res->function = reim4_from_cplx_ref;
+    }
+  } else {
+    res->function = reim4_from_cplx_ref;
+  }
+  return res;
+}
+
+EXPORT REIM4_FROM_CPLX_PRECOMP* new_reim4_from_cplx_precomp(uint32_t m) {
+  REIM4_FROM_CPLX_PRECOMP* res = malloc(sizeof(*res));
+  if (!res) return spqlios_error(strerror(errno));
+  return spqlios_keep_or_free(res, init_reim4_from_cplx_precomp(res, m));
+}
+
+EXPORT void reim4_from_cplx_simple(uint32_t m, double* r, const void* a) {
+  static REIM4_FROM_CPLX_PRECOMP precomp[32];
+  REIM4_FROM_CPLX_PRECOMP* p = precomp + log2m(m);
+  if (!p->function) {
+    if (!init_reim4_from_cplx_precomp(p, m)) abort();
+  }
+  p->function(p, r, a);
+}
+
 EXPORT void reim4_to_cplx_ref(const REIM4_TO_CPLX_PRECOMP* tables, void* r, const double* a) {
   double* y = (double*)r;
   const uint64_t m = tables->m;
@@ -56,24 +86,10 @@ EXPORT void reim4_to_cplx_ref(const REIM4_TO_CPLX_PRECOMP* tables, void* r, cons
   }
 }
 
-void* init_reim4_from_cplx_precomp(REIM4_FROM_CPLX_PRECOMP* res, uint32_t m) {
-  res->m = m;
-  if (CPU_SUPPORTS("fma")) {
-    if (m >= 4) {
-      res->function = reim4_from_cplx_fma;
-    } else {
-      res->function = reim4_from_cplx_ref;
-    }
-  } else {
-    res->function = reim4_from_cplx_ref;
-  }
-  return res;
-}
-
 void* init_reim4_to_cplx_precomp(REIM4_TO_CPLX_PRECOMP* res, uint32_t m) {
   res->m = m;
   if (CPU_SUPPORTS("fma")) {
-    if (m >= 4) {
+    if (m >= 2) {
       res->function = reim4_to_cplx_fma;
     } else {
       res->function = reim4_to_cplx_ref;
@@ -84,28 +100,11 @@ void* init_reim4_to_cplx_precomp(REIM4_TO_CPLX_PRECOMP* res, uint32_t m) {
   return res;
 }
 
-EXPORT REIM4_FROM_CPLX_PRECOMP* new_reim4_from_cplx_precomp(uint32_t m) {
-  REIM4_FROM_CPLX_PRECOMP* res = malloc(sizeof(*res));
-  if (!res) return spqlios_error(strerror(errno));
-  return spqlios_keep_or_free(res, init_reim4_from_cplx_precomp(res, m));
-}
-
 EXPORT REIM4_TO_CPLX_PRECOMP* new_reim4_to_cplx_precomp(uint32_t m) {
   REIM4_TO_CPLX_PRECOMP* res = malloc(sizeof(*res));
   if (!res) return spqlios_error(strerror(errno));
   return spqlios_keep_or_free(res, init_reim4_to_cplx_precomp(res, m));
 }
-
-
-EXPORT void reim4_from_cplx_simple(uint32_t m, double* r, const void* a) {
-  static REIM4_FROM_CPLX_PRECOMP precomp[32];
-  REIM4_FROM_CPLX_PRECOMP* p = precomp + log2m(m);
-  if (!p->function) {
-    if (!init_reim4_from_cplx_precomp(p, m)) abort();
-  }
-  p->function(p, r, a);
-}
-
 
 EXPORT void reim4_to_cplx_simple(uint32_t m, void* r, const double* a) {
   static REIM4_TO_CPLX_PRECOMP precomp[32];

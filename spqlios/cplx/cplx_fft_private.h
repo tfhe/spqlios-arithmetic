@@ -1,7 +1,10 @@
 #ifndef SPQLIOS_CPLX_FFT_PRIVATE_H
 #define SPQLIOS_CPLX_FFT_PRIVATE_H
 
-#include "cplx_fft_public.h"
+#include "cplx_fft.h"
+
+typedef struct cplx_twiddle_precomp CPLX_FFTVEC_TWIDDLE_PRECOMP;
+typedef struct cplx_bitwiddle_precomp CPLX_FFTVEC_BITWIDDLE_PRECOMP;
 
 typedef void (*IFFT_FUNCTION)(const CPLX_IFFT_PRECOMP*, void*);
 typedef void (*FFT_FUNCTION)(const CPLX_FFT_PRECOMP*, void*);
@@ -17,9 +20,13 @@ typedef void (*ROUND_TO_RNX64_FUNCTION)(const CPLX_ROUND_TO_RNX64_PRECOMP* preco
 typedef void (*FFTVEC_MUL_FUNCTION)(const CPLX_FFTVEC_MUL_PRECOMP*, void*, const void*, const void*);
 typedef void (*FFTVEC_ADDMUL_FUNCTION)(const CPLX_FFTVEC_ADDMUL_PRECOMP*, void*, const void*, const void*);
 
+typedef void (*FFTVEC_TWIDDLE_FUNCTION)(const CPLX_FFTVEC_TWIDDLE_PRECOMP*, void*, const void*, const void*);
+typedef void (*FFTVEC_BITWIDDLE_FUNCTION)(const CPLX_FFTVEC_BITWIDDLE_PRECOMP*, void*, uint64_t, const void*);
+
 struct cplx_ifft_precomp {
   IFFT_FUNCTION function;
   int64_t m;
+  uint64_t buf_size;
   double* powomegas;
   void* aligned_buffers;
 };
@@ -27,6 +34,7 @@ struct cplx_ifft_precomp {
 struct cplx_fft_precomp {
   FFT_FUNCTION function;
   int64_t m;
+  uint64_t buf_size;
   double* powomegas;
   void* aligned_buffers;
 };
@@ -80,5 +88,22 @@ typedef struct cplx_addmul_precomp {
   FFTVEC_ADDMUL_FUNCTION function;
   int64_t m;
 } CPLX_FFTVEC_ADDMUL_PRECOMP;
+
+struct cplx_twiddle_precomp {
+   FFTVEC_TWIDDLE_FUNCTION function;
+   int64_t m;
+ };
+
+struct cplx_bitwiddle_precomp {
+  FFTVEC_BITWIDDLE_FUNCTION function;
+  int64_t m;
+};
+
+EXPORT void cplx_fftvec_twiddle_fma(const CPLX_FFTVEC_TWIDDLE_PRECOMP* tables, void* a, void* b, const void* om);
+EXPORT void cplx_fftvec_twiddle_avx512(const CPLX_FFTVEC_TWIDDLE_PRECOMP* tables, void* a, void* b, const void* om);
+EXPORT void cplx_fftvec_bitwiddle_fma(const CPLX_FFTVEC_BITWIDDLE_PRECOMP* tables, void* a, uint64_t slice,
+                                      const void* om);
+EXPORT void cplx_fftvec_bitwiddle_avx512(const CPLX_FFTVEC_BITWIDDLE_PRECOMP* tables, void* a, uint64_t slice,
+                                         const void* om);
 
 #endif  // SPQLIOS_CPLX_FFT_PRIVATE_H

@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-#include "spqlios/cplx/cplx_fft.h"
+#include "spqlios/cplx/cplx_fft_internal.h"
 #include "spqlios/cplx/cplx_fft_private.h"
 
 #ifdef __x86_64__

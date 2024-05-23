@@ -1,36 +1,22 @@
 #include <benchmark/benchmark.h>
+#include <stdint.h>
 
 #include <cassert>
 #include <cmath>
 #include <complex>
-#include <cstdint>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
 #include <string>
 #include <vector>
 
-#include "../spqlios/cplx/cplx_fft.h"
-#include "../spqlios/cplx.h"
+#include "../spqlios/cplx/cplx_fft_internal.h"
 #include "spqlios/reim/reim_fft.h"
-#include "spqlios/reim.h"
-
 
 using namespace std;
 
 void init_random_values(uint64_t n, double* v) {
   for (uint64_t i = 0; i < n; ++i) v[i] = rand() - (RAND_MAX >> 1);
-}
-
-void benchmark_cplx_ifft(benchmark::State& state) {
-  const int32_t nn = state.range(0);
-  CPLX_IFFT_PRECOMP* a = new_cplx_ifft_precomp(nn / 2, 1);
-  double* c = (double*)cplx_ifft_precomp_get_buffer(a, 0);
-  init_random_values(nn, c);
-  for (auto _ : state) {
-    cplx_ifft(a, c);
-  }
-  delete_cplx_ifft_precomp(a);
 }
 
 void benchmark_cplx_fft(benchmark::State& state) {
@@ -43,6 +29,18 @@ void benchmark_cplx_fft(benchmark::State& state) {
     cplx_fft(a, c);
   }
   delete_cplx_fft_precomp(a);
+}
+
+void benchmark_cplx_ifft(benchmark::State& state) {
+  const int32_t nn = state.range(0);
+  CPLX_IFFT_PRECOMP* a = new_cplx_ifft_precomp(nn / 2, 1);
+  double* c = (double*)cplx_ifft_precomp_get_buffer(a, 0);
+  init_random_values(nn, c);
+  for (auto _ : state) {
+    // cplx_ifft_simple(nn/2, c);
+    cplx_ifft(a, c);
+  }
+  delete_cplx_ifft_precomp(a);
 }
 
 void benchmark_reim_fft(benchmark::State& state) {
@@ -79,10 +77,14 @@ int main(int argc, char** argv) {
   if (::benchmark::ReportUnrecognizedArguments(argc, argv)) return 1;
   std::cout << "Dimensions n in the benchmark below are in \"real FFT\" modulo X^n+1" << std::endl;
   std::cout << "The complex dimension m (modulo X^m-i) is half of it" << std::endl;
-  BENCHMARK(benchmark_cplx_ifft)->ARGS;
   BENCHMARK(benchmark_cplx_fft)->ARGS;
+  BENCHMARK(benchmark_cplx_ifft)->ARGS;
   BENCHMARK(benchmark_reim_fft)->ARGS;
   BENCHMARK(benchmark_reim_ifft)->ARGS;
+  // if (CPU_SUPPORTS("avx512f")) {
+  //  BENCHMARK(bench_cplx_fftvec_twiddle_avx512)->ARGS;
+  //  BENCHMARK(bench_cplx_fftvec_bitwiddle_avx512)->ARGS;
+  //}
   ::benchmark::RunSpecifiedBenchmarks();
   ::benchmark::Shutdown();
   return 0;

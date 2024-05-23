@@ -24,17 +24,41 @@ if (benchmark_inc AND benchmark)
 else()
 	message(FATAL_ERROR "Libbenchmark not found (required if ENABLE_TESTING is on): I=${benchmark_inc} L=${benchmark}")
 endif()
+find_path(VALGRIND_DIR NAMES valgrind/valgrind.h)
+if (VALGRIND_DIR)
+	message(STATUS "Found valgrind header ${VALGRIND_DIR}")
+else ()
+	# for now, we will fail if we don't find valgrind for tests
+	message(STATUS "CANNOT FIND valgrind header: ${VALGRIND_DIR}")
+endif ()
+
+add_library(spqlios-testlib SHARED
+		testlib/random.cpp
+		testlib/test_commons.h
+		testlib/test_commons.cpp
+)
+if (VALGRIND_DIR)
+	target_include_directories(spqlios-testlib PRIVATE ${VALGRIND_DIR})
+	target_compile_definitions(spqlios-testlib PRIVATE VALGRIND_MEM_TESTS)
+endif ()
+
 
 
 # main unittest file
 message(STATUS "${gtest_libs}")
-add_executable(spqlios-test spqlios_test.cpp spqlios_cplx_test.cpp spqlios_reim_test.cpp spqlios_reim4_test.cpp spqlios_cplx_conversions_test.cpp)
-target_link_libraries(spqlios-test spqlios-fft ${gtest_libs})
+add_executable(spqlios-test
+		spqlios_test.cpp
+		spqlios_cplx_test.cpp
+		spqlios_cplx_conversions_test.cpp
+		spqlios_reim_test.cpp
+		spqlios_reim_conversions_test.cpp
+)
+target_link_libraries(spqlios-test spqlios-testlib libspqlios ${gtest_libs})
 target_include_directories(spqlios-test PRIVATE ${test_incs})
 add_test(NAME spqlios-test COMMAND spqlios-test)
 
 
 # benchmarks
 add_executable(spqlios-cplx-fft-bench spqlios_cplx_fft_bench.cpp)
-target_link_libraries(spqlios-cplx-fft-bench spqlios-fft benchmark pthread)
+target_link_libraries(spqlios-cplx-fft-bench libspqlios benchmark pthread)
 target_include_directories(spqlios-cplx-fft-bench PRIVATE ../)

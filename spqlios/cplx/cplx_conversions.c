@@ -2,7 +2,7 @@
 #include <string.h>
 
 #include "../commons_private.h"
-#include "cplx_fft.h"
+#include "cplx_fft_internal.h"
 #include "cplx_fft_private.h"
 
 EXPORT void cplx_from_znx32_ref(const CPLX_FROM_ZNX32_PRECOMP* precomp, void* r, const int32_t* x) {
