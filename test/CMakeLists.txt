@@ -47,6 +47,10 @@ add_library(spqlios-testlib SHARED
 		testlib/fft64_dft.h
 		testlib/fft64_layouts.h
 		testlib/fft64_layouts.cpp
+		testlib/ntt120_layouts.cpp
+		testlib/ntt120_layouts.h
+		testlib/ntt120_dft.cpp
+		testlib/ntt120_dft.h
 		testlib/test_hash.cpp
 		testlib/sha3.h
 		testlib/sha3.c
@@ -75,6 +79,8 @@ add_executable(spqlios-test
 		spqlios_reim4_arithmetic_test.cpp
 		spqlios_vec_znx_big_test.cpp
 		spqlios_vmp_product_test.cpp
+		spqlios_vec_znx_dft_test.cpp
+		spqlios_vec_znx_test.cpp
 )
 target_link_libraries(spqlios-test spqlios-testlib libspqlios ${gtest_libs})
 target_include_directories(spqlios-test PRIVATE ${test_incs})
