@@ -41,6 +41,8 @@ add_library(spqlios-testlib SHARED
 		testlib/negacyclic_polynomial.cpp
 		testlib/negacyclic_polynomial.h
 		testlib/negacyclic_polynomial_impl.h
+		testlib/reim4_elem.cpp
+		testlib/reim4_elem.h
 )
 if (VALGRIND_DIR)
 	target_include_directories(spqlios-testlib PRIVATE ${VALGRIND_DIR})
@@ -60,6 +62,8 @@ add_executable(spqlios-test
 		spqlios_q120_ntt_test.cpp
 		spqlios_q120_arithmetic_test.cpp
 		spqlios_znx_small_test.cpp
+		spqlios_coeffs_arithmetic_test.cpp
+		spqlios_reim4_arithmetic_test.cpp
 )
 target_link_libraries(spqlios-test spqlios-testlib libspqlios ${gtest_libs})
 target_include_directories(spqlios-test PRIVATE ${test_incs})
@@ -79,4 +83,11 @@ if (${X86})
     add_executable(spqlios-q120-arithmetic-bench spqlios_q120_arithmetic_bench.cpp)
     target_link_libraries(spqlios-q120-arithmetic-bench libspqlios benchmark pthread)
     target_include_directories(spqlios-q120-arithmetic-bench PRIVATE ${test_incs})
+endif ()
+
+if (${X86})
+	add_executable(spqlios_reim4_arithmetic_bench spqlios_reim4_arithmetic_bench.cpp)
+	target_compile_options(spqlios_reim4_arithmetic_bench PRIVATE "-march=native")
+	target_link_libraries(spqlios_reim4_arithmetic_bench benchmark libspqlios pthread)
+	target_include_directories(spqlios_reim4_arithmetic_bench PRIVATE ../)
 endif ()
