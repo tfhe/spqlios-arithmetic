@@ -38,6 +38,9 @@ add_library(spqlios-testlib SHARED
 		testlib/test_commons.cpp
 		testlib/mod_q120.h
 		testlib/mod_q120.cpp
+		testlib/negacyclic_polynomial.cpp
+		testlib/negacyclic_polynomial.h
+		testlib/negacyclic_polynomial_impl.h
 )
 if (VALGRIND_DIR)
 	target_include_directories(spqlios-testlib PRIVATE ${VALGRIND_DIR})
@@ -55,6 +58,7 @@ add_executable(spqlios-test
 		spqlios_reim_test.cpp
 		spqlios_reim_conversions_test.cpp
 		spqlios_q120_ntt_test.cpp
+		spqlios_q120_arithmetic_test.cpp
 )
 target_link_libraries(spqlios-test spqlios-testlib libspqlios ${gtest_libs})
 target_include_directories(spqlios-test PRIVATE ${test_incs})
