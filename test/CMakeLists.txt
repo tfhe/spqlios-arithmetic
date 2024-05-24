@@ -74,4 +74,8 @@ if (${X86})
     add_executable(spqlios-q120-ntt-bench spqlios_q120_ntt_bench.cpp)
     target_link_libraries(spqlios-q120-ntt-bench libspqlios benchmark pthread)
     target_include_directories(spqlios-q120-ntt-bench PRIVATE ${test_incs})
+
+    add_executable(spqlios-q120-arithmetic-bench spqlios_q120_arithmetic_bench.cpp)
+    target_link_libraries(spqlios-q120-arithmetic-bench libspqlios benchmark pthread)
+    target_include_directories(spqlios-q120-arithmetic-bench PRIVATE ${test_incs})
 endif ()
