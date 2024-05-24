@@ -31,6 +31,7 @@ set(SRCS_GENERIC
         arithmetic/scalar_vector_product.c
         arithmetic/vec_znx_big.c
         arithmetic/znx_small.c
+        arithmetic/module_api.c
 )
 # C or assembly source files compiled only on x86 targets
 set(SRCS_X86
@@ -154,8 +155,6 @@ if (ENABLE_SPQLIOS_F128)
 endif (ENABLE_SPQLIOS_F128)
 
 add_library(libspqlios-static STATIC ${SPQLIOSSOURCES})
-add_library(spqlios SHARED ${SPQLIOSSOURCES}
-        arithmetic/vector_matrix_product.c)
 add_library(libspqlios SHARED ${SPQLIOSSOURCES})
 set_property(TARGET libspqlios-static PROPERTY POSITION_INDEPENDENT_CODE ON)
 set_property(TARGET libspqlios PROPERTY OUTPUT_NAME spqlios)
