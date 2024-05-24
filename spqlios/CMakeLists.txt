@@ -87,6 +87,7 @@ set(SRCS_F128
 # H header files containing the public API (these headers are installed)
 set(HEADERSPUBLIC
         commons.h
+        arithmetic/vec_znx_arithmetic.h
         cplx/cplx_fft.h
         reim/reim_fft.h
         q120/q120_common.h
@@ -107,6 +108,7 @@ set(HEADERSPRIVATE
         reim/reim_fft_private.h
         q120/q120_arithmetic_private.h
         q120/q120_ntt_private.h
+        arithmetic/vec_znx_arithmetic.h
         )
 
 set(SPQLIOSSOURCES
