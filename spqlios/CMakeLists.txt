@@ -21,6 +21,9 @@ set(SRCS_GENERIC
         reim/reim_ifft_ref.c
         reim/reim_ifft_ref.c
         reim/reim_to_tnx_ref.c
+        q120/q120_ntt.c
+        q120/q120_arithmetic_ref.c
+        q120/q120_arithmetic_simple.c
         )
 # C or assembly source files compiled only on x86 targets
 set(SRCS_X86
@@ -33,6 +36,7 @@ set(SRCS_AARCH64
         cplx/cplx_fallbacks_aarch64.c
         reim/reim_fallbacks_aarch64.c
         reim4/reim4_fallbacks_aarch64.c
+        q120/q120_fallbacks_aarch64.c
         )
 
 # C or assembly source files compiled only on x86: avx, avx2, fma targets
@@ -69,6 +73,8 @@ set_source_files_properties(${SRCS_AVX512} PROPERTIES COMPILE_OPTIONS "-mfma;-ma
 
 # C or assembly source files compiled only on x86: avx2 + bmi targets
 set(SRCS_AVX2
+        q120/q120_arithmetic_avx2.c
+        q120/q120_ntt_avx2.c
         )
 set_source_files_properties(${SRCS_AVX2} PROPERTIES COMPILE_OPTIONS "-mbmi2;-mavx2")
 
@@ -83,6 +89,9 @@ set(HEADERSPUBLIC
         commons.h
         cplx/cplx_fft.h
         reim/reim_fft.h
+        q120/q120_common.h
+        q120/q120_arithmetic.h
+        q120/q120_ntt.h
         )
 
 # H header files containing the private API (these headers are used internally)
@@ -96,6 +105,8 @@ set(HEADERSPRIVATE
         reim4/reim4_fftvec_public.h
         reim/reim_fft_internal.h
         reim/reim_fft_private.h
+        q120/q120_arithmetic_private.h
+        q120/q120_ntt_private.h
         )
 
 set(SPQLIOSSOURCES

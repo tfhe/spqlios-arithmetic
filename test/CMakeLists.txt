@@ -36,6 +36,11 @@ add_library(spqlios-testlib SHARED
 		testlib/random.cpp
 		testlib/test_commons.h
 		testlib/test_commons.cpp
+		testlib/mod_q120.h
+		testlib/mod_q120.cpp
+		testlib/negacyclic_polynomial.cpp
+		testlib/negacyclic_polynomial.h
+		testlib/negacyclic_polynomial_impl.h
 )
 if (VALGRIND_DIR)
 	target_include_directories(spqlios-testlib PRIVATE ${VALGRIND_DIR})
@@ -52,6 +57,8 @@ add_executable(spqlios-test
 		spqlios_cplx_conversions_test.cpp
 		spqlios_reim_test.cpp
 		spqlios_reim_conversions_test.cpp
+		spqlios_q120_ntt_test.cpp
+		spqlios_q120_arithmetic_test.cpp
 )
 target_link_libraries(spqlios-test spqlios-testlib libspqlios ${gtest_libs})
 target_include_directories(spqlios-test PRIVATE ${test_incs})
@@ -62,3 +69,13 @@ add_test(NAME spqlios-test COMMAND spqlios-test)
 add_executable(spqlios-cplx-fft-bench spqlios_cplx_fft_bench.cpp)
 target_link_libraries(spqlios-cplx-fft-bench libspqlios benchmark pthread)
 target_include_directories(spqlios-cplx-fft-bench PRIVATE ../)
+
+if (${X86})
+    add_executable(spqlios-q120-ntt-bench spqlios_q120_ntt_bench.cpp)
+    target_link_libraries(spqlios-q120-ntt-bench libspqlios benchmark pthread)
+    target_include_directories(spqlios-q120-ntt-bench PRIVATE ${test_incs})
+
+    add_executable(spqlios-q120-arithmetic-bench spqlios_q120_arithmetic_bench.cpp)
+    target_link_libraries(spqlios-q120-arithmetic-bench libspqlios benchmark pthread)
+    target_include_directories(spqlios-q120-arithmetic-bench PRIVATE ${test_incs})
+endif ()
