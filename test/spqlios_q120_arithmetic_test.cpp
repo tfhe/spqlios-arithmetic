@@ -5,6 +5,7 @@
 
 #include "spqlios/q120/q120_arithmetic.h"
 #include "test/testlib/negacyclic_polynomial.h"
+#include "test/testlib/ntt120_layouts.h"
 #include "testlib/mod_q120.h"
 
 typedef typeof(q120_vec_mat1col_product_baa_ref) vec_mat1col_product_baa_f;
@@ -231,6 +232,71 @@ TEST(q120_arithmetic, q120x2_vec_mat1col_product_bbc_avx2) {
   test_q120x2_vec_mat1col_product_bbc(q120x2_vec_mat1col_product_bbc_avx2);
 }
 #endif
+
+typedef typeof(q120x2_extract_1blk_from_q120b_ref) q120x2_extract_f;
+void test_q120x2_extract_1blk(q120x2_extract_f q120x2_extract) {
+  for (uint64_t n : {2, 4, 64}) {
+    ntt120_vec_znx_dft_layout v(n, 1);
+    std::vector<uint64_t> r(8);
+    std::vector<uint64_t> expect(8);
+    for (uint64_t blk = 0; blk < n / 2; ++blk) {
+      for (uint64_t i = 0; i < 8; ++i) {
+        expect[i] = uniform_u64();
+      }
+      memcpy(v.get_blk(0, blk), expect.data(), 8 * sizeof(uint64_t));
+      q120x2_extract_1blk_from_q120b_ref(n, blk, (q120x2b*)r.data(), (q120b*)v.data);
+      ASSERT_EQ(r, expect);
+    }
+  }
+}
+
+TEST(q120_arithmetic, q120x2_extract_1blk_from_q120b_ref) {
+  test_q120x2_extract_1blk(q120x2_extract_1blk_from_q120b_ref);
+}
+
+typedef typeof(q120x2_extract_1blk_from_contiguous_q120b_ref) q120x2_extract_vec_f;
+void test_q120x2_extract_1blk_vec(q120x2_extract_vec_f q120x2_extract) {
+  for (uint64_t n : {2, 4, 32}) {
+    for (uint64_t size : {1, 2, 7}) {
+      ntt120_vec_znx_dft_layout v(n, size);
+      std::vector<uint64_t> r(8 * size);
+      std::vector<uint64_t> expect(8 * size);
+      for (uint64_t blk = 0; blk < n / 2; ++blk) {
+        for (uint64_t i = 0; i < 8 * size; ++i) {
+          expect[i] = uniform_u64();
+        }
+        for (uint64_t i = 0; i < size; ++i) {
+          memcpy(v.get_blk(i, blk), expect.data() + 8 * i, 8 * sizeof(uint64_t));
+        }
+        q120x2_extract(n, size, blk, (q120x2b*)r.data(), (q120b*)v.data);
+        ASSERT_EQ(r, expect);
+      }
+    }
+  }
+}
+
+TEST(q120_arithmetic, q120x2_extract_1blk_from_contiguous_q120b_ref) {
+  test_q120x2_extract_1blk_vec(q120x2_extract_1blk_from_contiguous_q120b_ref);
+}
+
+typedef typeof(q120x2b_save_1blk_to_q120b_ref) q120x2_save_f;
+void test_q120x2_save_1blk(q120x2_save_f q120x2_save) {
+  for (uint64_t n : {2, 4, 64}) {
+    ntt120_vec_znx_dft_layout v(n, 1);
+    std::vector<uint64_t> r(8);
+    std::vector<uint64_t> expect(8);
+    for (uint64_t blk = 0; blk < n / 2; ++blk) {
+      for (uint64_t i = 0; i < 8; ++i) {
+        expect[i] = uniform_u64();
+      }
+      q120x2_save(n, blk, (q120b*)v.data, (q120x2b*)expect.data());
+      memcpy(r.data(), v.get_blk(0, blk), 8 * sizeof(uint64_t));
+      ASSERT_EQ(r, expect);
+    }
+  }
+}
+
+TEST(q120_arithmetic, q120x2b_save_1blk_to_q120b_ref) { test_q120x2_save_1blk(q120x2b_save_1blk_to_q120b_ref); }
 
 TEST(q120_arithmetic, q120_add_bbb_simple) {
   for (const uint64_t n : {2, 4, 1024}) {
