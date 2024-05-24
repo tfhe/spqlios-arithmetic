@@ -1,4 +1,4 @@
-#include "cplx_fft.h"
+#include "cplx_fft_internal.h"
 
 void cplx_set(CPLX r, const CPLX a) {
   r[0] = a[0];
@@ -40,6 +40,29 @@ EXPORT void cplx_split_fft_ref(int32_t h, CPLX* data, const CPLX powom) {
     cplx_add(d0[i], d0[i], d1[i]);
     cplx_mul(d1[i], diff, powom);
   }
+}
+
+/**
+ * @brief Do two layers of itwiddle (i.e. split).
+ * Input/output:  d0,d1,d2,d3 of length h
+ * Algo:
+ *   itwiddle(d0,d1,om[0]),itwiddle(d2,d3,i.om[0])
+ *   itwiddle(d0,d2,om[1]),itwiddle(d1,d3,om[1])
+ * @param h number of "coefficients" h >= 1
+ * @param data 4h complex coefficients interleaved and 256b aligned
+ * @param powom om[0] (re,im) and om[1] where om[1]=om[0]^2
+ */
+EXPORT void cplx_bisplit_fft_ref(int32_t h, CPLX* data, const CPLX powom[2]) {
+  CPLX* d0 = data;
+  CPLX* d2 = data + 2*h;
+  const CPLX* om0 = powom;
+  CPLX iom0;
+  iom0[0]=powom[0][1];
+  iom0[1]=-powom[0][0];
+  const CPLX* om1 = powom+1;
+  cplx_split_fft_ref(h, d0, *om0);
+  cplx_split_fft_ref(h, d2, iom0);
+  cplx_split_fft_ref(2*h, d0, *om1);
 }
 
 /**

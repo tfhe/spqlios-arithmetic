@@ -2,21 +2,31 @@ enable_language(ASM)
 
 # C source files that are compiled for all targets (i.e. reference code)
 set(SRCS_GENERIC
-        commons.c
+        commons.c 
         commons_private.c
         cplx/cplx_common.c
-        cplx/cplx_ifft_ref.c
-        cplx/cplx_fft_ref.c
         cplx/cplx_conversions.c
+        cplx/cplx_fft_asserts.c
+        cplx/cplx_fft_ref.c
         cplx/cplx_fftvec_ref.c
+        cplx/cplx_ifft_ref.c
+        cplx/spqlios_cplx_fft.c
+        reim4/reim4_arithmetic_ref.c
+        reim4/reim4_fftvec_addmul_ref.c
+        reim4/reim4_fftvec_conv_ref.c
         reim/reim_conversions.c
         reim/reim_fft_ifft.c
         reim/reim_fft_ref.c
         reim/reim_fftvec_addmul_ref.c
-        reim4/reim4_fftvec_addmul_ref.c
-        reim4/reim4_fftvec_conv_ref.c)
+        reim/reim_ifft_ref.c
+        reim/reim_ifft_ref.c
+        reim/reim_to_tnx_ref.c
+        )
 # C or assembly source files compiled only on x86 targets
 set(SRCS_X86
+        cplx/spqlios_fft_execute.s
+        reim/reim_execute.s
+        reim4/reim4_execute.s
         )
 # C or assembly source files compiled only on aarch64 targets
 set(SRCS_AARCH64
@@ -27,22 +37,33 @@ set(SRCS_AARCH64
 
 # C or assembly source files compiled only on x86: avx, avx2, fma targets
 set(SRCS_FMA
-        cplx/cplx_ifft_avx2_fma.c
-        cplx/cplx_ifft16_avx_fma.s
-        cplx/cplx_fft_avx2_fma.c
-        cplx/cplx_fft16_avx_fma.s
         cplx/cplx_conversions_avx2_fma.c
-        cplx/cplx_fftvec_fma.c
-        reim/reim_ifft_avx2_fma.s
-        reim/reim_fft_avx2_fma.s
-        reim/reim_fftvec_addmul_fma.s
+        cplx/cplx_fft16_avx_fma.s
+        cplx/cplx_fft_avx2_fma.c
+        cplx/cplx_fft_sse.c
+        cplx/cplx_fftvec_avx2_fma.c
+        cplx/cplx_ifft16_avx_fma.s
+        cplx/cplx_ifft_avx2_fma.c
+        reim4/reim4_arithmetic_avx2.c
         reim4/reim4_fftvec_addmul_fma.s
         reim4/reim4_fftvec_conv_fma.s
+        reim/reim_conversions_avx.c
+        reim/reim_fft16_avx_fma.s
+        reim/reim_fft4_avx_fma.s
+        reim/reim_fft8_avx_fma.s
+        reim/reim_fft_avx2.c
+        reim/reim_fftvec_addmul_fma.s
+        reim/reim_ifft16_avx_fma.s
+        reim/reim_ifft4_avx_fma.s
+        reim/reim_ifft8_avx_fma.s
+        reim/reim_ifft_avx2.c
+        reim/reim_to_tnx_avx.c
         )
 set_source_files_properties(${SRCS_FMA} PROPERTIES COMPILE_OPTIONS "-mfma;-mavx;-mavx2")
 
 # C or assembly source files compiled only on x86: avx512f/vl/dq + fma targets
 set(SRCS_AVX512
+        cplx/cplx_fft_avx512.c
         )
 set_source_files_properties(${SRCS_AVX512} PROPERTIES COMPILE_OPTIONS "-mfma;-mavx512f;-mavx512vl;-mavx512dq")
 
@@ -59,24 +80,22 @@ set(SRCS_F128
 
 # H header files containing the public API (these headers are installed)
 set(HEADERSPUBLIC
-        cplx.h
-        reim.h
         commons.h
-        cplx/cplx_fft_public.h
-        reim/reim_fft_public.h
-        reim4/reim4_fftvec_public.h
+        cplx/cplx_fft.h
+        reim/reim_fft.h
         )
 
 # H header files containing the private API (these headers are used internally)
 set(HEADERSPRIVATE
         commons_private.h
-        cplx/cplx_fft.h
+        cplx/cplx_fft_internal.h
         cplx/cplx_fft_private.h
-        reim/reim_fft.h
-        reim/reim_fft_private.h
-        reim4/reim4_fftvec.h
+        reim4/reim4_arithmetic.h
+        reim4/reim4_fftvec_internal.h
         reim4/reim4_fftvec_private.h
         reim4/reim4_fftvec_public.h
+        reim/reim_fft_internal.h
+        reim/reim_fft_private.h
         )
 
 set(SPQLIOSSOURCES
@@ -109,19 +128,20 @@ if (ENABLE_SPQLIOS_F128)
     set(SPQLIOSLIBDEP ${SPQLIOSLIBDEP} quadmath)
 endif (ENABLE_SPQLIOS_F128)
 
-add_library(spqlios-fft-static STATIC ${SPQLIOSSOURCES})
-add_library(spqlios-fft SHARED ${SPQLIOSSOURCES})
-set_property(TARGET spqlios-fft-static PROPERTY POSITION_INDEPENDENT_CODE ON)
-set_property(TARGET spqlios-fft-static PROPERTY OUTPUT_NAME spqlios-fft)
-set_property(TARGET spqlios-fft PROPERTY POSITION_INDEPENDENT_CODE ON)
-set_property(TARGET spqlios-fft PROPERTY SOVERSION ${SPQLIOS_VERSION_MAJOR})
-set_property(TARGET spqlios-fft PROPERTY VERSION ${SPQLIOS_VERSION})
-target_link_options(spqlios-fft-static PUBLIC -Wl,--no-undefined)
-target_link_options(spqlios-fft PUBLIC -Wl,--no-undefined)
-target_link_libraries(spqlios-fft ${SPQLIOSLIBDEP})
-target_link_libraries(spqlios-fft-static ${SPQLIOSLIBDEP})
-install(TARGETS spqlios-fft-static DESTINATION lib)
-install(TARGETS spqlios-fft DESTINATION lib)
+add_library(libspqlios-static STATIC ${SPQLIOSSOURCES})
+add_library(libspqlios SHARED ${SPQLIOSSOURCES})
+set_property(TARGET libspqlios-static PROPERTY POSITION_INDEPENDENT_CODE ON)
+set_property(TARGET libspqlios PROPERTY OUTPUT_NAME spqlios)
+set_property(TARGET libspqlios-static PROPERTY OUTPUT_NAME spqlios)
+set_property(TARGET libspqlios PROPERTY POSITION_INDEPENDENT_CODE ON)
+set_property(TARGET libspqlios PROPERTY SOVERSION ${SPQLIOS_VERSION_MAJOR})
+set_property(TARGET libspqlios PROPERTY VERSION ${SPQLIOS_VERSION})
+target_link_options(libspqlios-static PUBLIC -Wl,--no-undefined)
+target_link_options(libspqlios PUBLIC -Wl,--no-undefined)
+target_link_libraries(libspqlios ${SPQLIOSLIBDEP})
+target_link_libraries(libspqlios-static ${SPQLIOSLIBDEP})
+install(TARGETS libspqlios-static DESTINATION lib)
+install(TARGETS libspqlios DESTINATION lib)
 
 # install the public headers only
 foreach (file ${HEADERSPUBLIC})

@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 #include "../commons_private.h"
-#include "cplx_fft.h"
+#include "cplx_fft_internal.h"
 #include "cplx_fft_private.h"
 
 /** @brief (a,b) <- (a+omega.b,a-omega.b) */
@@ -95,7 +95,8 @@ void cplx_fft16_precomp(const double entry_pwr, CPLX** omg) {
 }
 
 /**
- * @brief merges 2 times h evaluations of even/odd polynomials into 2h evaluations of a sigle polynomial
+ * @brief h twiddles-fft on the same omega
+ * (also called merge-fft)merges 2 times h evaluations of even/odd polynomials into 2h evaluations of a sigle polynomial
  * Input:  P_0(z),...,P_{h-1}(z),P_h(z),...,P_{2h-1}(z)
  * Output: Q_0(y),...,Q_{h-1}(y),Q_0(-y),...,Q_{h-1}(-y)
  * where Q_i(X)=P_i(X^2)+X.P_{h+i}(X^2) and y^2 = z
@@ -103,14 +104,26 @@ void cplx_fft16_precomp(const double entry_pwr, CPLX** omg) {
  * @param data 2h complex coefficients interleaved and 256b aligned
  * @param powom y represented as (yre,yim)
  */
-void cplx_merge_fft_ref(int32_t h, CPLX* data, const CPLX powom) {
+void cplx_twiddle_fft_ref(int32_t h, CPLX* data, const CPLX powom) {
   CPLX* d0 = data;
   CPLX* d1 = data + h;
   for (uint64_t i = 0; i < h; ++i) {
-    CPLX prod;
-    cplx_mul(prod, d1[i], powom);
-    cplx_sub(d1[i], d0[i], prod);
-    cplx_add(d0[i], d0[i], prod);
+    ctwiddle(d0[i], d1[i], powom);
+  }
+}
+
+void cplx_bitwiddle_fft_ref(int32_t h, CPLX* data, const CPLX powom[2]) {
+  CPLX* d0 = data;
+  CPLX* d1 = data + h;
+  CPLX* d2 = data + 2*h;
+  CPLX* d3 = data + 3*h;
+  for (uint64_t i = 0; i < h; ++i) {
+    ctwiddle(d0[i], d2[i], powom[0]);
+    ctwiddle(d1[i], d3[i], powom[0]);
+  }
+  for (uint64_t i = 0; i < h; ++i) {
+    ctwiddle(d0[i], d1[i], powom[1]);
+    citwiddle(d2[i], d3[i], powom[1]);
   }
 }
 
@@ -134,7 +147,7 @@ void cplx_fft_ref_bfs_2(CPLX* dat, const CPLX** omg, uint32_t m) {
   for (int32_t h = m / 2; h >= 2; h >>= 1) {
     for (CPLX* d = data; d < dend; d += 2 * h) {
       if (memcmp((*omg)[0], (*omg)[1], 8) != 0) abort();
-      cplx_merge_fft_ref(h, d, **omg);
+      cplx_twiddle_fft_ref(h, d, **omg);
       *omg += 2;
     }
 #if 0
@@ -164,19 +177,20 @@ void cplx_fft_ref_bfs_2(CPLX* dat, const CPLX** omg, uint32_t m) {
 void cplx_fft_ref_bfs_16(CPLX* dat, const CPLX** omg, uint32_t m) {
   CPLX* data = (CPLX*)dat;
   CPLX* const dend = data + m;
-  for (int32_t h = m / 2; h >= 16; h >>= 1) {
-    for (CPLX* d = data; d < dend; d += 2 * h) {
-      if (memcmp((*omg)[0], (*omg)[1], 8) != 0) abort();
-      cplx_merge_fft_ref(h, d, **omg);
+  uint32_t mm = m;
+  uint32_t log2m = log2(m);
+  if (log2m % 2 == 1) {
+    cplx_twiddle_fft_ref(mm/2, data, **omg);
+    *omg += 2;
+    mm >>= 1;
+  }
+  while(mm>16) {
+    uint32_t h = mm/4;
+    for (CPLX* d = data; d < dend; d += mm) {
+      cplx_bitwiddle_fft_ref(h, d, *omg);
       *omg += 2;
     }
-#if 0
-    printf("after merge %d: ", h);
-    for (uint64_t ii=0; ii<nn/2; ++ii) {
-      printf("%.6lf %.6lf ",data[ii][0],data[ii][1]);
-    }
-    printf("\n");
-#endif
+    mm=h;
   }
   for (CPLX* d = data; d < dend; d += 16) {
     cplx_fft16_ref(d, *omg);
@@ -209,19 +223,36 @@ void cplx_fft_naive(const uint32_t m, const double entry_pwr, CPLX* data) {
 
 /** @brief fills omega for cplx_fft_bfs_16 modulo X^m-exp(i.2.pi.entry_pwr) */
 void fill_cplx_fft_omegas_bfs_16(const double entry_pwr, CPLX** omg, uint32_t m) {
-  double pom = entry_pwr / 2.;
-  for (int32_t h = m / 2; h >= 16; h >>= 1) {
-    for (uint32_t i = 0; i < m / (2 * h); i++) {
+  uint32_t mm = m;
+  uint32_t log2m = log2(m);
+  double ss = entry_pwr;
+  if (log2m % 2 == 1) {
+    uint32_t h = mm / 2;
+    double pom = ss / 2.;
+    for (uint32_t i = 0; i < m / mm; i++) {
       cplx_set_e2pix(omg[0][0], pom + fracrevbits(i) / 2.);
       cplx_set(omg[0][1], omg[0][0]);
       *omg += 2;
     }
-    pom /= 2;
+    mm = h;
+    ss = pom;
+  }
+  while (mm>16) {
+    double pom = ss / 4.;
+    uint32_t h = mm / 4;
+    for (uint32_t i = 0; i < m / mm; i++) {
+      double om = pom + fracrevbits(i) / 4.;
+      cplx_set_e2pix(omg[0][0], 2. * om);
+      cplx_set_e2pix(omg[0][1], om);
+      *omg += 2;
+    }
+    mm = h;
+    ss = pom;
   }
   {
-    // h=8
+    // mm=16
     for (uint32_t i = 0; i < m / 16; i++) {
-      cplx_fft16_precomp(2. * pom + fracrevbits(i), omg);
+      cplx_fft16_precomp(ss + fracrevbits(i), omg);
     }
   }
 }
@@ -268,7 +299,7 @@ void cplx_fft_ref_rec_16(CPLX* dat, const CPLX** omg, uint32_t m) {
   if (m <= 2048) return cplx_fft_ref_bfs_16(dat, omg, m);
   const uint32_t h = m / 2;
   if (memcmp((*omg)[0], (*omg)[1], 8) != 0) abort();
-  cplx_merge_fft_ref(h, dat, **omg);
+  cplx_twiddle_fft_ref(h, dat, **omg);
   *omg += 2;
   cplx_fft_ref_rec_16(dat, omg, h);
   cplx_fft_ref_rec_16(dat + h, omg, h);
@@ -285,14 +316,16 @@ void cplx_fft_ref(const CPLX_FFT_PRECOMP* precomp, void* d) {
 }
 
 EXPORT CPLX_FFT_PRECOMP* new_cplx_fft_precomp(uint32_t m, uint32_t num_buffers) {
-  const uint64_t OMG_SPACE = 2 * m * sizeof(CPLX);
-  void* reps = malloc(sizeof(CPLX_FFT_PRECOMP) + 32     // padding
+  const uint64_t OMG_SPACE = ceilto64b((2 * m)* sizeof(CPLX));
+  const uint64_t BUF_SIZE = ceilto64b(m * sizeof(CPLX));
+  void* reps = malloc(sizeof(CPLX_FFT_PRECOMP) + 63     // padding
                       + OMG_SPACE                       // tables //TODO 16?
-                      + num_buffers * m * sizeof(CPLX)  // buffers
+                      + num_buffers * BUF_SIZE          // buffers
   );
-  uint64_t aligned_addr = (uint64_t)(reps + sizeof(CPLX_FFT_PRECOMP) + 31) & (-32UL);
+  uint64_t aligned_addr = ceilto64b((uint64_t)(reps) + sizeof(CPLX_FFT_PRECOMP));
   CPLX_FFT_PRECOMP* r = (CPLX_FFT_PRECOMP*)reps;
   r->m = m;
+  r->buf_size = BUF_SIZE;
   r->powomegas = (double*)aligned_addr;
   r->aligned_buffers = (void*)(aligned_addr + OMG_SPACE);
   // fill in powomegas
@@ -321,7 +354,7 @@ EXPORT CPLX_FFT_PRECOMP* new_cplx_fft_precomp(uint32_t m, uint32_t num_buffers) 
 }
 
 EXPORT void* cplx_fft_precomp_get_buffer(const CPLX_FFT_PRECOMP* tables, uint32_t buffer_index) {
-  return ((CPLX*)tables->aligned_buffers) + buffer_index * tables->m;
+  return (uint8_t *)tables->aligned_buffers + buffer_index * tables->buf_size;
 }
 
 EXPORT void cplx_fft_simple(uint32_t m, void* data) {

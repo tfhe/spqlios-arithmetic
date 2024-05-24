@@ -1,5 +1,5 @@
-#ifndef SPQLIOS_REIM4_FFTVEC_H
-#define SPQLIOS_REIM4_FFTVEC_H
+#ifndef SPQLIOS_REIM4_FFTVEC_INTERNAL_H
+#define SPQLIOS_REIM4_FFTVEC_INTERNAL_H
 
 #include "reim4_fftvec_public.h"
 
@@ -17,4 +17,4 @@ EXPORT void reim4_from_cplx_fma(const REIM4_FROM_CPLX_PRECOMP* tables, double* r
 EXPORT void reim4_to_cplx_ref(const REIM4_TO_CPLX_PRECOMP* tables, void* r, const double* a);
 EXPORT void reim4_to_cplx_fma(const REIM4_TO_CPLX_PRECOMP* tables, void* r, const double* a);
 
-#endif  // SPQLIOS_REIM4_FFTVEC_H
+#endif  // SPQLIOS_REIM4_FFTVEC_INTERNAL_H

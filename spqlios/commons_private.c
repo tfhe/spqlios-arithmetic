@@ -49,3 +49,11 @@ double fracrevbits(uint32_t i) {
   else
     return fracrevbits((i - 1) / 2) / 2. + 0.5;
 }
+
+uint64_t ceilto64b(uint64_t size) {
+  return (size + 63UL) & (-64UL);
+}
+
+uint64_t ceilto32b(uint64_t size) {
+  return (size + 31UL) & (-32UL);
+}
