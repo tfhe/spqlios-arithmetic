@@ -43,6 +43,13 @@ add_library(spqlios-testlib SHARED
 		testlib/negacyclic_polynomial_impl.h
 		testlib/reim4_elem.cpp
 		testlib/reim4_elem.h
+		testlib/fft64_dft.cpp
+		testlib/fft64_dft.h
+		testlib/fft64_layouts.h
+		testlib/fft64_layouts.cpp
+		testlib/test_hash.cpp
+		testlib/sha3.h
+		testlib/sha3.c
 )
 if (VALGRIND_DIR)
 	target_include_directories(spqlios-testlib PRIVATE ${VALGRIND_DIR})
