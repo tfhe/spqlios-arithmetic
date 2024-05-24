@@ -81,6 +81,8 @@ add_executable(spqlios-test
 		spqlios_vmp_product_test.cpp
 		spqlios_vec_znx_dft_test.cpp
 		spqlios_vec_znx_test.cpp
+		spqlios_svp_test.cpp
+		spqlios_svp_product_test.cpp
 )
 target_link_libraries(spqlios-test spqlios-testlib libspqlios ${gtest_libs})
 target_include_directories(spqlios-test PRIVATE ${test_incs})
