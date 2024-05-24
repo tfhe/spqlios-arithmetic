@@ -50,6 +50,8 @@ add_library(spqlios-testlib SHARED
 		testlib/test_hash.cpp
 		testlib/sha3.h
 		testlib/sha3.c
+		testlib/polynomial_vector.h
+		testlib/polynomial_vector.cpp
 )
 if (VALGRIND_DIR)
 	target_include_directories(spqlios-testlib PRIVATE ${VALGRIND_DIR})
@@ -71,6 +73,8 @@ add_executable(spqlios-test
 		spqlios_znx_small_test.cpp
 		spqlios_coeffs_arithmetic_test.cpp
 		spqlios_reim4_arithmetic_test.cpp
+		spqlios_vec_znx_big_test.cpp
+		spqlios_vmp_product_test.cpp
 )
 target_link_libraries(spqlios-test spqlios-testlib libspqlios ${gtest_libs})
 target_include_directories(spqlios-test PRIVATE ${test_incs})
