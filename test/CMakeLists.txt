@@ -59,6 +59,7 @@ add_executable(spqlios-test
 		spqlios_reim_conversions_test.cpp
 		spqlios_q120_ntt_test.cpp
 		spqlios_q120_arithmetic_test.cpp
+		spqlios_znx_small_test.cpp
 )
 target_link_libraries(spqlios-test spqlios-testlib libspqlios ${gtest_libs})
 target_include_directories(spqlios-test PRIVATE ${test_incs})
