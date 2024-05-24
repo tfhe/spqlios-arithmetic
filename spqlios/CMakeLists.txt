@@ -7,6 +7,7 @@ set(SRCS_GENERIC
         coeffs/coeffs_arithmetic.c
         arithmetic/vec_znx.c
         arithmetic/vec_znx_dft.c
+        arithmetic/vector_matrix_product.c
         cplx/cplx_common.c
         cplx/cplx_conversions.c
         cplx/cplx_fft_asserts.c
@@ -47,6 +48,7 @@ set(SRCS_AARCH64
 
 # C or assembly source files compiled only on x86: avx, avx2, fma targets
 set(SRCS_FMA
+        arithmetic/vector_matrix_product_avx.c
         cplx/cplx_conversions_avx2_fma.c
         cplx/cplx_fft16_avx_fma.s
         cplx/cplx_fft_avx2_fma.c
@@ -152,6 +154,8 @@ if (ENABLE_SPQLIOS_F128)
 endif (ENABLE_SPQLIOS_F128)
 
 add_library(libspqlios-static STATIC ${SPQLIOSSOURCES})
+add_library(spqlios SHARED ${SPQLIOSSOURCES}
+        arithmetic/vector_matrix_product.c)
 add_library(libspqlios SHARED ${SPQLIOSSOURCES})
 set_property(TARGET libspqlios-static PROPERTY POSITION_INDEPENDENT_CODE ON)
 set_property(TARGET libspqlios PROPERTY OUTPUT_NAME spqlios)
