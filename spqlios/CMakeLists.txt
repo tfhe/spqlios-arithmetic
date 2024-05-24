@@ -27,7 +27,9 @@ set(SRCS_GENERIC
         q120/q120_ntt.c
         q120/q120_arithmetic_ref.c
         q120/q120_arithmetic_simple.c
-        )
+        arithmetic/scalar_vector_product.c
+        arithmetic/vec_znx_big.c
+)
 # C or assembly source files compiled only on x86 targets
 set(SRCS_X86
         cplx/spqlios_fft_execute.s
