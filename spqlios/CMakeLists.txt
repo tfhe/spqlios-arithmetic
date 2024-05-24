@@ -4,6 +4,8 @@ enable_language(ASM)
 set(SRCS_GENERIC
         commons.c 
         commons_private.c
+        coeffs/coeffs_arithmetic.c
+        arithmetic/vec_znx.c
         arithmetic/vec_znx_dft.c
         cplx/cplx_common.c
         cplx/cplx_conversions.c
@@ -74,6 +76,8 @@ set_source_files_properties(${SRCS_AVX512} PROPERTIES COMPILE_OPTIONS "-mfma;-ma
 
 # C or assembly source files compiled only on x86: avx2 + bmi targets
 set(SRCS_AVX2
+        arithmetic/vec_znx_avx.c
+        coeffs/coeffs_arithmetic_avx.c
         arithmetic/vec_znx_dft_avx2.c
         q120/q120_arithmetic_avx2.c
         q120/q120_ntt_avx2.c
@@ -111,6 +115,7 @@ set(HEADERSPRIVATE
         q120/q120_arithmetic_private.h
         q120/q120_ntt_private.h
         arithmetic/vec_znx_arithmetic.h
+        coeffs/coeffs_arithmetic.h
         )
 
 set(SPQLIOSSOURCES
