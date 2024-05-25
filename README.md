@@ -22,7 +22,7 @@ This makes the SPQlios API a high value target for hardware acceleration, that t
 
 ### SPQLios is not an FHE library, but a huge enabler
 
-SPQlios itself is not an FHE library: there is no ciphertext, plaintext or key. It is a mathematical library that exposes efficient algebra over polynomials. Using the functions exposed, it is possible to to quickly build efficient FHE libraries, with support for the main schemes based on Ring-LWE: BFV, BGV, CGGI, DM, CKKS.
+SPQlios itself is not an FHE library: there is no ciphertext, plaintext or key. It is a mathematical library that exposes efficient algebra over polynomials. Using the functions exposed, it is possible to quickly build efficient FHE libraries, with support for the main schemes based on Ring-LWE: BFV, BGV, CGGI, DM, CKKS.
 
 
 ## Dependencies 
@@ -31,7 +31,7 @@ The SPQLIOS-FFT library is a C library that can be compiled with a standard C co
 interface can be used in a regular C code, and any other language via classical foreign APIs. 
 
 The unittests and integration tests are in an optional part of the code, and are written in C++.  These tests rely on 
-[```benchmark```](https://github.com/google/benchmark), and ```gtest``` libraries, and therefore require a C++17 compiler.
+[```benchmark```](https://github.com/google/benchmark), and [```gtest```](https://github.com/google/googletest) libraries, and therefore require a C++17 compiler.
 
 Currently, the project has been tested with the gcc,g++ >= 11.3.0 compiler under Linux (x86_64). In the future, we plan to
 extend the compatibility to other compilers, platforms and operating systems. 
@@ -39,7 +39,7 @@ extend the compatibility to other compilers, platforms and operating systems.
 
 ## Installation
 
-The library uses a classical ```cmake``` build mechanism: use ```cmake``` to create a ```build``` folder in the top level directory and run ```make``` from inside it. This assumes that the standard tool cmake is already installed on the system, and an up-to-date c++ compiler (i.e. g++ >=11.3.0) as well.
+The library uses a classical ```cmake``` build mechanism: use ```cmake``` to create a ```build``` folder in the top level directory and run ```make``` from inside it. This assumes that the standard tool ```cmake``` is already installed on the system, and an up-to-date c++ compiler (i.e. g++ >=11.3.0) as well.
 
 It will compile the shared library in optimized mode, and ```make install``` install it to the desired prefix folder (by default ```/usr/local/lib```).
 
