@@ -61,6 +61,7 @@ if (VALGRIND_DIR)
 	target_include_directories(spqlios-testlib PRIVATE ${VALGRIND_DIR})
 	target_compile_definitions(spqlios-testlib PRIVATE VALGRIND_MEM_TESTS)
 endif ()
+target_link_libraries(spqlios-testlib libspqlios)
 
 
 
@@ -91,7 +92,7 @@ add_test(NAME spqlios-test COMMAND spqlios-test)
 
 # benchmarks
 add_executable(spqlios-cplx-fft-bench spqlios_cplx_fft_bench.cpp)
-target_link_libraries(spqlios-cplx-fft-bench libspqlios benchmark pthread)
+target_link_libraries(spqlios-cplx-fft-bench libspqlios ${benchmark} pthread)
 target_include_directories(spqlios-cplx-fft-bench PRIVATE ../)
 
 if (${X86})

@@ -19,6 +19,7 @@ if (WARNING_PARANOID)
     add_compile_options(-Wall -Werror)
 endif()
 
+
 if (CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)|(amd64)|(AMD64)")
     set(X86 ON)
     set(AARCH64 OFF)
@@ -30,6 +31,14 @@ if (CMAKE_SYSTEM_PROCESSOR MATCHES "(aarch64)")
     set(AARCH64 ON)
 endif ()
 
+if (WIN32)
+    message(STATUS "win32 detected!")
+    #overrides for win32
+    set(X86 OFF)
+    set(AARCH64 OFF)
+    set(X86_WIN32 ON)
+    include_directories(/usr/local/mingw/include)
+endif (WIN32)
 
 # compiles the main library in spqlios
 add_subdirectory(spqlios)

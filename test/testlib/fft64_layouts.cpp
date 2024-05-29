@@ -7,7 +7,7 @@ void* alloc64(uint64_t size) {
   static uint64_t _msk64 = -64;
   if (size == 0) return nullptr;
   uint64_t rsize = (size + 63) & _msk64;
-  uint8_t* reps = (uint8_t*)std::aligned_alloc(64, rsize);
+  uint8_t* reps = (uint8_t*)aligned_alloc(64, rsize);
   REQUIRE_DRAMATICALLY(reps != 0, "Out of memory");
 #ifdef VALGRIND_MEM_TESTS
   VALGRIND_MAKE_MEM_NOACCESS(reps + size, rsize - size);

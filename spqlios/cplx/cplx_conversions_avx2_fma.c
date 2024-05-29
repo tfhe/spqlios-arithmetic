@@ -47,7 +47,7 @@ __always_inline void cplx_from_any_fma(uint64_t m, void* r, const int32_t* x, co
 EXPORT void cplx_from_znx32_avx2_fma(const CPLX_FROM_ZNX32_PRECOMP* precomp, void* r, const int32_t* x) {
   //note: the hex code of 2^31 + 2^52 is 0x4330000080000000
   const __m256i C = _mm256_set1_epi32(0x43300000);
-  const __m256d R = _mm256_set1_pd((1L<<31) + (1L<<52));
+  const __m256d R = _mm256_set1_pd((INT64_C(1) << 31) + (INT64_C(1) << 52));
   //double XX =  1L + (1L<<31) + (1L<<52);
   //printf("\n\n%016lx\n", *(uint64_t*)&XX);
   //abort();

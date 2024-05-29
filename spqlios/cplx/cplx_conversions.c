@@ -17,7 +17,7 @@ EXPORT void cplx_from_znx32_ref(const CPLX_FROM_ZNX32_PRECOMP* precomp, void* r,
 }
 
 EXPORT void cplx_from_tnx32_ref(const CPLX_FROM_TNX32_PRECOMP* precomp, void* r, const int32_t* x) {
-  static const double _2p32 = 1. / (1L << 32);
+  static const double _2p32 = 1. / (INT64_C(1) << 32);
   const uint32_t m = precomp->m;
   const int32_t* inre = x;
   const int32_t* inim = x + m;
@@ -29,7 +29,7 @@ EXPORT void cplx_from_tnx32_ref(const CPLX_FROM_TNX32_PRECOMP* precomp, void* r,
 }
 
 EXPORT void cplx_to_tnx32_ref(const CPLX_TO_TNX32_PRECOMP* precomp, int32_t* r, const void* x) {
-  static const double _2p32 = (1L << 32);
+  static const double _2p32 = (INT64_C(1) << 32);
   const uint32_t m = precomp->m;
   double factor = _2p32 / precomp->divisor;
   int32_t* outre = r;

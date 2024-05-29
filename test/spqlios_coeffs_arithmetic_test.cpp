@@ -196,8 +196,8 @@ void test_znx_normalize(F normalize) {
   for (const uint64_t n : {1, 2, 4, 8, 16, 64, 256, 4096}) {
     polynomial<int64_t> inp = znx_i64::random_log2bound(n, 62);
     if (n >= 2) {
-      inp.set_coeff(0, -(1l << 62));
-      inp.set_coeff(1, (1l << 62));
+      inp.set_coeff(0, -(INT64_C(1) << 62));
+      inp.set_coeff(1, (INT64_C(1) << 62));
     }
     for (const uint64_t base_k : {2, 3, 19, 35, 62}) {
       polynomial<int64_t> out;
@@ -231,8 +231,8 @@ void test_znx_normalize_cout(F normalize) {
   for (const uint64_t n : {1, 2, 4, 8, 16, 64, 256, 4096}) {
     polynomial<int64_t> inp = znx_i64::random_log2bound(n, 62);
     if (n >= 2) {
-      inp.set_coeff(0, -(1l << 62));
-      inp.set_coeff(1, (1l << 62));
+      inp.set_coeff(0, -(INT64_C(1) << 62));
+      inp.set_coeff(1, (INT64_C(1) << 62));
     }
     for (const uint64_t base_k : {2, 3, 19, 35, 62}) {
       polynomial<int64_t> out, cout;
@@ -285,18 +285,18 @@ void test_znx_normalize_cin(F normalize) {
   for (const uint64_t n : {1, 2, 4, 8, 16, 64, 256, 4096}) {
     polynomial<int64_t> inp = znx_i64::random_log2bound(n, 62);
     if (n >= 4) {
-      inp.set_coeff(0, -(1l << 62));
-      inp.set_coeff(1, -(1l << 62));
-      inp.set_coeff(2, (1l << 62));
-      inp.set_coeff(3, (1l << 62));
+      inp.set_coeff(0, -(INT64_C(1) << 62));
+      inp.set_coeff(1, -(INT64_C(1) << 62));
+      inp.set_coeff(2, (INT64_C(1) << 62));
+      inp.set_coeff(3, (INT64_C(1) << 62));
     }
     for (const uint64_t base_k : {2, 3, 19, 35, 62}) {
       polynomial<int64_t> cin = znx_i64::random_log2bound(n, 62);
       if (n >= 4) {
-        inp.set_coeff(0, -(1l << 62));
-        inp.set_coeff(1, (1l << 62));
-        inp.set_coeff(0, -(1l << 62));
-        inp.set_coeff(1, (1l << 62));
+        inp.set_coeff(0, -(INT64_C(1) << 62));
+        inp.set_coeff(1, (INT64_C(1) << 62));
+        inp.set_coeff(0, -(INT64_C(1) << 62));
+        inp.set_coeff(1, (INT64_C(1) << 62));
       }
 
       polynomial<int64_t> out;
@@ -344,18 +344,18 @@ void test_znx_normalize_cin_cout(F normalize) {
   for (const uint64_t n : {1, 2, 4, 8, 16, 64, 256, 4096}) {
     polynomial<int64_t> inp = znx_i64::random_log2bound(n, 62);
     if (n >= 4) {
-      inp.set_coeff(0, -(1l << 62));
-      inp.set_coeff(1, -(1l << 62));
-      inp.set_coeff(2, (1l << 62));
-      inp.set_coeff(3, (1l << 62));
+      inp.set_coeff(0, -(INT64_C(1) << 62));
+      inp.set_coeff(1, -(INT64_C(1) << 62));
+      inp.set_coeff(2, (INT64_C(1) << 62));
+      inp.set_coeff(3, (INT64_C(1) << 62));
     }
     for (const uint64_t base_k : {2, 3, 19, 35, 62}) {
       polynomial<int64_t> cin = znx_i64::random_log2bound(n, 62);
       if (n >= 4) {
-        inp.set_coeff(0, -(1l << 62));
-        inp.set_coeff(1, (1l << 62));
-        inp.set_coeff(0, -(1l << 62));
-        inp.set_coeff(1, (1l << 62));
+        inp.set_coeff(0, -(INT64_C(1) << 62));
+        inp.set_coeff(1, (INT64_C(1) << 62));
+        inp.set_coeff(0, -(INT64_C(1) << 62));
+        inp.set_coeff(1, (INT64_C(1) << 62));
       }
 
       polynomial<int64_t> out, cout;

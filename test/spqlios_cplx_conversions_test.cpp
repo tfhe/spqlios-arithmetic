@@ -65,7 +65,8 @@ TEST(fft, cplx_to_tnx32_ref_vs_fma) {
       cplx_to_tnx32_avx2_fma(&precomp, dst2, src);
       // cplx_to_tnx32_simple(m, divisor, 18, dst2, src);
       for (uint64_t i = 0; i < 2 * m; ++i) {
-        double truevalue = (src[i % m][i / m] / divisor - floor(src[i % m][i / m] / divisor + 0.5)) * (1L << 32);
+        double truevalue =
+            (src[i % m][i / m] / divisor - floor(src[i % m][i / m] / divisor + 0.5)) * (INT64_C(1) << 32);
         if (fabs(truevalue - floor(truevalue)) == 0.5) {
           // ties can differ by 0, 1 or -1
           ASSERT_LE(abs(dst1[i] - dst2[i]), 0)

@@ -34,7 +34,7 @@ void reim_to_znx64_avx2_bnd63_fma(const REIM_TO_ZNX64_PRECOMP* precomp, int64_t*
   static const uint64_t EXPO_MASK = 0x7FF0000000000000UL;
   static const uint64_t MANTISSA_MASK = 0x000FFFFFFFFFFFFFUL;
   static const uint64_t MANTISSA_MSB = 0x0010000000000000UL;
-  const double divisor_bits = precomp->divisor * ((double)(1UL << 52));
+  const double divisor_bits = precomp->divisor * ((double)(INT64_C(1) << 52));
   const double offset = precomp->divisor / 2.;
 
   const __m256d SIGN_MASK_4 = _mm256_castsi256_pd(_mm256_set1_epi64x(SIGN_MASK));
@@ -81,8 +81,8 @@ void reim_to_znx64_avx2_bnd63_fma(const REIM_TO_ZNX64_PRECOMP* precomp, int64_t*
 // version where the output norm can be as big as 2^50
 void reim_to_znx64_avx2_bnd50_fma(const REIM_TO_ZNX64_PRECOMP* precomp, int64_t* r, const void* x) {
   static const uint64_t MANTISSA_MASK = 0x000FFFFFFFFFFFFFUL;
-  const int64_t SUB_CST = 1L << 51;
-  const double add_cst = precomp->divisor * ((double)(3UL << 51));
+  const int64_t SUB_CST = INT64_C(1) << 51;
+  const double add_cst = precomp->divisor * ((double)(INT64_C(3) << 51));
 
   const __m256i SUB_CST_4 = _mm256_set1_epi64x(SUB_CST);
   const __m256d add_cst_4 = _mm256_set1_pd(add_cst);

@@ -32,12 +32,12 @@ set(SRCS_GENERIC
         arithmetic/vec_znx_big.c
         arithmetic/znx_small.c
         arithmetic/module_api.c
+        reim/reim_execute.c
+        cplx/cplx_execute.c
+        reim4/reim4_execute.c
 )
 # C or assembly source files compiled only on x86 targets
 set(SRCS_X86
-        cplx/spqlios_fft_execute.s
-        reim/reim_execute.s
-        reim4/reim4_execute.s
         )
 # C or assembly source files compiled only on aarch64 targets
 set(SRCS_AARCH64
@@ -48,31 +48,47 @@ set(SRCS_AARCH64
         )
 
 # C or assembly source files compiled only on x86: avx, avx2, fma targets
-set(SRCS_FMA
+set(SRCS_FMA_C
         arithmetic/vector_matrix_product_avx.c
         cplx/cplx_conversions_avx2_fma.c
-        cplx/cplx_fft16_avx_fma.s
         cplx/cplx_fft_avx2_fma.c
         cplx/cplx_fft_sse.c
         cplx/cplx_fftvec_avx2_fma.c
-        cplx/cplx_ifft16_avx_fma.s
         cplx/cplx_ifft_avx2_fma.c
         reim4/reim4_arithmetic_avx2.c
+        reim/reim_conversions_avx.c
+        reim/reim_fft_avx2.c
+        reim/reim_ifft_avx2.c
+        reim/reim_to_tnx_avx.c
+)
+set(SRCS_FMA_ASM
+        cplx/cplx_fft16_avx_fma.s
+        cplx/cplx_ifft16_avx_fma.s
         reim4/reim4_fftvec_addmul_fma.s
         reim4/reim4_fftvec_conv_fma.s
-        reim/reim_conversions_avx.c
         reim/reim_fft16_avx_fma.s
         reim/reim_fft4_avx_fma.s
         reim/reim_fft8_avx_fma.s
-        reim/reim_fft_avx2.c
         reim/reim_fftvec_addmul_fma.s
         reim/reim_ifft16_avx_fma.s
         reim/reim_ifft4_avx_fma.s
         reim/reim_ifft8_avx_fma.s
-        reim/reim_ifft_avx2.c
-        reim/reim_to_tnx_avx.c
-        )
-set_source_files_properties(${SRCS_FMA} PROPERTIES COMPILE_OPTIONS "-mfma;-mavx;-mavx2")
+)
+set(SRCS_FMA_WIN32_ASM
+        cplx/cplx_fft16_avx_fma_win32.s
+        cplx/cplx_ifft16_avx_fma_win32.s
+        reim4/reim4_fftvec_addmul_fma_win32.s
+        reim4/reim4_fftvec_conv_fma_win32.s
+        reim/reim_fft16_avx_fma_win32.s
+        reim/reim_fft4_avx_fma_win32.s
+        reim/reim_fft8_avx_fma_win32.s
+        reim/reim_fftvec_addmul_fma_win32.s
+        reim/reim_ifft16_avx_fma_win32.s
+        reim/reim_ifft4_avx_fma_win32.s
+        reim/reim_ifft8_avx_fma_win32.s
+)
+set_source_files_properties(${SRCS_FMA_C} PROPERTIES COMPILE_OPTIONS "-mfma;-mavx;-mavx2")
+set_source_files_properties(${SRCS_FMA_ASM} PROPERTIES COMPILE_OPTIONS "-mfma;-mavx;-mavx2")
 
 # C or assembly source files compiled only on x86: avx512f/vl/dq + fma targets
 set(SRCS_AVX512
@@ -132,12 +148,20 @@ set(SPQLIOSSOURCES
 if (${X86})
     set(SPQLIOSSOURCES ${SPQLIOSSOURCES}
             ${SRCS_X86}
-            ${SRCS_FMA}
+            ${SRCS_FMA_C}
+            ${SRCS_FMA_ASM}
             ${SRCS_AVX2}
             ${SRCS_AVX512}
             )
-endif ()
-if (${AARCH64})
+elseif (${X86_WIN32})
+    set(SPQLIOSSOURCES ${SPQLIOSSOURCES}
+            #${SRCS_X86}
+            ${SRCS_FMA_C}
+            ${SRCS_FMA_WIN32_ASM}
+            ${SRCS_AVX2}
+            ${SRCS_AVX512}
+    )
+elseif (${AARCH64})
     set(SPQLIOSSOURCES ${SPQLIOSSOURCES}
             ${SRCS_AARCH64}
             )

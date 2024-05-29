@@ -1,6 +1,7 @@
 #ifndef SPQLIOS_REIM_FFT_PRIVATE_H
 #define SPQLIOS_REIM_FFT_PRIVATE_H
 
+#include "../commons_private.h"
 #include "reim_fft.h"
 
 #define STATIC_ASSERT(condition) (void)sizeof(char[-1 + 2 * !!(condition)])

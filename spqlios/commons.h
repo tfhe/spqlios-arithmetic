@@ -32,13 +32,6 @@
     abort();                                   \
   }
 
-#ifdef __x86_64__
-#define CPU_SUPPORTS __builtin_cpu_supports
-#else
-// TODO for now, we do not have any optimization for non x86 targets
-#define CPU_SUPPORTS(xxxx) 0
-#endif
-
 EXPORT void* UNDEFINED_p_ii(int32_t n, int32_t m);
 EXPORT void* UNDEFINED_p_uu(uint32_t n, uint32_t m);
 EXPORT double* UNDEFINED_dp_pi(const void* p, int32_t n);
@@ -54,5 +47,11 @@ EXPORT void NOT_IMPLEMENTED_v_vp(void* p);
 EXPORT void NOT_IMPLEMENTED_v_idpdpdp(int32_t n, double* a, const double* b, const double* c);
 EXPORT void NOT_IMPLEMENTED_v_uvpcvpcvp(uint32_t n, void* r, const void* a, const void* b);
 EXPORT void NOT_IMPLEMENTED_v_uvpvpcvp(uint32_t n, void* a, void* b, const void* o);
+
+// windows
+#ifdef _WIN32
+EXPORT void* aligned_alloc(size_t align, size_t n);
+#define __always_inline inline __attribute((always_inline))
+#endif
 
 #endif  // SPQLIOS_COMMONS_H

@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <immintrin.h>
+#include <inttypes.h>
 #include <math.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -30,7 +31,7 @@ __always_inline __m256i modq_red(const __m256i x, const uint64_t h, const __m256
 
 void print_data(const uint64_t n, const uint64_t* const data, const uint64_t q) {
   for (uint64_t i = 0; i < n; i++) {
-    printf("%lu ", *(data + i) % q);
+    printf("%" PRIu64 " ", *(data + i) % q);
   }
   printf("\n");
 }
@@ -185,7 +186,7 @@ EXPORT void q120_ntt_bb_avx2(const q120_ntt_precomp* const precomp, q120b* const
 
   if (CHECK_BOUNDS) {
     double bs __attribute__((unused)) = max_bit_size((void*)begin, (void*)end);
-    LOG("Input %lf %lu\n", bs, precomp->input_bit_size);
+    LOG("Input %lf %" PRIu64 "\n", bs, precomp->input_bit_size);
     assert(bs <= precomp->input_bit_size);
   }
 
@@ -194,7 +195,7 @@ EXPORT void q120_ntt_bb_avx2(const q120_ntt_precomp* const precomp, q120b* const
 
   if (CHECK_BOUNDS) {
     double bs __attribute__((unused)) = max_bit_size((void*)begin, (void*)end);
-    LOG("Iter %3lu - %lf %lu\n", n, bs, itData->bs);
+    LOG("Iter %3" PRIu64 " - %lf %" PRIu64 "\n", n, bs, itData->bs);
     assert(bs < itData->bs);
   }
 
@@ -216,7 +217,7 @@ EXPORT void q120_ntt_bb_avx2(const q120_ntt_precomp* const precomp, q120b* const
 
     if (CHECK_BOUNDS) {
       double bs __attribute__((unused)) = max_bit_size((void*)begin, (void*)end);
-      LOG("Iter %3lu - %lf %lu %c\n", nn / 2, bs, itData->bs, itData->reduce ? '*' : ' ');
+      LOG("Iter %3" PRIu64 " - %lf %" PRIu64 " %c\n", nn / 2, bs, itData->bs, itData->reduce ? '*' : ' ');
       assert(bs < itData->bs);
     }
 
@@ -257,7 +258,7 @@ EXPORT void q120_ntt_bb_avx2(const q120_ntt_precomp* const precomp, q120b* const
 
   if (CHECK_BOUNDS) {
     double bs __attribute__((unused)) = max_bit_size((void*)begin, (void*)end);
-    LOG("Iter %3lu - %lf %lu\n", 1ul, bs, precomp->output_bit_size);
+    LOG("Iter %3" PRIu64 " - %lf %" PRIu64 "\n", UINT64_C(1), bs, precomp->output_bit_size);
     assert(bs < precomp->output_bit_size);
   }
 }
@@ -405,7 +406,7 @@ EXPORT void q120_intt_bb_avx2(const q120_ntt_precomp* const precomp, q120b* cons
 
   if (CHECK_BOUNDS) {
     double bs __attribute__((unused)) = max_bit_size((void*)begin, (void*)end);
-    LOG("Input %lf %lu\n", bs, precomp->input_bit_size);
+    LOG("Input %lf %" PRIu64 "\n", bs, precomp->input_bit_size);
     assert(bs <= precomp->input_bit_size);
   }
 
@@ -455,7 +456,7 @@ EXPORT void q120_intt_bb_avx2(const q120_ntt_precomp* const precomp, q120b* cons
 
     if (CHECK_BOUNDS) {
       double bs __attribute__((unused)) = max_bit_size((void*)begin, (void*)end);
-      LOG("Iter %3lu - %lf %lu %c\n", nn / 2, bs, itData->bs, itData->reduce ? '*' : ' ');
+      LOG("Iter %3" PRIu64 " - %lf %" PRIu64 " %c\n", nn / 2, bs, itData->bs, itData->reduce ? '*' : ' ');
       assert(bs < itData->bs);
     }
 
@@ -472,7 +473,7 @@ EXPORT void q120_intt_bb_avx2(const q120_ntt_precomp* const precomp, q120b* cons
 
   if (CHECK_BOUNDS) {
     double bs __attribute__((unused)) = max_bit_size((void*)begin, (void*)end);
-    LOG("Iter %3lu - %lf %lu\n", n, bs, itData->bs);
+    LOG("Iter %3" PRIu64 " - %lf %" PRIu64 "\n", n, bs, itData->bs);
     assert(bs < itData->bs);
   }
 }
