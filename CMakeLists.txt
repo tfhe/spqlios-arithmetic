@@ -15,6 +15,11 @@ message(STATUS "Compiling spqlios-fft version: ${SPQLIOS_VERSION_MAJOR}.${SPQLIO
 set(WARNING_PARANOID ON CACHE BOOL "Treat all warnings as errors")
 set(ENABLE_TESTING ON CACHE BOOL "Compiles unittests and integration tests")
 
+if (NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type: Release or Debug" FORCE)
+endif()
+message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+
 if (WARNING_PARANOID)
     add_compile_options(-Wall -Werror)
 endif()
