@@ -34,7 +34,7 @@ void test_vec_mat1col_product_baa(vec_mat1col_product_baa_f vec_mat1col_product_
     vec_mat1col_product_baa(precomp, ell, (q120b*)pr, (q120a*)pa, (q120a*)pb);
     mod_q120 comp_r = mod_q120::from_q120b(pr);
     // check for equality
-    ASSERT_EQ(comp_r, expect_r);
+    ASSERT_EQ(comp_r, expect_r) << ell;
   }
   q120_delete_vec_mat1col_product_baa_precomp(precomp);
 }

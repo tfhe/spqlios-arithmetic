@@ -33,7 +33,7 @@ TEST(fft, fftvec_convolution) {
   double* a2 = (double*)aligned_alloc(32, nn * 8);
   double* b = (double*)aligned_alloc(32, nn * 8);
   double* dist_vector = (double*)aligned_alloc(32, nn * 8);
-  int64_t p = 1ul << k;
+  int64_t p = UINT64_C(1) << k;
   printf("p size: %" PRId64 "\n", p);
   for (uint32_t i = 0; i < nn; i++) {
     a[i] = (rand() % p) - p / 2;  // between -p/2 and p/2
@@ -227,7 +227,7 @@ TEST(fft, fftvec_convolution_recursiveoverk) {
 
   for (uint32_t k = 14; k <= 24; k++) {  // vary k
     printf("k size: %" PRId32 "\n", k);
-    int64_t p = 1ul << k;
+    int64_t p = UINT64_C(1) << k;
     for (uint32_t i = 0; i < nn; i++) {
       a[i] = (rand() % p) - p / 2;
       b[i] = (rand() % p) - p / 2;

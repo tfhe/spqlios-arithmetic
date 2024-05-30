@@ -177,7 +177,7 @@ polynomial<__int128_t> random_polynomial_bounds(uint64_t n, const __int128_t lb,
 
 template <typename T>
 polynomial<T> random_polynomial_bits(uint64_t n, const uint64_t bits) {
-  T b = 1ul << bits;
+  T b = UINT64_C(1) << bits;
   return random_polynomial_bounds(n, -b, b);
 }
 

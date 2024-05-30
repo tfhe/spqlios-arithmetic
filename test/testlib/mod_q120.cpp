@@ -121,7 +121,7 @@ std::ostream& operator<<(std::ostream& out, const mod_q120& x) {
 }
 
 mod_q120 mod_q120::from_q120a(const void* addr) {
-  static const uint64_t _2p32 = uint64_t(1) << 32;
+  static const uint64_t _2p32 = UINT64_C(1) << 32;
   const uint64_t* in = (const uint64_t*)addr;
   mod_q120 r;
   for (uint64_t i = 0; i < 4; ++i) {

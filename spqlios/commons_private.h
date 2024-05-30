@@ -49,12 +49,7 @@ EXPORT void* spqlios_error(const char* error);
 EXPORT void* spqlios_keep_or_free(void* ptr, void* ptr2);
 
 #ifdef __x86_64__
-#ifdef __WIN32
-// TODO for now, we do not have any optimization for windows targets
-#define CPU_SUPPORTS(xxxx) 0
-#else
 #define CPU_SUPPORTS __builtin_cpu_supports
-#endif
 #else
 // TODO for now, we do not have any optimization for non x86 targets
 #define CPU_SUPPORTS(xxxx) 0

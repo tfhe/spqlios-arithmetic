@@ -3,7 +3,8 @@
 #include "spqlios/reim4/reim4_arithmetic.h"
 
 void init_random_values(uint64_t n, double* v) {
-  for (uint64_t i = 0; i < n; ++i) v[i] = (double(rand() % (1ul << 14)) - (1ul << 13)) / (1ul << 12);
+  for (uint64_t i = 0; i < n; ++i)
+    v[i] = (double(rand() % (UINT64_C(1) << 14)) - (UINT64_C(1) << 13)) / (UINT64_C(1) << 12);
 }
 
 // Run the benchmark

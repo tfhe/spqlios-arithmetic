@@ -67,24 +67,32 @@ target_link_libraries(spqlios-testlib libspqlios)
 
 # main unittest file
 message(STATUS "${gtest_libs}")
-add_executable(spqlios-test
-		spqlios_test.cpp
-		spqlios_cplx_test.cpp
-		spqlios_cplx_conversions_test.cpp
-		spqlios_reim_test.cpp
+set(UNITTEST_FILES
 		spqlios_reim_conversions_test.cpp
+		spqlios_cplx_test.cpp
 		spqlios_q120_ntt_test.cpp
 		spqlios_q120_arithmetic_test.cpp
-		spqlios_znx_small_test.cpp
 		spqlios_coeffs_arithmetic_test.cpp
-		spqlios_reim4_arithmetic_test.cpp
 		spqlios_vec_znx_big_test.cpp
-		spqlios_vmp_product_test.cpp
-		spqlios_vec_znx_dft_test.cpp
-		spqlios_vec_znx_test.cpp
-		spqlios_svp_test.cpp
-		spqlios_svp_product_test.cpp
 )
+if (NOT WIN32)
+	# the following test do not work yet on windows
+	# (because win32 assembly is not ready)
+	set(UNITTEST_FILES ${UNITTEST_FILES}
+			spqlios_znx_small_test.cpp
+			spqlios_test.cpp
+			spqlios_cplx_conversions_test.cpp
+			spqlios_reim_test.cpp
+			spqlios_reim4_arithmetic_test.cpp
+			spqlios_vmp_product_test.cpp
+			spqlios_vec_znx_dft_test.cpp
+			spqlios_svp_test.cpp
+			spqlios_svp_product_test.cpp
+			spqlios_vec_znx_test.cpp
+	)
+endif ()
+
+add_executable(spqlios-test ${UNITTEST_FILES})
 target_link_libraries(spqlios-test spqlios-testlib libspqlios ${gtest_libs})
 target_include_directories(spqlios-test PRIVATE ${test_incs})
 add_test(NAME spqlios-test COMMAND spqlios-test)

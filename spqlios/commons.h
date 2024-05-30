@@ -54,4 +54,19 @@ EXPORT void* aligned_alloc(size_t align, size_t n);
 #define __always_inline inline __attribute((always_inline))
 #endif
 
+#define USE_LIBM_SIN_COS
+#ifndef USE_LIBM_SIN_COS
+// if at some point, we want to remove the libm dependency, we can
+// consider this:
+EXPORT double internal_accurate_cos(double x);
+EXPORT double internal_accurate_sin(double x);
+EXPORT void internal_accurate_sincos(double* rcos, double* rsin, double x);
+#define m_accurate_cos internal_accurate_cos
+#define m_accurate_sin internal_accurate_sin
+#else
+// let's use libm sin and cos
+#define m_accurate_cos cos
+#define m_accurate_sin sin
+#endif
+
 #endif  // SPQLIOS_COMMONS_H

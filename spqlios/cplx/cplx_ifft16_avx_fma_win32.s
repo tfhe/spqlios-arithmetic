@@ -1,11 +1,52 @@
+        .text
+        .p2align 4
+        .globl  cplx_ifft16_avx_fma
+        .def    cplx_ifft16_avx_fma;    .scl    2;      .type   32;     .endef
+        .seh_proc       cplx_ifft16_avx_fma
+cplx_ifft16_avx_fma:
+        .seh_endprologue
+
+  pushq %rdi
+  pushq %rsi
+  movq %rcx,%rdi
+  movq %rdx,%rsi
+  subq $0x100,%rsp
+  movdqu %xmm6,(%rsp)
+  movdqu %xmm7,0x10(%rsp)
+  movdqu %xmm8,0x20(%rsp)
+  movdqu %xmm9,0x30(%rsp)
+  movdqu %xmm10,0x40(%rsp)
+  movdqu %xmm11,0x50(%rsp)
+  movdqu %xmm12,0x60(%rsp)
+  movdqu %xmm13,0x70(%rsp)
+  movdqu %xmm14,0x80(%rsp)
+  movdqu %xmm15,0x90(%rsp)
+  callq cplx_ifft16_avx_fma_amd64
+  movdqu (%rsp),%xmm6
+  movdqu 0x10(%rsp),%xmm7
+  movdqu 0x20(%rsp),%xmm8
+  movdqu 0x30(%rsp),%xmm9
+  movdqu 0x40(%rsp),%xmm10
+  movdqu 0x50(%rsp),%xmm11
+  movdqu 0x60(%rsp),%xmm12
+  movdqu 0x70(%rsp),%xmm13
+  movdqu 0x80(%rsp),%xmm14
+  movdqu 0x90(%rsp),%xmm15
+  addq $0x100,%rsp
+  popq %rsi
+  popq %rdi
+  retq
+        .seh_endproc
+        .ident  "GCC: (GNU) 13-win32"
+
 # shifted FFT over X^16-i
 # 1st argument (rdi) contains 16 complexes
 # 2nd argument (rsi) contains: 8 complexes
 #     omega,alpha,beta,j.beta,gamma,j.gamma,k.gamma,kj.gamma
 #     alpha = sqrt(omega), beta = sqrt(alpha), gamma = sqrt(beta)
 #     j = sqrt(i), k=sqrt(j)
-.globl cplx_ifft16_avx_fma
-cplx_ifft16_avx_fma:
+
+cplx_ifft16_avx_fma_amd64:
 vmovupd (%rdi),%ymm8        # load data into registers %ymm8 -> %ymm15
 vmovupd 0x20(%rdi),%ymm9
 vmovupd 0x40(%rdi),%ymm10

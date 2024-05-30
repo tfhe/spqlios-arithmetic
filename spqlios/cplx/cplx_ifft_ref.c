@@ -28,8 +28,8 @@ void invcitwiddle(CPLX a, CPLX b, const CPLX ombar) {
 
 /** @brief exp(-i.2pi.x) */
 void cplx_set_e2pimx(CPLX res, double x) {
-  res[0] = cos(2 * M_PI * x);
-  res[1] = -sin(2 * M_PI * x);
+  res[0] = m_accurate_cos(2 * M_PI * x);
+  res[1] = -m_accurate_sin(2 * M_PI * x);
 }
 /**
  * @brief this computes the sequence: 0,1/2,1/4,3/4,1/8,5/8,3/8,7/8,...

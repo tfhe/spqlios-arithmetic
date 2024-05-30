@@ -214,7 +214,7 @@ void test_znx_normalize(F normalize) {
       for (uint64_t i = 0; i < n; ++i) {
         const int64_t x = inp.get_coeff(i);
         const int64_t y = out.get_coeff(i);
-        const int64_t y_exp = centermod(x, 1l << base_k);
+        const int64_t y_exp = centermod(x, INT64_C(1) << base_k);
         ASSERT_EQ(y, y_exp) << n << " " << base_k << " " << i << " " << x << " " << y;
       }
     }
@@ -258,7 +258,7 @@ void test_znx_normalize_cout(F normalize) {
       for (uint64_t i = 0; i < n; ++i) {
         const int64_t x = inp.get_coeff(i);
         const int64_t co = cout.get_coeff(i);
-        const int64_t y_exp = centermod((int64_t)x, 1l << base_k);
+        const int64_t y_exp = centermod((int64_t)x, INT64_C(1) << base_k);
         const int64_t co_exp = (x - y_exp) >> base_k;
         ASSERT_EQ(co, co_exp);
 
@@ -325,7 +325,7 @@ void test_znx_normalize_cin(F normalize) {
         const int64_t y = out.get_coeff(i);
 
         const __int128_t xp = (__int128_t)x + ci;
-        const int64_t y_exp = centermod((int64_t)xp, 1l << base_k);
+        const int64_t y_exp = centermod((int64_t)xp, INT64_C(1) << base_k);
 
         ASSERT_EQ(y, y_exp) << n << " " << base_k << " " << i << " " << x << " " << y << " " << ci;
       }
@@ -410,7 +410,7 @@ void test_znx_normalize_cin_cout(F normalize) {
         const int64_t co = cout.get_coeff(i);
 
         const __int128_t xp = (__int128_t)x + ci;
-        const int64_t y_exp = centermod((int64_t)xp, 1l << base_k);
+        const int64_t y_exp = centermod((int64_t)xp, INT64_C(1) << base_k);
         const int64_t co_exp = (xp - y_exp) >> base_k;
         ASSERT_EQ(co, co_exp);
 
