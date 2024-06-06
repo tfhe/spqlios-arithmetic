@@ -68,6 +68,7 @@ target_link_libraries(spqlios-testlib libspqlios)
 # main unittest file
 message(STATUS "${gtest_libs}")
 set(UNITTEST_FILES
+		spqlios_test.cpp
 		spqlios_reim_conversions_test.cpp
 		spqlios_cplx_test.cpp
 		spqlios_q120_ntt_test.cpp
@@ -80,7 +81,6 @@ if (NOT WIN32)
 	# (because win32 assembly is not ready)
 	set(UNITTEST_FILES ${UNITTEST_FILES}
 			spqlios_znx_small_test.cpp
-			spqlios_test.cpp
 			spqlios_cplx_conversions_test.cpp
 			spqlios_reim_test.cpp
 			spqlios_reim4_arithmetic_test.cpp
