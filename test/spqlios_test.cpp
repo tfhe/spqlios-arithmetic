@@ -96,39 +96,39 @@ EXPORT void invctwiddle(CPLX, CPLX, const CPLX);
 #include "../spqlios/reim4/reim4_fftvec_internal.h"
 #include "../spqlios/reim4/reim4_fftvec_private.h"
 
-// TEST(fft, simple_fft_test) {  // test for checking the simple_fft api
-//   uint64_t nn = 8;            // vary accross (8192, 16384), 32768, 65536
-//   // double* buf_fft = fft_precomp_get_buffer(tables, 0);
-//   // double* buf_ifft = ifft_precomp_get_buffer(itables, 0);
+TEST(fft, simple_fft_test) {  // test for checking the simple_fft api
+  uint64_t nn = 8;            // vary accross (8192, 16384), 32768, 65536
+  // double* buf_fft = fft_precomp_get_buffer(tables, 0);
+  // double* buf_ifft = ifft_precomp_get_buffer(itables, 0);
 
-//   // define the complex coefficients of two polynomials mod X^4-i
-//   double a[4][2] = {{1.1, 2.2}, {3.3, 4.4}, {5.5, 6.6}, {7.7, 8.8}};
-//   double b[4][2] = {{9., 10.}, {11., 12.}, {13., 14.}, {15., 16.}};
-//   double c[4][2];   // for the result
-//   double a2[4][2];  // for testing inverse fft
-//   memcpy(a2, a, 8 * nn);
-//   cplx_fft_simple(4, a);
-//   cplx_fft_simple(4, b);
-//   cplx_fftvec_mul_simple(4, c, a, b);
-//   cplx_ifft_simple(4, c);
-//   // c contains the complex coefficients 4.a*b mod X^4-i
-//   cplx_ifft_simple(4, a);
+  // define the complex coefficients of two polynomials mod X^4-i
+  double a[4][2] = {{1.1, 2.2}, {3.3, 4.4}, {5.5, 6.6}, {7.7, 8.8}};
+  double b[4][2] = {{9., 10.}, {11., 12.}, {13., 14.}, {15., 16.}};
+  double c[4][2];   // for the result
+  double a2[4][2];  // for testing inverse fft
+  memcpy(a2, a, 8 * nn);
+  cplx_fft_simple(4, a);
+  cplx_fft_simple(4, b);
+  cplx_fftvec_mul_simple(4, c, a, b);
+  cplx_ifft_simple(4, c);
+  // c contains the complex coefficients 4.a*b mod X^4-i
+  cplx_ifft_simple(4, a);
 
-//   double distance = 0;
-//   for (uint32_t i = 0; i < nn / 2; i++) {
-//     double dist = fabs(a[i][0] / 4. - a2[i][0]);
-//     if (distance < dist) distance = dist;
-//     dist = fabs(a[i][1] / 4. - a2[i][1]);
-//     if (distance < dist) distance = dist;
-//   }
-//   printf("distance: %lf\n", distance);
-//   ASSERT_LE(distance, 0.1);  // switch from previous 0.1 to 0.5 per experiment 1 reqs
+  double distance = 0;
+  for (uint32_t i = 0; i < nn / 2; i++) {
+    double dist = fabs(a[i][0] / 4. - a2[i][0]);
+    if (distance < dist) distance = dist;
+    dist = fabs(a[i][1] / 4. - a2[i][1]);
+    if (distance < dist) distance = dist;
+  }
+  printf("distance: %lf\n", distance);
+  ASSERT_LE(distance, 0.1);  // switch from previous 0.1 to 0.5 per experiment 1 reqs
 
-//   for (uint32_t i = 0; i < nn / 4; i++) {
-//     printf("%lf %lf\n", a2[i][0], a[i][0] / (nn / 2.));
-//     printf("%lf %lf\n", a2[i][1], a[i][1] / (nn / 2.));
-//   }
-// }
+  for (uint32_t i = 0; i < nn / 4; i++) {
+    printf("%lf %lf\n", a2[i][0], a[i][0] / (nn / 2.));
+    printf("%lf %lf\n", a2[i][1], a[i][1] / (nn / 2.));
+  }
+}
 
 // TEST(fft, reim_test) {
 //   // double a[16] __attribute__ ((aligned(32)))= {1.1,2.2,3.3,4.4,5.5,6.6,7.7,8.8,9.9,10.,11.,12.,13.,14.,15.,16.};
@@ -216,53 +216,53 @@ EXPORT void invctwiddle(CPLX, CPLX, const CPLX);
 //   // free(c2);
 // }
 
-// TEST(fft, fftvec_convolution_recursiveoverk) {
-//   static const uint64_t nn = 32768;  // vary accross (8192, 16384), 32768, 65536
-//   double* a = (double*)aligned_alloc(32, nn * 8);
-//   double* a2 = (double*)aligned_alloc(32, nn * 8);
-//   double* b = (double*)aligned_alloc(32, nn * 8);
-//   double* dist_vector = (double*)aligned_alloc(32, nn * 8);
+TEST(fft, fftvec_convolution_recursiveoverk) {
+  static const uint64_t nn = 32768;  // vary accross (8192, 16384), 32768, 65536
+  double* a = (double*)aligned_alloc(32, nn * 8);
+  double* a2 = (double*)aligned_alloc(32, nn * 8);
+  double* b = (double*)aligned_alloc(32, nn * 8);
+  double* dist_vector = (double*)aligned_alloc(32, nn * 8);
 
-//   printf("N size: %" PRId64 "\n", nn);
+  printf("N size: %" PRId64 "\n", nn);
 
-//   for (uint32_t k = 14; k <= 24; k++) {  // vary k
-//     printf("k size: %" PRId32 "\n", k);
-//     int64_t p = UINT64_C(1) << k;
-//     for (uint32_t i = 0; i < nn; i++) {
-//       a[i] = (rand() % p) - p / 2;
-//       b[i] = (rand() % p) - p / 2;
-//       a2[i] = 0;
-//     }
-//     cplx_fft_simple(nn / 2, a);
-//     cplx_fft_simple(nn / 2, b);
-//     cplx_fftvec_addmul_simple(nn / 2, a2, a, b);
-//     cplx_ifft_simple(nn / 2, a2);
-//     double distance = 0;
-//     for (uint32_t i = 0; i < nn; i++) {
-//       double curdist = fabs(a2[i] / (nn / 2.) - rint(a2[i] / (nn / 2.)));
-//       if (distance < curdist) distance = curdist;
-//       dist_vector[i] = a2[i] / (nn / 2.) - rint(a2[i] / (nn / 2.));
-//     }
-//     printf("distance: %lf\n", distance);
-//     ASSERT_LE(distance, 0.5);  // switch from previous 0.1 to 0.5 per experiment 1 reqs
-//     double mean = 0;
-//     for (uint32_t i = 0; i < nn; i++) {
-//       mean = mean + dist_vector[i];
-//     }
-//     mean = mean / nn;
-//     double variance = 0;
-//     for (uint32_t i = 0; i < nn; i++) {
-//       variance = variance + pow((mean - dist_vector[i]), 2);
-//     }
-//     double stdev = sqrt(variance / nn);
-//     printf("stdev: %lf\n", stdev);
-//   }
+  for (uint32_t k = 14; k <= 24; k++) {  // vary k
+    printf("k size: %" PRId32 "\n", k);
+    int64_t p = UINT64_C(1) << k;
+    for (uint32_t i = 0; i < nn; i++) {
+      a[i] = (rand() % p) - p / 2;
+      b[i] = (rand() % p) - p / 2;
+      a2[i] = 0;
+    }
+    cplx_fft_simple(nn / 2, a);
+    cplx_fft_simple(nn / 2, b);
+    cplx_fftvec_addmul_simple(nn / 2, a2, a, b);
+    cplx_ifft_simple(nn / 2, a2);
+    double distance = 0;
+    for (uint32_t i = 0; i < nn; i++) {
+      double curdist = fabs(a2[i] / (nn / 2.) - rint(a2[i] / (nn / 2.)));
+      if (distance < curdist) distance = curdist;
+      dist_vector[i] = a2[i] / (nn / 2.) - rint(a2[i] / (nn / 2.));
+    }
+    printf("distance: %lf\n", distance);
+    ASSERT_LE(distance, 0.5);  // switch from previous 0.1 to 0.5 per experiment 1 reqs
+    double mean = 0;
+    for (uint32_t i = 0; i < nn; i++) {
+      mean = mean + dist_vector[i];
+    }
+    mean = mean / nn;
+    double variance = 0;
+    for (uint32_t i = 0; i < nn; i++) {
+      variance = variance + pow((mean - dist_vector[i]), 2);
+    }
+    double stdev = sqrt(variance / nn);
+    printf("stdev: %lf\n", stdev);
+  }
 
-//   free(a);
-//   free(b);
-//   free(a2);
-//   free(dist_vector);
-// }
+  free(a);
+  free(b);
+  free(a2);
+  free(dist_vector);
+}
 
 // #ifdef __x86_64__
 // TEST(fft, cplx_fft_ref_vs_fft_reim_ref) {
