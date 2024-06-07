@@ -161,59 +161,59 @@ TEST(fft, reim_vecfft_mul_fma_vs_ref) {
 }
 #endif
 
-// typedef void (*FILL_REIM_FFT_OMG_F)(const double entry_pwr, double **omg);
-// typedef void (*REIM_FFT_F)(double *dre, double *dim, const void *omega);
+typedef void (*FILL_REIM_FFT_OMG_F)(const double entry_pwr, double **omg);
+typedef void (*REIM_FFT_F)(double *dre, double *dim, const void *omega);
 
-// // template to test a fixed-dimension fft vs. naive
-// template<uint64_t N>
-// void test_reim_fft_ref_vs_naive(
-//     FILL_REIM_FFT_OMG_F fill_omega_f,
-//     REIM_FFT_F reim_fft_f
-//     ) {
-//   double om[N];
-//   double data[2*N];
-//   double datacopy[2*N];
-//   double* omg = om;
-//   fill_omega_f(0.25, &omg);
-//   ASSERT_EQ(omg - om, ptrdiff_t(N));  // it may depend on N
-//   for (uint64_t i = 0; i < N; ++i) {
-//     datacopy[i] = data[i] = (rand() % 100) - 50;
-//     datacopy[N + i] = data[N + i] = (rand() % 100) - 50;
-//   }
-//   reim_fft_f(datacopy, datacopy + N, om);
-//   reim_naive_fft(N, 0.25, data, data + N);
-//   double d = 0;
-//   for (uint64_t i = 0; i < 2*N; ++i) {
-//     d += fabs(datacopy[i] - data[i]);
-//   }
-//   ASSERT_LE(d, 1e-7);
-// }
+// template to test a fixed-dimension fft vs. naive
+template<uint64_t N>
+void test_reim_fft_ref_vs_naive(
+    FILL_REIM_FFT_OMG_F fill_omega_f,
+    REIM_FFT_F reim_fft_f
+    ) {
+  double om[N];
+  double data[2*N];
+  double datacopy[2*N];
+  double* omg = om;
+  fill_omega_f(0.25, &omg);
+  ASSERT_EQ(omg - om, ptrdiff_t(N));  // it may depend on N
+  for (uint64_t i = 0; i < N; ++i) {
+    datacopy[i] = data[i] = (rand() % 100) - 50;
+    datacopy[N + i] = data[N + i] = (rand() % 100) - 50;
+  }
+  reim_fft_f(datacopy, datacopy + N, om);
+  reim_naive_fft(N, 0.25, data, data + N);
+  double d = 0;
+  for (uint64_t i = 0; i < 2*N; ++i) {
+    d += fabs(datacopy[i] - data[i]);
+  }
+  ASSERT_LE(d, 1e-7);
+}
 
-// template<uint64_t N>
-// void test_reim_fft_ref_vs_accel(
-//     REIM_FFT_F reim_fft_ref_f,
-//     REIM_FFT_F reim_fft_accel_f) {
-//   double om[N];
-//   double data[2*N];
-//   double datacopy[2*N];
-//   for (uint64_t i = 0; i < N; ++i) {
-//     om[i] = (rand() % 100) - 50;
-//     datacopy[i] = data[i] = (rand() % 100) - 50;
-//     datacopy[N + i] = data[N + i] = (rand() % 100) - 50;
-//   }
-//   reim_fft_ref_f(datacopy, datacopy + N, om);
-//   reim_fft_accel_f(data, data + N, om);
-//   double d = 0;
-//   for (uint64_t i = 0; i < 2*N; ++i) {
-//     d += fabs(datacopy[i] - data[i]);
-//   }
-//   if (d > 1e-15) {
-//     for (uint64_t i = 0; i < N; ++i) {
-//       printf("%" PRId64 " %lf %lf %lf %lf\n", i, data[i], data[N + i], datacopy[i], datacopy[N + i]);
-//     }
-//     ASSERT_LE(d, 0);
-//   }
-// }
+template<uint64_t N>
+void test_reim_fft_ref_vs_accel(
+    REIM_FFT_F reim_fft_ref_f,
+    REIM_FFT_F reim_fft_accel_f) {
+  double om[N];
+  double data[2*N];
+  double datacopy[2*N];
+  for (uint64_t i = 0; i < N; ++i) {
+    om[i] = (rand() % 100) - 50;
+    datacopy[i] = data[i] = (rand() % 100) - 50;
+    datacopy[N + i] = data[N + i] = (rand() % 100) - 50;
+  }
+  reim_fft_ref_f(datacopy, datacopy + N, om);
+  reim_fft_accel_f(data, data + N, om);
+  double d = 0;
+  for (uint64_t i = 0; i < 2*N; ++i) {
+    d += fabs(datacopy[i] - data[i]);
+  }
+  if (d > 1e-15) {
+    for (uint64_t i = 0; i < N; ++i) {
+      printf("%" PRId64 " %lf %lf %lf %lf\n", i, data[i], data[N + i], datacopy[i], datacopy[N + i]);
+    }
+    ASSERT_LE(d, 0);
+  }
+}
 
 // TEST(fft, reim_fft16_ref_vs_naive) {
 //   test_reim_fft_ref_vs_naive<16>(fill_reim_fft16_omegas, reim_fft16_ref);
@@ -235,15 +235,15 @@ TEST(fft, reim_vecfft_mul_fma_vs_ref) {
 // }
 // #endif
 
-// TEST(fft, reim_fft4_ref_vs_naive) {
-//   test_reim_fft_ref_vs_naive<4>(fill_reim_fft4_omegas, reim_fft4_ref);
-// }
+TEST(fft, reim_fft4_ref_vs_naive) {
+  test_reim_fft_ref_vs_naive<4>(fill_reim_fft4_omegas, reim_fft4_ref);
+}
 
-// #ifdef __x86_64__
-// TEST(fft, reim_fft4_ref_vs_fma) {
-//   test_reim_fft_ref_vs_accel<4>(reim_fft4_ref, reim_fft4_avx_fma);
-// }
-// #endif
+#ifdef __x86_64__
+TEST(fft, reim_fft4_ref_vs_fma) {
+  test_reim_fft_ref_vs_accel<4>(reim_fft4_ref, reim_fft4_avx_fma);
+}
+#endif
 
 // TEST(fft, reim_fft2_ref_vs_naive) {
 //   test_reim_fft_ref_vs_naive<2>(fill_reim_fft2_omegas, reim_fft2_ref);

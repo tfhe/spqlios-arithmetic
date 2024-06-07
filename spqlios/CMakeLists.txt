@@ -59,6 +59,7 @@ set(SRCS_FMA_C
         reim4/reim4_fftvec_conv_fma.c
         reim4/reim4_fftvec_addmul_fma.c
         reim/reim_conversions_avx.c
+        reim/reim_fft4_avx_fma.c
         reim/reim_fft_avx2.c
         reim/reim_ifft_avx2.c
         reim/reim_to_tnx_avx.c
@@ -68,7 +69,6 @@ set(SRCS_FMA_ASM
         cplx/cplx_fft16_avx_fma.s
         cplx/cplx_ifft16_avx_fma.s
         reim/reim_fft16_avx_fma.s
-        reim/reim_fft4_avx_fma.s
         reim/reim_fft8_avx_fma.s
         reim/reim_ifft16_avx_fma.s
         reim/reim_ifft4_avx_fma.s
@@ -78,7 +78,6 @@ set(SRCS_FMA_WIN32_ASM
         cplx/cplx_fft16_avx_fma_win32.s
         cplx/cplx_ifft16_avx_fma_win32.s
         reim/reim_fft16_avx_fma_win32.s
-        reim/reim_fft4_avx_fma_win32.s
         reim/reim_fft8_avx_fma_win32.s
         reim/reim_ifft16_avx_fma_win32.s
         reim/reim_ifft4_avx_fma_win32.s
