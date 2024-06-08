@@ -4,7 +4,7 @@
 
 #include "reim_fft_private.h"
 
-__always_inline void reim_ctwiddle(__m128d* ra, __m128d* rb, __m128d* ia, __m128d* ib, const __m128d omre,
+__always_inline void reim_ctwiddle_avx_fma(__m128d* ra, __m128d* rb, __m128d* ia, __m128d* ib, const __m128d omre,
                                    const __m128d omim) {
   // rb * omre - ib * omim;
   __m128d rprod0 = _mm_mul_pd(*ib, omim);
@@ -35,7 +35,7 @@ EXPORT void reim_fft4_avx_fma(double* dre, double* dim, const void* ompv) {
     __m128d omre = _mm_permute_pd(om, 0);
     __m128d omim = _mm_permute_pd(om, 3);
 
-    reim_ctwiddle(&ra01, &ra23, &ia01, &ia23, omre, omim);
+    reim_ctwiddle_avx_fma(&ra01, &ra23, &ia01, &ia23, omre, omim);
   }
 
   // 2
@@ -50,7 +50,7 @@ EXPORT void reim_fft4_avx_fma(double* dre, double* dim, const void* ompv) {
     __m128d ra = _mm_unpacklo_pd(ra01, ra23);  // (r0, r1), (r2, r3) -> (r0, r2)
     __m128d ia = _mm_unpacklo_pd(ia01, ia23);  // (i0, i1), (i2, i3) -> (i0, i2)
 
-    reim_ctwiddle(&ra, &rb, &ia, &ib, omre, omim);
+    reim_ctwiddle_avx_fma(&ra, &rb, &ia, &ib, omre, omim);
 
     ra01 = _mm_unpackhi_pd(ra, rb);
     ra23 = _mm_unpackhi_pd(ia, ib);
