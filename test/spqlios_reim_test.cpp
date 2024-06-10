@@ -381,15 +381,15 @@ void test_reim_ifft_ref_vs_accel(
 // }
 // #endif
 
-// TEST(fft, reim_ifft8_ref_vs_naive) {
-//   test_reim_ifft_ref_vs_naive<8>(fill_reim_ifft8_omegas, reim_ifft8_ref);
-// }
+TEST(fft, reim_ifft8_ref_vs_naive) {
+  test_reim_ifft_ref_vs_naive<8>(fill_reim_ifft8_omegas, reim_ifft8_ref);
+}
 
-// #ifdef __x86_64__
-// TEST(fft, reim_ifft8_ref_vs_fma) {
-//   test_reim_ifft_ref_vs_accel<8>(reim_ifft8_ref, reim_ifft8_avx_fma);
-// }
-// #endif
+#ifdef __x86_64__
+TEST(fft, reim_ifft8_ref_vs_fma) {
+  test_reim_ifft_ref_vs_accel<8>(reim_ifft8_ref, reim_ifft8_avx_fma);
+}
+#endif
 
 TEST(fft, reim_ifft4_ref_vs_naive) {
   test_reim_ifft_ref_vs_naive<4>(fill_reim_ifft4_omegas, reim_ifft4_ref);
