@@ -21,7 +21,7 @@ endif()
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 if (WARNING_PARANOID)
-    add_compile_options(-Wall -Werror)
+	add_compile_options(-Wall -Werror -Wno-unused-command-line-argument)
 endif()
 
 message(STATUS "CMAKE_HOST_SYSTEM_NAME: ${CMAKE_HOST_SYSTEM_NAME}")

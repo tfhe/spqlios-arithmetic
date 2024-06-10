@@ -51,6 +51,9 @@ EXPORT void NOT_IMPLEMENTED_v_uvpvpcvp(uint32_t n, void* a, void* b, const void*
 // windows
 #ifdef _WIN32
 EXPORT void* aligned_alloc(size_t align, size_t n);
+#ifdef __cplusplus
+#define aligned_alloc ::aligned_alloc
+#endif
 #define __always_inline inline __attribute((always_inline))
 #endif
 
