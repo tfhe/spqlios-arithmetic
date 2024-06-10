@@ -1,8 +1,46 @@
+        .text
+        .p2align 4
+        .globl  reim_ifft16_avx_fma
+        .def    reim_ifft16_avx_fma;    .scl    2;      .type   32;     .endef
+reim_ifft16_avx_fma:
+
+  pushq %rdi
+  pushq %rsi
+  movq %rcx,%rdi
+  movq %rdx,%rsi
+  movq %r8,%rdx
+  subq $0x100,%rsp
+  movdqu %xmm6,(%rsp)
+  movdqu %xmm7,0x10(%rsp)
+  movdqu %xmm8,0x20(%rsp)
+  movdqu %xmm9,0x30(%rsp)
+  movdqu %xmm10,0x40(%rsp)
+  movdqu %xmm11,0x50(%rsp)
+  movdqu %xmm12,0x60(%rsp)
+  movdqu %xmm13,0x70(%rsp)
+  movdqu %xmm14,0x80(%rsp)
+  movdqu %xmm15,0x90(%rsp)
+  callq reim_ifft16_avx_fma_amd64
+  movdqu (%rsp),%xmm6
+  movdqu 0x10(%rsp),%xmm7
+  movdqu 0x20(%rsp),%xmm8
+  movdqu 0x30(%rsp),%xmm9
+  movdqu 0x40(%rsp),%xmm10
+  movdqu 0x50(%rsp),%xmm11
+  movdqu 0x60(%rsp),%xmm12
+  movdqu 0x70(%rsp),%xmm13
+  movdqu 0x80(%rsp),%xmm14
+  movdqu 0x90(%rsp),%xmm15
+  addq $0x100,%rsp
+  popq %rsi
+  popq %rdi
+  retq
+
 #rdi datare ptr
 #rsi dataim ptr
 #rdx om ptr
-.globl reim_ifft16_avx_fma
-reim_ifft16_avx_fma:
+#.globl reim_ifft16_avx_fma_amd64
+reim_ifft16_avx_fma_amd64:
 vmovupd     (%rdi),%ymm0       # ra0
 vmovupd     0x20(%rdi),%ymm1   # ra4
 vmovupd     0x40(%rdi),%ymm2   # ra8

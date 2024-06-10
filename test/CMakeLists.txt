@@ -78,19 +78,13 @@ set(UNITTEST_FILES
 		spqlios_q120_arithmetic_test.cpp
 		spqlios_coeffs_arithmetic_test.cpp
 		spqlios_vec_znx_big_test.cpp
+		spqlios_znx_small_test.cpp
+		spqlios_vmp_product_test.cpp
+		spqlios_vec_znx_dft_test.cpp
+		spqlios_svp_test.cpp
+		spqlios_svp_product_test.cpp
+		spqlios_vec_znx_test.cpp
 )
-if (NOT WIN32)
-	# the following test do not work yet on windows
-	# (because win32 assembly is not ready)
-	set(UNITTEST_FILES ${UNITTEST_FILES}
-			spqlios_znx_small_test.cpp
-			spqlios_vmp_product_test.cpp
-			spqlios_vec_znx_dft_test.cpp
-			spqlios_svp_test.cpp
-			spqlios_svp_product_test.cpp
-			spqlios_vec_znx_test.cpp
-	)
-endif ()
 
 add_executable(spqlios-test ${UNITTEST_FILES})
 target_link_libraries(spqlios-test spqlios-testlib libspqlios ${gtest_libs})

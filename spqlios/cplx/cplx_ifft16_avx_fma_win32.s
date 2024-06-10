@@ -2,9 +2,7 @@
         .p2align 4
         .globl  cplx_ifft16_avx_fma
         .def    cplx_ifft16_avx_fma;    .scl    2;      .type   32;     .endef
-        .seh_proc       cplx_ifft16_avx_fma
 cplx_ifft16_avx_fma:
-        .seh_endprologue
 
   pushq %rdi
   pushq %rsi
@@ -36,8 +34,6 @@ cplx_ifft16_avx_fma:
   popq %rsi
   popq %rdi
   retq
-        .seh_endproc
-        .ident  "GCC: (GNU) 13-win32"
 
 # shifted FFT over X^16-i
 # 1st argument (rdi) contains 16 complexes

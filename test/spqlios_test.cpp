@@ -130,91 +130,91 @@ TEST(fft, simple_fft_test) {  // test for checking the simple_fft api
   }
 }
 
-// TEST(fft, reim_test) {
-//   // double a[16] __attribute__ ((aligned(32)))= {1.1,2.2,3.3,4.4,5.5,6.6,7.7,8.8,9.9,10.,11.,12.,13.,14.,15.,16.};
-//   // double b[16] __attribute__ ((aligned(32)))= {17.,18.,19.,20.,21.,22.,23.,24.,25.,26.,27.,28.,29.,30., 31.,32.};
-//   // double c[16] __attribute__ ((aligned(32))); // for the result in reference layout
-//   double a[16] = {1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8, 9.9, 10., 11., 12., 13., 14., 15., 16.};
-//   double b[16] = {17., 18., 19., 20., 21., 22., 23., 24., 25., 26., 27., 28., 29., 30., 31., 32.};
-//   double c[16];  // for the result in reference layout
-//   reim_fft_simple(8, a);
-//   reim_fft_simple(8, b);
-//   reim_fftvec_mul_simple(8, c, a, b);
-//   reim_ifft_simple(8, c);
-// }
+TEST(fft, reim_test) {
+  // double a[16] __attribute__ ((aligned(32)))= {1.1,2.2,3.3,4.4,5.5,6.6,7.7,8.8,9.9,10.,11.,12.,13.,14.,15.,16.};
+  // double b[16] __attribute__ ((aligned(32)))= {17.,18.,19.,20.,21.,22.,23.,24.,25.,26.,27.,28.,29.,30., 31.,32.};
+  // double c[16] __attribute__ ((aligned(32))); // for the result in reference layout
+  double a[16] = {1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8, 9.9, 10., 11., 12., 13., 14., 15., 16.};
+  double b[16] = {17., 18., 19., 20., 21., 22., 23., 24., 25., 26., 27., 28., 29., 30., 31., 32.};
+  double c[16];  // for the result in reference layout
+  reim_fft_simple(8, a);
+  reim_fft_simple(8, b);
+  reim_fftvec_mul_simple(8, c, a, b);
+  reim_ifft_simple(8, c);
+}
 
-// TEST(fft, reim_vs_regular_layout_mul_test) {
-//   uint64_t nn = 16;
+TEST(fft, reim_vs_regular_layout_mul_test) {
+  uint64_t nn = 16;
 
-//   // define the complex coefficients of two polynomials mod X^8-i
+  // define the complex coefficients of two polynomials mod X^8-i
 
-//   double a1[8][2] __attribute__((aligned(32))) = {{1.1, 2.2}, {3.3, 4.4}, {5.5, 6.6}, {7.7, 8.8},
-//                                                   {9.9, 10.}, {11., 12.}, {13., 14.}, {15., 16.}};
-//   double b1[8][2] __attribute__((aligned(32))) = {{17., 18.}, {19., 20.}, {21., 22.}, {23., 24.},
-//                                                   {25., 26.}, {27., 28.}, {29., 30.}, {31., 32.}};
-//   double c1[8][2] __attribute__((aligned(32)));  // for the result
-//   double c2[16] __attribute__((aligned(32)));    // for the result
-//   double c3[8][2] __attribute__((aligned(32)));  // for the result
+  double a1[8][2] __attribute__((aligned(32))) = {{1.1, 2.2}, {3.3, 4.4}, {5.5, 6.6}, {7.7, 8.8},
+                                                  {9.9, 10.}, {11., 12.}, {13., 14.}, {15., 16.}};
+  double b1[8][2] __attribute__((aligned(32))) = {{17., 18.}, {19., 20.}, {21., 22.}, {23., 24.},
+                                                  {25., 26.}, {27., 28.}, {29., 30.}, {31., 32.}};
+  double c1[8][2] __attribute__((aligned(32)));  // for the result
+  double c2[16] __attribute__((aligned(32)));    // for the result
+  double c3[8][2] __attribute__((aligned(32)));  // for the result
 
-//   double* a2 = (double*)aligned_alloc(32, nn / 2 * 2 * sizeof(double));  // for storing the coefs in reim layout
-//   double* b2 = (double*)aligned_alloc(32, nn / 2 * 2 * sizeof(double));  // for storing the coefs in reim layout
-//   // double* c2 = (double*)aligned_alloc(32, nn / 2 * sizeof(CPLX)); // for storing the coefs in reim layout
+  double* a2 = (double*)aligned_alloc(32, nn / 2 * 2 * sizeof(double));  // for storing the coefs in reim layout
+  double* b2 = (double*)aligned_alloc(32, nn / 2 * 2 * sizeof(double));  // for storing the coefs in reim layout
+  // double* c2 = (double*)aligned_alloc(32, nn / 2 * sizeof(CPLX)); // for storing the coefs in reim layout
 
-//   // organise the coefficients in the reim layout
-//   for (uint32_t i = 0; i < nn / 2; i++) {
-//     a2[i] = a1[i][0];  // a1 = a2, b1 = b2
-//     a2[nn / 2 + i] = a1[i][1];
-//     b2[i] = b1[i][0];
-//     b2[nn / 2 + i] = b1[i][1];
-//   }
+  // organise the coefficients in the reim layout
+  for (uint32_t i = 0; i < nn / 2; i++) {
+    a2[i] = a1[i][0];  // a1 = a2, b1 = b2
+    a2[nn / 2 + i] = a1[i][1];
+    b2[i] = b1[i][0];
+    b2[nn / 2 + i] = b1[i][1];
+  }
 
-//   // fft
-//   cplx_fft_simple(8, a1);
-//   reim_fft_simple(8, a2);
+  // fft
+  cplx_fft_simple(8, a1);
+  reim_fft_simple(8, a2);
 
-//   cplx_fft_simple(8, b1);
-//   reim_fft_simple(8, b2);
+  cplx_fft_simple(8, b1);
+  reim_fft_simple(8, b2);
 
-//   cplx_fftvec_mul_simple(8, c1, a1, b1);
-//   reim_fftvec_mul_simple(8, c2, a2, b2);
+  cplx_fftvec_mul_simple(8, c1, a1, b1);
+  reim_fftvec_mul_simple(8, c2, a2, b2);
 
-//   cplx_ifft_simple(8, c1);
-//   reim_ifft_simple(8, c2);
+  cplx_ifft_simple(8, c1);
+  reim_ifft_simple(8, c2);
 
-//   // check base layout and reim layout result in the same values
-//   double d = 0;
-//   for (uint32_t i = 0; i < nn / 2; i++) {
-//     // printf("RE: cplx_result %lf and reim_result %lf \n", c1[i][0], c2[i]);
-//     // printf("IM: cplx_result %lf and reim_result %lf \n", c1[i][1], c2[nn / 2 + i]);
-//     double dre = fabs(c1[i][0] - c2[i]);
-//     double dim = fabs(c1[i][1] - c2[nn / 2 + i]);
-//     if (dre > d) d = dre;
-//     if (dim > d) d = dim;
-//     ASSERT_LE(d, 1e-7);
-//   }
-//   ASSERT_LE(d, 1e-7);
+  // check base layout and reim layout result in the same values
+  double d = 0;
+  for (uint32_t i = 0; i < nn / 2; i++) {
+    // printf("RE: cplx_result %lf and reim_result %lf \n", c1[i][0], c2[i]);
+    // printf("IM: cplx_result %lf and reim_result %lf \n", c1[i][1], c2[nn / 2 + i]);
+    double dre = fabs(c1[i][0] - c2[i]);
+    double dim = fabs(c1[i][1] - c2[nn / 2 + i]);
+    if (dre > d) d = dre;
+    if (dim > d) d = dim;
+    ASSERT_LE(d, 1e-7);
+  }
+  ASSERT_LE(d, 1e-7);
 
-//   // check converting back to base layout:
+  // check converting back to base layout:
 
-//   for (uint32_t i = 0; i < nn / 2; i++) {
-//     c3[i][0] = c2[i];
-//     c3[i][1] = c2[8 + i];
-//   }
+  for (uint32_t i = 0; i < nn / 2; i++) {
+    c3[i][0] = c2[i];
+    c3[i][1] = c2[8 + i];
+  }
 
-//   d = 0;
-//   for (uint32_t i = 0; i < nn / 2; i++) {
-//     double dre = fabs(c1[i][0] - c3[i][0]);
-//     double dim = fabs(c1[i][1] - c3[i][1]);
-//     if (dre > d) d = dre;
-//     if (dim > d) d = dim;
-//     ASSERT_LE(d, 1e-7);
-//   }
-//   ASSERT_LE(d, 1e-7);
+  d = 0;
+  for (uint32_t i = 0; i < nn / 2; i++) {
+    double dre = fabs(c1[i][0] - c3[i][0]);
+    double dim = fabs(c1[i][1] - c3[i][1]);
+    if (dre > d) d = dre;
+    if (dim > d) d = dim;
+    ASSERT_LE(d, 1e-7);
+  }
+  ASSERT_LE(d, 1e-7);
 
-//   free(a2);
-//   free(b2);
-//   // free(c2);
-// }
+  free(a2);
+  free(b2);
+  // free(c2);
+}
 
 TEST(fft, fftvec_convolution_recursiveoverk) {
   static const uint64_t nn = 32768;  // vary accross (8192, 16384), 32768, 65536
@@ -264,81 +264,81 @@ TEST(fft, fftvec_convolution_recursiveoverk) {
   free(dist_vector);
 }
 
-// #ifdef __x86_64__
-// TEST(fft, cplx_fft_ref_vs_fft_reim_ref) {
-//   for (uint64_t nn : {16, 32, 64, 1024, 8192, 65536}) {
-//     uint64_t m = nn / 2;
-//     CPLX_FFT_PRECOMP* tables = new_cplx_fft_precomp(m, 0);
-//     REIM_FFT_PRECOMP* reimtables = new_reim_fft_precomp(m, 0);
-//     CPLX* a = (CPLX*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
-//     CPLX* a1 = (CPLX*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
-//     double* a2 = (double*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
-//     int64_t p = 1 << 16;
-//     for (uint32_t i = 0; i < nn / 2; i++) {
-//       a[i][0] = (rand() % p) - p / 2;  // between -p/2 and p/2
-//       a[i][1] = (rand() % p) - p / 2;
-//     }
-//     memcpy(a1, a, nn / 2 * sizeof(CPLX));
-//     for (uint32_t i = 0; i < nn / 2; i++) {
-//       a2[i] = a[i][0];
-//       a2[nn / 2 + i] = a[i][1];
-//     }
-//     cplx_fft_ref(tables, a1);
-//     reim_fft_ref(reimtables, a2);
-//     double d = 0;
-//     for (uint32_t i = 0; i < nn / 2; i++) {
-//       double dre = fabs(a1[i][0] - a2[i]);
-//       double dim = fabs(a1[i][1] - a2[nn / 2 + i]);
-//       if (dre > d) d = dre;
-//       if (dim > d) d = dim;
-//       ASSERT_LE(d, 1e-7);
-//     }
-//     ASSERT_LE(d, 1e-7);
-//     free(a);
-//     free(a1);
-//     free(a2);
-//     delete_cplx_fft_precomp(tables);
-//     delete_reim_fft_precomp(reimtables);
-//   }
-// }
-// #endif
+#ifdef __x86_64__
+TEST(fft, cplx_fft_ref_vs_fft_reim_ref) {
+  for (uint64_t nn : {16, 32, 64, 1024, 8192, 65536}) {
+    uint64_t m = nn / 2;
+    CPLX_FFT_PRECOMP* tables = new_cplx_fft_precomp(m, 0);
+    REIM_FFT_PRECOMP* reimtables = new_reim_fft_precomp(m, 0);
+    CPLX* a = (CPLX*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
+    CPLX* a1 = (CPLX*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
+    double* a2 = (double*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
+    int64_t p = 1 << 16;
+    for (uint32_t i = 0; i < nn / 2; i++) {
+      a[i][0] = (rand() % p) - p / 2;  // between -p/2 and p/2
+      a[i][1] = (rand() % p) - p / 2;
+    }
+    memcpy(a1, a, nn / 2 * sizeof(CPLX));
+    for (uint32_t i = 0; i < nn / 2; i++) {
+      a2[i] = a[i][0];
+      a2[nn / 2 + i] = a[i][1];
+    }
+    cplx_fft_ref(tables, a1);
+    reim_fft_ref(reimtables, a2);
+    double d = 0;
+    for (uint32_t i = 0; i < nn / 2; i++) {
+      double dre = fabs(a1[i][0] - a2[i]);
+      double dim = fabs(a1[i][1] - a2[nn / 2 + i]);
+      if (dre > d) d = dre;
+      if (dim > d) d = dim;
+      ASSERT_LE(d, 1e-7);
+    }
+    ASSERT_LE(d, 1e-7);
+    free(a);
+    free(a1);
+    free(a2);
+    delete_cplx_fft_precomp(tables);
+    delete_reim_fft_precomp(reimtables);
+  }
+}
+#endif
 
-// TEST(fft, cplx_ifft_ref_vs_reim_ifft_ref) {
-//   for (uint64_t nn : {16, 32, 64, 1024, 8192, 65536}) {
-//     uint64_t m = nn / 2;
-//     CPLX_IFFT_PRECOMP* tables = new_cplx_ifft_precomp(m, 0);
-//     REIM_IFFT_PRECOMP* reimtables = new_reim_ifft_precomp(m, 0);
-//     CPLX* a = (CPLX*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
-//     CPLX* a1 = (CPLX*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
-//     double* a2 = (double*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
-//     int64_t p = 1 << 16;
-//     for (uint32_t i = 0; i < nn / 2; i++) {
-//       a[i][0] = (rand() % p) - p / 2;  // between -p/2 and p/2
-//       a[i][1] = (rand() % p) - p / 2;
-//     }
-//     memcpy(a1, a, nn / 2 * sizeof(CPLX));
-//     for (uint32_t i = 0; i < nn / 2; i++) {
-//       a2[i] = a[i][0];
-//       a2[nn / 2 + i] = a[i][1];
-//     }
-//     cplx_ifft_ref(tables, a1);
-//     reim_ifft_ref(reimtables, a2);
-//     double d = 0;
-//     for (uint32_t i = 0; i < nn / 2; i++) {
-//       double dre = fabs(a1[i][0] - a2[i]);
-//       double dim = fabs(a1[i][1] - a2[nn / 2 + i]);
-//       if (dre > d) d = dre;
-//       if (dim > d) d = dim;
-//       ASSERT_LE(d, 1e-7);
-//     }
-//     ASSERT_LE(d, 1e-7);
-//     free(a);
-//     free(a1);
-//     free(a2);
-//     delete_cplx_fft_precomp(tables);
-//     delete_reim_fft_precomp(reimtables);
-//   }
-// }
+TEST(fft, cplx_ifft_ref_vs_reim_ifft_ref) {
+  for (uint64_t nn : {16, 32, 64, 1024, 8192, 65536}) {
+    uint64_t m = nn / 2;
+    CPLX_IFFT_PRECOMP* tables = new_cplx_ifft_precomp(m, 0);
+    REIM_IFFT_PRECOMP* reimtables = new_reim_ifft_precomp(m, 0);
+    CPLX* a = (CPLX*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
+    CPLX* a1 = (CPLX*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
+    double* a2 = (double*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
+    int64_t p = 1 << 16;
+    for (uint32_t i = 0; i < nn / 2; i++) {
+      a[i][0] = (rand() % p) - p / 2;  // between -p/2 and p/2
+      a[i][1] = (rand() % p) - p / 2;
+    }
+    memcpy(a1, a, nn / 2 * sizeof(CPLX));
+    for (uint32_t i = 0; i < nn / 2; i++) {
+      a2[i] = a[i][0];
+      a2[nn / 2 + i] = a[i][1];
+    }
+    cplx_ifft_ref(tables, a1);
+    reim_ifft_ref(reimtables, a2);
+    double d = 0;
+    for (uint32_t i = 0; i < nn / 2; i++) {
+      double dre = fabs(a1[i][0] - a2[i]);
+      double dim = fabs(a1[i][1] - a2[nn / 2 + i]);
+      if (dre > d) d = dre;
+      if (dim > d) d = dim;
+      ASSERT_LE(d, 1e-7);
+    }
+    ASSERT_LE(d, 1e-7);
+    free(a);
+    free(a1);
+    free(a2);
+    delete_cplx_fft_precomp(tables);
+    delete_reim_fft_precomp(reimtables);
+  }
+}
 
 #ifdef __x86_64__
 TEST(fft, reim4_vecfft_addmul_fma_vs_ref) {
