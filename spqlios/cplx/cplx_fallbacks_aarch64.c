@@ -39,9 +39,3 @@ EXPORT void cplx_fftvec_add_fma(uint32_t m, void* r, const void* a, const void* 
 //  itables->function(itables, data);
 //}
 //EXPORT void cplx_fft(const CPLX_FFT_PRECOMP* tables, void* data) { tables->function(tables, data); }
-EXPORT void cplx_fftvec_mul(const CPLX_FFTVEC_MUL_PRECOMP* tables, void* r, const void* a, const void* b) {
-  tables->function(tables, r, a, b);
-}
-EXPORT void cplx_fftvec_addmul(const CPLX_FFTVEC_ADDMUL_PRECOMP* tables, void* r, const void* a, const void* b) {
-  tables->function(tables, r, a, b);
-}

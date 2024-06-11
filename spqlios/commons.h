@@ -32,13 +32,6 @@
     abort();                                   \
   }
 
-#ifdef __x86_64__
-#define CPU_SUPPORTS __builtin_cpu_supports
-#else
-// TODO for now, we do not have any optimization for non x86 targets
-#define CPU_SUPPORTS(xxxx) 0
-#endif
-
 EXPORT void* UNDEFINED_p_ii(int32_t n, int32_t m);
 EXPORT void* UNDEFINED_p_uu(uint32_t n, uint32_t m);
 EXPORT double* UNDEFINED_dp_pi(const void* p, int32_t n);
@@ -54,5 +47,29 @@ EXPORT void NOT_IMPLEMENTED_v_vp(void* p);
 EXPORT void NOT_IMPLEMENTED_v_idpdpdp(int32_t n, double* a, const double* b, const double* c);
 EXPORT void NOT_IMPLEMENTED_v_uvpcvpcvp(uint32_t n, void* r, const void* a, const void* b);
 EXPORT void NOT_IMPLEMENTED_v_uvpvpcvp(uint32_t n, void* a, void* b, const void* o);
+
+// windows
+#ifdef _WIN32
+EXPORT void* aligned_alloc(size_t align, size_t n);
+#ifdef __cplusplus
+#define aligned_alloc ::aligned_alloc
+#endif
+#define __always_inline inline __attribute((always_inline))
+#endif
+
+#define USE_LIBM_SIN_COS
+#ifndef USE_LIBM_SIN_COS
+// if at some point, we want to remove the libm dependency, we can
+// consider this:
+EXPORT double internal_accurate_cos(double x);
+EXPORT double internal_accurate_sin(double x);
+EXPORT void internal_accurate_sincos(double* rcos, double* rsin, double x);
+#define m_accurate_cos internal_accurate_cos
+#define m_accurate_sin internal_accurate_sin
+#else
+// let's use libm sin and cos
+#define m_accurate_cos cos
+#define m_accurate_sin sin
+#endif
 
 #endif  // SPQLIOS_COMMONS_H

@@ -1,3 +1,5 @@
+#include <inttypes.h>
+
 #include <cmath>
 
 #include "gtest/gtest.h"
@@ -30,9 +32,9 @@ TEST(fft, reim_fft_avx2_vs_fft_reim_ref) {
       double dim = fabs(a1[nn / 2 + i] - a2[nn / 2 + i]);
       if (dre > d) d = dre;
       if (dim > d) d = dim;
-      ASSERT_LE(d, 1e-8);
+      ASSERT_LE(d, nn * 1e-10) << nn;
     }
-    ASSERT_LE(d, 1e-8);
+    ASSERT_LE(d, nn * 1e-10) << nn;
     free(a);
     free(a1);
     free(a2);
@@ -173,7 +175,7 @@ void test_reim_fft_ref_vs_naive(
   double datacopy[2*N];
   double* omg = om;
   fill_omega_f(0.25, &omg);
-  ASSERT_EQ(omg - om, N); // it may depend on N
+  ASSERT_EQ(omg - om, ptrdiff_t(N));  // it may depend on N
   for (uint64_t i = 0; i < N; ++i) {
     datacopy[i] = data[i] = (rand() % 100) - 50;
     datacopy[N + i] = data[N + i] = (rand() % 100) - 50;
@@ -207,7 +209,7 @@ void test_reim_fft_ref_vs_accel(
   }
   if (d > 1e-15) {
     for (uint64_t i = 0; i < N; ++i) {
-      printf("%ld %lf %lf %lf %lf\n", i, data[i], data[N + i], datacopy[i], datacopy[N + i]);
+      printf("%" PRId64 " %lf %lf %lf %lf\n", i, data[i], data[N + i], datacopy[i], datacopy[N + i]);
     }
     ASSERT_LE(d, 0);
   }
@@ -254,7 +256,7 @@ TEST(fft, reim_fft_bfs_16_ref_vs_naive) {
     std::vector<double> datacopy(2 * m);
     double* omg = om.data();
     fill_reim_fft_bfs_16_omegas(m, 0.25, &omg);
-    ASSERT_LE(omg - om.data(), 2 * m);  // it may depend on m
+    ASSERT_LE(omg - om.data(), ptrdiff_t(2 * m));  // it may depend on m
     for (uint64_t i = 0; i < m; ++i) {
       datacopy[i] = data[i] = (rand() % 100) - 50;
       datacopy[m + i] = data[m + i] = (rand() % 100) - 50;
@@ -277,7 +279,7 @@ TEST(fft, reim_fft_rec_16_ref_vs_naive) {
     std::vector<double> datacopy(2 * m);
     double* omg = om.data();
     fill_reim_fft_rec_16_omegas(m, 0.25, &omg);
-    ASSERT_LE(omg - om.data(), 2 * m);  // it may depend on m
+    ASSERT_LE(omg - om.data(), ptrdiff_t(2 * m));  // it may depend on m
     for (uint64_t i = 0; i < m; ++i) {
       datacopy[i] = data[i] = (rand() % 100) - 50;
       datacopy[m + i] = data[m + i] = (rand() % 100) - 50;
@@ -329,7 +331,7 @@ void test_reim_ifft_ref_vs_naive(
   double datacopy[2*N];
   double* omg = om;
   fill_omega_f(0.25, &omg);
-  ASSERT_EQ(omg - om, N); // it may depend on N
+  ASSERT_EQ(omg - om, ptrdiff_t(N));  // it may depend on N
   for (uint64_t i = 0; i < N; ++i) {
     datacopy[i] = data[i] = (rand() % 100) - 50;
     datacopy[N + i] = data[N + i] = (rand() % 100) - 50;
@@ -363,7 +365,7 @@ void test_reim_ifft_ref_vs_accel(
   }
   if (d > 1e-15) {
     for (uint64_t i = 0; i < N; ++i) {
-      printf("%ld %lf %lf %lf %lf\n", i, data[i], data[N + i], datacopy[i], datacopy[N + i]);
+      printf("%" PRId64 " %lf %lf %lf %lf\n", i, data[i], data[N + i], datacopy[i], datacopy[N + i]);
     }
     ASSERT_LE(d, 0);
   }
@@ -410,7 +412,7 @@ TEST(fft, reim_ifft_bfs_16_ref_vs_naive) {
     std::vector<double> datacopy(2 * m);
     double* omg = om.data();
     fill_reim_ifft_bfs_16_omegas(m, 0.25, &omg);
-    ASSERT_LE(omg - om.data(), 2 * m);  // it may depend on m
+    ASSERT_LE(omg - om.data(), ptrdiff_t(2 * m));  // it may depend on m
     for (uint64_t i = 0; i < m; ++i) {
       datacopy[i] = data[i] = (rand() % 100) - 50;
       datacopy[m + i] = data[m + i] = (rand() % 100) - 50;
@@ -433,7 +435,7 @@ TEST(fft, reim_ifft_rec_16_ref_vs_naive) {
     std::vector<double> datacopy(2 * m);
     double* omg = om.data();
     fill_reim_ifft_rec_16_omegas(m, 0.25, &omg);
-    ASSERT_LE(omg - om.data(), 2 * m);  // it may depend on m
+    ASSERT_LE(omg - om.data(), ptrdiff_t(2 * m));  // it may depend on m
     for (uint64_t i = 0; i < m; ++i) {
       datacopy[i] = data[i] = (rand() % 100) - 50;
       datacopy[m + i] = data[m + i] = (rand() % 100) - 50;

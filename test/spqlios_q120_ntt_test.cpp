@@ -167,8 +167,8 @@ TEST_P(ntt, q120_ntt_intt_bb_avx2) {
 }
 
 INSTANTIATE_TEST_SUITE_P(q120, ntt,
-                         testing::Values(1, 2, 4, 16, 256, 1ul << 10, 1ul << 11, 1ul << 12, 1ul << 13, 1ul << 14,
-                                         1ul << 15, 1ul << 16),
+                         testing::Values(1, 2, 4, 16, 256, UINT64_C(1) << 10, UINT64_C(1) << 11, UINT64_C(1) << 12,
+                                         UINT64_C(1) << 13, UINT64_C(1) << 14, UINT64_C(1) << 15, UINT64_C(1) << 16),
                          testing::PrintToStringParamName());
 
 #endif

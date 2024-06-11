@@ -21,8 +21,12 @@ endif()
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 if (WARNING_PARANOID)
-    add_compile_options(-Wall -Werror)
+	add_compile_options(-Wall -Werror -Wno-unused-command-line-argument)
 endif()
+
+message(STATUS "CMAKE_HOST_SYSTEM_NAME: ${CMAKE_HOST_SYSTEM_NAME}")
+message(STATUS "CMAKE_SYSTEM_PROCESSOR: ${CMAKE_SYSTEM_PROCESSOR}")
+message(STATUS "CMAKE_SYSTEM_NAME: ${CMAKE_SYSTEM_NAME}")
 
 if (CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)|(amd64)|(AMD64)")
     set(X86 ON)
@@ -34,6 +38,24 @@ endif ()
 if (CMAKE_SYSTEM_PROCESSOR MATCHES "(aarch64)")
     set(AARCH64 ON)
 endif ()
+
+if (CMAKE_SYSTEM_NAME MATCHES "(Windows)|(MSYS)")
+    set(WIN32 ON)
+endif ()
+if (WIN32)
+    #overrides for win32
+    set(X86 OFF)
+    set(AARCH64 OFF)
+    set(X86_WIN32 ON)
+else()
+    set(X86_WIN32 OFF)
+    set(WIN32 OFF)
+endif (WIN32)
+
+message(STATUS "--> WIN32: ${WIN32}")
+message(STATUS "--> X86_WIN32: ${X86_WIN32}")
+message(STATUS "--> X86_LINUX: ${X86}")
+message(STATUS "--> AARCH64: ${AARCH64}")
 
 
 # compiles the main library in spqlios

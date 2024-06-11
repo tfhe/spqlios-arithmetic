@@ -25,8 +25,8 @@ void cplx_ifft_avx2_fma_bfs_2(D4MEM* dat, const D2MEM** omga, uint32_t m) {
     do {
       /*
   BEGIN_TEMPLATE
-      const __m256d ab% = _mm256_load_pd(dd[0+2*%]);
-      const __m256d cd% = _mm256_load_pd(dd[1+2*%]);
+      const __m256d ab% = _mm256_loadu_pd(dd[0+2*%]);
+      const __m256d cd% = _mm256_loadu_pd(dd[1+2*%]);
       const __m256d ac% = _mm256_permute2f128_pd(ab%, cd%, 0b100000);
       const __m256d bd% = _mm256_permute2f128_pd(ab%, cd%, 0b110001);
       const __m256d sum% = _mm256_add_pd(ac%, bd%);
@@ -39,15 +39,15 @@ void cplx_ifft_avx2_fma_bfs_2(D4MEM* dat, const D2MEM** omga, uint32_t m) {
       const __m256d t2% = _mm256_fmaddsub_pd(diff%, omre%, t1%);
       const __m256d newab% = _mm256_permute2f128_pd(sum%, t2%, 0b100000);
       const __m256d newcd% = _mm256_permute2f128_pd(sum%, t2%, 0b110001);
-      _mm256_store_pd(dd[0+2*%], newab%);
-      _mm256_store_pd(dd[1+2*%], newcd%);
+      _mm256_storeu_pd(dd[0+2*%], newab%);
+      _mm256_storeu_pd(dd[1+2*%], newcd%);
       dd += 2*@;
       *omg += 2*@;
   END_TEMPLATE
      */
       // BEGIN_INTERLEAVE 1
-      const __m256d ab0 = _mm256_load_pd(dd[0 + 2 * 0]);
-      const __m256d cd0 = _mm256_load_pd(dd[1 + 2 * 0]);
+      const __m256d ab0 = _mm256_loadu_pd(dd[0 + 2 * 0]);
+      const __m256d cd0 = _mm256_loadu_pd(dd[1 + 2 * 0]);
       const __m256d ac0 = _mm256_permute2f128_pd(ab0, cd0, 0b100000);
       const __m256d bd0 = _mm256_permute2f128_pd(ab0, cd0, 0b110001);
       const __m256d sum0 = _mm256_add_pd(ac0, bd0);
@@ -60,8 +60,8 @@ void cplx_ifft_avx2_fma_bfs_2(D4MEM* dat, const D2MEM** omga, uint32_t m) {
       const __m256d t20 = _mm256_fmaddsub_pd(diff0, omre0, t10);
       const __m256d newab0 = _mm256_permute2f128_pd(sum0, t20, 0b100000);
       const __m256d newcd0 = _mm256_permute2f128_pd(sum0, t20, 0b110001);
-      _mm256_store_pd(dd[0 + 2 * 0], newab0);
-      _mm256_store_pd(dd[1 + 2 * 0], newcd0);
+      _mm256_storeu_pd(dd[0 + 2 * 0], newab0);
+      _mm256_storeu_pd(dd[1 + 2 * 0], newcd0);
       dd += 2 * 1;
       *omga += 2 * 1;
       // END_INTERLEAVE
@@ -87,15 +87,15 @@ void cplx_ifft_avx2_fma_bfs_2(D4MEM* dat, const D2MEM** omga, uint32_t m) {
       D4MEM* const ddend = (dd + nblock);
       D4MEM* ddmid = ddend;
       do {
-        const __m256d a = _mm256_load_pd(dd[0]);
-        const __m256d b = _mm256_load_pd(ddmid[0]);
+        const __m256d a = _mm256_loadu_pd(dd[0]);
+        const __m256d b = _mm256_loadu_pd(ddmid[0]);
         const __m256d newa = _mm256_add_pd(a, b);
-        _mm256_store_pd(dd[0], newa);
+        _mm256_storeu_pd(dd[0], newa);
         const __m256d diff = _mm256_sub_pd(a, b);
         const __m256d t1 = _mm256_mul_pd(diff, omre);
         const __m256d bardiff = _mm256_shuffle_pd(diff, diff, 5);
         const __m256d t2 = _mm256_fmadd_pd(bardiff, omim, t1);
-        _mm256_store_pd(ddmid[0], t2);
+        _mm256_storeu_pd(ddmid[0], t2);
         dd += 1;
         ddmid += 1;
       } while (dd < ddend);
@@ -238,7 +238,7 @@ void cplx_ifft_avx2_fma_rec_16(D4MEM* dat, const D2MEM** omga, uint32_t m) {
       const __m256d a = _mm256_loadu_pd(dd[0]);
       const __m256d b = _mm256_loadu_pd(ddmid[0]);
       const __m256d newa = _mm256_add_pd(a, b);
-      _mm256_store_pd(dd[0], newa);
+      _mm256_storeu_pd(dd[0], newa);
       const __m256d diff = _mm256_sub_pd(a, b);
       const __m256d t1 = _mm256_mul_pd(diff, omre);
       const __m256d bardiff = _mm256_shuffle_pd(diff, diff, 5);

@@ -196,8 +196,8 @@ void test_znx_normalize(F normalize) {
   for (const uint64_t n : {1, 2, 4, 8, 16, 64, 256, 4096}) {
     polynomial<int64_t> inp = znx_i64::random_log2bound(n, 62);
     if (n >= 2) {
-      inp.set_coeff(0, -(1l << 62));
-      inp.set_coeff(1, (1l << 62));
+      inp.set_coeff(0, -(INT64_C(1) << 62));
+      inp.set_coeff(1, (INT64_C(1) << 62));
     }
     for (const uint64_t base_k : {2, 3, 19, 35, 62}) {
       polynomial<int64_t> out;
@@ -214,7 +214,7 @@ void test_znx_normalize(F normalize) {
       for (uint64_t i = 0; i < n; ++i) {
         const int64_t x = inp.get_coeff(i);
         const int64_t y = out.get_coeff(i);
-        const int64_t y_exp = centermod(x, 1l << base_k);
+        const int64_t y_exp = centermod(x, INT64_C(1) << base_k);
         ASSERT_EQ(y, y_exp) << n << " " << base_k << " " << i << " " << x << " " << y;
       }
     }
@@ -231,8 +231,8 @@ void test_znx_normalize_cout(F normalize) {
   for (const uint64_t n : {1, 2, 4, 8, 16, 64, 256, 4096}) {
     polynomial<int64_t> inp = znx_i64::random_log2bound(n, 62);
     if (n >= 2) {
-      inp.set_coeff(0, -(1l << 62));
-      inp.set_coeff(1, (1l << 62));
+      inp.set_coeff(0, -(INT64_C(1) << 62));
+      inp.set_coeff(1, (INT64_C(1) << 62));
     }
     for (const uint64_t base_k : {2, 3, 19, 35, 62}) {
       polynomial<int64_t> out, cout;
@@ -258,7 +258,7 @@ void test_znx_normalize_cout(F normalize) {
       for (uint64_t i = 0; i < n; ++i) {
         const int64_t x = inp.get_coeff(i);
         const int64_t co = cout.get_coeff(i);
-        const int64_t y_exp = centermod((int64_t)x, 1l << base_k);
+        const int64_t y_exp = centermod((int64_t)x, INT64_C(1) << base_k);
         const int64_t co_exp = (x - y_exp) >> base_k;
         ASSERT_EQ(co, co_exp);
 
@@ -285,18 +285,18 @@ void test_znx_normalize_cin(F normalize) {
   for (const uint64_t n : {1, 2, 4, 8, 16, 64, 256, 4096}) {
     polynomial<int64_t> inp = znx_i64::random_log2bound(n, 62);
     if (n >= 4) {
-      inp.set_coeff(0, -(1l << 62));
-      inp.set_coeff(1, -(1l << 62));
-      inp.set_coeff(2, (1l << 62));
-      inp.set_coeff(3, (1l << 62));
+      inp.set_coeff(0, -(INT64_C(1) << 62));
+      inp.set_coeff(1, -(INT64_C(1) << 62));
+      inp.set_coeff(2, (INT64_C(1) << 62));
+      inp.set_coeff(3, (INT64_C(1) << 62));
     }
     for (const uint64_t base_k : {2, 3, 19, 35, 62}) {
       polynomial<int64_t> cin = znx_i64::random_log2bound(n, 62);
       if (n >= 4) {
-        inp.set_coeff(0, -(1l << 62));
-        inp.set_coeff(1, (1l << 62));
-        inp.set_coeff(0, -(1l << 62));
-        inp.set_coeff(1, (1l << 62));
+        inp.set_coeff(0, -(INT64_C(1) << 62));
+        inp.set_coeff(1, (INT64_C(1) << 62));
+        inp.set_coeff(0, -(INT64_C(1) << 62));
+        inp.set_coeff(1, (INT64_C(1) << 62));
       }
 
       polynomial<int64_t> out;
@@ -325,7 +325,7 @@ void test_znx_normalize_cin(F normalize) {
         const int64_t y = out.get_coeff(i);
 
         const __int128_t xp = (__int128_t)x + ci;
-        const int64_t y_exp = centermod((int64_t)xp, 1l << base_k);
+        const int64_t y_exp = centermod((int64_t)xp, INT64_C(1) << base_k);
 
         ASSERT_EQ(y, y_exp) << n << " " << base_k << " " << i << " " << x << " " << y << " " << ci;
       }
@@ -344,18 +344,18 @@ void test_znx_normalize_cin_cout(F normalize) {
   for (const uint64_t n : {1, 2, 4, 8, 16, 64, 256, 4096}) {
     polynomial<int64_t> inp = znx_i64::random_log2bound(n, 62);
     if (n >= 4) {
-      inp.set_coeff(0, -(1l << 62));
-      inp.set_coeff(1, -(1l << 62));
-      inp.set_coeff(2, (1l << 62));
-      inp.set_coeff(3, (1l << 62));
+      inp.set_coeff(0, -(INT64_C(1) << 62));
+      inp.set_coeff(1, -(INT64_C(1) << 62));
+      inp.set_coeff(2, (INT64_C(1) << 62));
+      inp.set_coeff(3, (INT64_C(1) << 62));
     }
     for (const uint64_t base_k : {2, 3, 19, 35, 62}) {
       polynomial<int64_t> cin = znx_i64::random_log2bound(n, 62);
       if (n >= 4) {
-        inp.set_coeff(0, -(1l << 62));
-        inp.set_coeff(1, (1l << 62));
-        inp.set_coeff(0, -(1l << 62));
-        inp.set_coeff(1, (1l << 62));
+        inp.set_coeff(0, -(INT64_C(1) << 62));
+        inp.set_coeff(1, (INT64_C(1) << 62));
+        inp.set_coeff(0, -(INT64_C(1) << 62));
+        inp.set_coeff(1, (INT64_C(1) << 62));
       }
 
       polynomial<int64_t> out, cout;
@@ -410,7 +410,7 @@ void test_znx_normalize_cin_cout(F normalize) {
         const int64_t co = cout.get_coeff(i);
 
         const __int128_t xp = (__int128_t)x + ci;
-        const int64_t y_exp = centermod((int64_t)xp, 1l << base_k);
+        const int64_t y_exp = centermod((int64_t)xp, INT64_C(1) << base_k);
         const int64_t co_exp = (xp - y_exp) >> base_k;
         ASSERT_EQ(co, co_exp);
 

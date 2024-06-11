@@ -47,8 +47,8 @@ __always_inline void cplx_from_any_fma(uint64_t m, void* r, const int32_t* x, co
 EXPORT void cplx_from_znx32_avx2_fma(const CPLX_FROM_ZNX32_PRECOMP* precomp, void* r, const int32_t* x) {
   //note: the hex code of 2^31 + 2^52 is 0x4330000080000000
   const __m256i C = _mm256_set1_epi32(0x43300000);
-  const __m256d R = _mm256_set1_pd((1L<<31) + (1L<<52));
-  //double XX =  1L + (1L<<31) + (1L<<52);
+  const __m256d R = _mm256_set1_pd((INT64_C(1) << 31) + (INT64_C(1) << 52));
+  // double XX =  INT64_C(1) + (INT64_C(1)<<31) + (INT64_C(1)<<52);
   //printf("\n\n%016lx\n", *(uint64_t*)&XX);
   //abort();
   const uint64_t m = precomp->m;
@@ -58,8 +58,8 @@ EXPORT void cplx_from_znx32_avx2_fma(const CPLX_FROM_ZNX32_PRECOMP* precomp, voi
 EXPORT void cplx_from_tnx32_avx2_fma(const CPLX_FROM_TNX32_PRECOMP* precomp, void* r, const int32_t* x) {
   //note: the hex code of 2^-1 + 2^30 is 0x4130000080000000
   const __m256i C = _mm256_set1_epi32(0x41300000);
-  const __m256d R = _mm256_set1_pd(0.5 + (1L<<20));
-  //double XX =  (double)(1L + (1L<<31) + (1L<<52))/(1L<<32);
+  const __m256d R = _mm256_set1_pd(0.5 + (INT64_C(1) << 20));
+  // double XX =  (double)(INT64_C(1) + (INT64_C(1)<<31) + (INT64_C(1)<<52))/(INT64_C(1)<<32);
   //printf("\n\n%016lx\n", *(uint64_t*)&XX);
   //abort();
   const uint64_t m = precomp->m;
@@ -67,7 +67,7 @@ EXPORT void cplx_from_tnx32_avx2_fma(const CPLX_FROM_TNX32_PRECOMP* precomp, voi
 }
 
 EXPORT void cplx_to_tnx32_avx2_fma(const CPLX_TO_TNX32_PRECOMP* precomp, int32_t* r, const void* x) {
-  const __m256d R = _mm256_set1_pd((0.5 + (3L<<19)) * precomp->divisor);
+  const __m256d R = _mm256_set1_pd((0.5 + (INT64_C(3) << 19)) * precomp->divisor);
   const __m256i MASK = _mm256_set1_epi64x(0xFFFFFFFFUL);
   const __m256i S = _mm256_set1_epi32(0x80000000);
   //const __m256i IDX = _mm256_set_epi32(0,4,1,5,2,6,3,7);

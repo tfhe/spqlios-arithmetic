@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <inttypes.h>
 #include <math.h>
 #include <stdint.h>
 
@@ -69,8 +70,8 @@ uint64_t fill_reduction_meta(const uint64_t bs_start, q120_ntt_reduc_step_precom
     for (uint64_t h = bs_start / 2; h < bs_start; ++h) {
       uint64_t t = 0;
       for (uint64_t k = 0; k < 4; ++k) {
-        const uint64_t t1 = bs_start - h + (uint64_t)ceil(log2((1ul << h) % PRIMES_VEC[k]));
-        const uint64_t t2 = 1ul + ((t1 > h) ? t1 : h);
+        const uint64_t t1 = bs_start - h + (uint64_t)ceil(log2((UINT64_C(1) << h) % PRIMES_VEC[k]));
+        const uint64_t t2 = UINT64_C(1) + ((t1 > h) ? t1 : h);
         if (t < t2) t = t2;
       }
       if (t < bs_after_reduc) {
@@ -80,9 +81,9 @@ uint64_t fill_reduction_meta(const uint64_t bs_start, q120_ntt_reduc_step_precom
     }
 
     reduc_metadata->h = min_h;
-    reduc_metadata->mask = (1ul << min_h) - 1;
+    reduc_metadata->mask = (UINT64_C(1) << min_h) - 1;
     for (uint64_t k = 0; k < 4; ++k) {
-      reduc_metadata->modulo_red_cst[k] = (1ul << min_h) % PRIMES_VEC[k];
+      reduc_metadata->modulo_red_cst[k] = (UINT64_C(1) << min_h) % PRIMES_VEC[k];
     }
 
     assert(bs_after_reduc < 64);
@@ -104,9 +105,9 @@ EXPORT q120_ntt_precomp* q120_new_ntt_bb_precomp(const uint64_t n) {
   uint64_t bs = precomp->input_bit_size = 64;
 
   LOG("NTT parameters:\n");
-  LOG("\tsize = %lu\n", n)
-  LOG("\tlogQ = %lu\n", logQ);
-  LOG("\tinput bit-size = %lu\n", bs);
+  LOG("\tsize = %" PRIu64 "\n", n)
+  LOG("\tlogQ = %" PRIu64 "\n", logQ);
+  LOG("\tinput bit-size = %" PRIu64 "\n", bs);
 
   if (n == 1) return precomp;
 
@@ -120,9 +121,9 @@ EXPORT q120_ntt_precomp* q120_new_ntt_bb_precomp(const uint64_t n) {
   {
     const uint64_t half_bs = (bs + 1) / 2;
     level_metadata_ptr->half_bs = half_bs;
-    level_metadata_ptr->mask = (1ul << half_bs) - 1ul;
+    level_metadata_ptr->mask = (UINT64_C(1) << half_bs) - UINT64_C(1);
     level_metadata_ptr->bs = bs = half_bs + logQ + 1;
-    LOG("\tlevel %6lu output bit-size = %lu (a_k.omega^k) \n", n, bs);
+    LOG("\tlevel %6" PRIu64 " output bit-size = %" PRIu64 " (a_k.omega^k) \n", n, bs);
     level_metadata_ptr++;
   }
 
@@ -130,7 +131,7 @@ EXPORT q120_ntt_precomp* q120_new_ntt_bb_precomp(const uint64_t n) {
     level_metadata_ptr->reduce = (bs == 64);
     if (level_metadata_ptr->reduce) {
       bs = bs_after_reduc;
-      LOG("\treduce       output bit-size = %lu\n", bs);
+      LOG("\treduce       output bit-size = %" PRIu64 "\n", bs);
     }
 
     for (int k = 0; k < 4; ++k) level_metadata_ptr->q2bs[k] = (uint64_t)PRIMES_VEC[k] << (bs - logQ);
@@ -144,10 +145,10 @@ EXPORT q120_ntt_precomp* q120_new_ntt_bb_precomp(const uint64_t n) {
 
     level_metadata_ptr->bs = bs;
     level_metadata_ptr->half_bs = half_bs;
-    level_metadata_ptr->mask = (1ul << half_bs) - 1ul;
+    level_metadata_ptr->mask = (UINT64_C(1) << half_bs) - UINT64_C(1);
     level_metadata_ptr++;
 
-    LOG("\tlevel %6lu output bit-size = %lu\n", nn / 2, bs);
+    LOG("\tlevel %6" PRIu64 " output bit-size = %" PRIu64 "\n", nn / 2, bs);
   }
 
   // last level (a-b, a+b)
@@ -155,13 +156,13 @@ EXPORT q120_ntt_precomp* q120_new_ntt_bb_precomp(const uint64_t n) {
     level_metadata_ptr->reduce = (bs == 64);
     if (level_metadata_ptr->reduce) {
       bs = bs_after_reduc;
-      LOG("\treduce       output bit-size = %lu\n", bs);
+      LOG("\treduce       output bit-size = %" PRIu64 "\n", bs);
     }
     for (int k = 0; k < 4; ++k) level_metadata_ptr->q2bs[k] = ((uint64_t)PRIMES_VEC[k] << (bs - logQ));
     level_metadata_ptr->bs = ++bs;
-    level_metadata_ptr->half_bs = level_metadata_ptr->mask = 0ul;  // not used
+    level_metadata_ptr->half_bs = level_metadata_ptr->mask = UINT64_C(0);  // not used
 
-    LOG("\tlevel %6lu output bit-size = %lu\n", 1ul, bs);
+    LOG("\tlevel %6" PRIu64 " output bit-size = %" PRIu64 "\n", UINT64_C(1), bs);
   }
   precomp->output_bit_size = bs;
 
@@ -178,7 +179,7 @@ EXPORT q120_ntt_precomp* q120_new_ntt_bb_precomp(const uint64_t n) {
     level_metadata_ptr = precomp->level_metadata;
 
     {
-      // const uint64_t hpow = 1ul << level_metadata_ptr->half_bs;
+      // const uint64_t hpow = UINT64_C(1) << level_metadata_ptr->half_bs;
       for (uint64_t i = 0; i < n; ++i) {
         uint64_t t = powomega[i];
         uint64_t t1 = (t << level_metadata_ptr->half_bs) % q;
@@ -192,7 +193,7 @@ EXPORT q120_ntt_precomp* q120_new_ntt_bb_precomp(const uint64_t n) {
       const uint64_t halfnn = nn / 2;
       const uint64_t m = n / halfnn;
 
-      // const uint64_t hpow = 1ul << level_metadata_ptr->half_bs;
+      // const uint64_t hpow = UINT64_C(1) << level_metadata_ptr->half_bs;
       for (uint64_t i = 1; i < halfnn; ++i) {
         uint64_t t = powomega[i * m];
         uint64_t t1 = (t << level_metadata_ptr->half_bs) % q;
@@ -218,9 +219,9 @@ EXPORT q120_ntt_precomp* q120_new_intt_bb_precomp(const uint64_t n) {
   uint64_t bs = precomp->input_bit_size = 64;
 
   LOG("iNTT parameters:\n");
-  LOG("\tsize = %lu\n", n)
-  LOG("\tlogQ = %lu\n", logQ);
-  LOG("\tinput bit-size = %lu\n", bs);
+  LOG("\tsize = %" PRIu64 "\n", n)
+  LOG("\tlogQ = %" PRIu64 "\n", logQ);
+  LOG("\tinput bit-size = %" PRIu64 "\n", bs);
 
   if (n == 1) return precomp;
 
@@ -235,14 +236,14 @@ EXPORT q120_ntt_precomp* q120_new_intt_bb_precomp(const uint64_t n) {
     level_metadata_ptr->reduce = (bs == 64);
     if (level_metadata_ptr->reduce) {
       bs = bs_after_reduc;
-      LOG("\treduce       output bit-size = %lu\n", bs);
+      LOG("\treduce       output bit-size = %" PRIu64 "\n", bs);
     }
 
     for (int k = 0; k < 4; ++k) level_metadata_ptr->q2bs[k] = (uint64_t)PRIMES_VEC[k] << (bs - logQ);
 
     level_metadata_ptr->bs = ++bs;
-    level_metadata_ptr->half_bs = level_metadata_ptr->mask = 0ul;  // not used
-    LOG("\tlevel %6lu output bit-size = %lu\n", 1ul, bs);
+    level_metadata_ptr->half_bs = level_metadata_ptr->mask = UINT64_C(0);  // not used
+    LOG("\tlevel %6" PRIu64 " output bit-size = %" PRIu64 "\n", UINT64_C(1), bs);
     level_metadata_ptr++;
   }
 
@@ -250,7 +251,7 @@ EXPORT q120_ntt_precomp* q120_new_intt_bb_precomp(const uint64_t n) {
     level_metadata_ptr->reduce = (bs == 64);
     if (level_metadata_ptr->reduce) {
       bs = bs_after_reduc;
-      LOG("\treduce       output bit-size = %lu\n", bs);
+      LOG("\treduce       output bit-size = %" PRIu64 "\n", bs);
     }
 
     const uint64_t half_bs = round_up_half_n(bs);
@@ -260,11 +261,11 @@ EXPORT q120_ntt_precomp* q120_new_intt_bb_precomp(const uint64_t n) {
 
     level_metadata_ptr->bs = bs;
     level_metadata_ptr->half_bs = half_bs;
-    level_metadata_ptr->mask = (1ul << half_bs) - 1ul;
+    level_metadata_ptr->mask = (UINT64_C(1) << half_bs) - UINT64_C(1);
     for (int k = 0; k < 4; ++k) level_metadata_ptr->q2bs[k] = (uint64_t)PRIMES_VEC[k] << (bs_mult - logQ);
     level_metadata_ptr++;
 
-    LOG("\tlevel %6lu output bit-size = %lu\n", nn / 2, bs);
+    LOG("\tlevel %6" PRIu64 " output bit-size = %" PRIu64 "\n", nn / 2, bs);
   }
 
   // last level a_k.omega^k
@@ -272,7 +273,7 @@ EXPORT q120_ntt_precomp* q120_new_intt_bb_precomp(const uint64_t n) {
     level_metadata_ptr->reduce = (bs == 64);
     if (level_metadata_ptr->reduce) {
       bs = bs_after_reduc;
-      LOG("\treduce       output bit-size = %lu\n", bs);
+      LOG("\treduce       output bit-size = %" PRIu64 "\n", bs);
     }
 
     const uint64_t half_bs = round_up_half_n(bs);
@@ -282,10 +283,10 @@ EXPORT q120_ntt_precomp* q120_new_intt_bb_precomp(const uint64_t n) {
 
     level_metadata_ptr->bs = bs;
     level_metadata_ptr->half_bs = half_bs;
-    level_metadata_ptr->mask = (1ul << half_bs) - 1ul;
+    level_metadata_ptr->mask = (UINT64_C(1) << half_bs) - UINT64_C(1);
     for (int k = 0; k < 4; ++k) level_metadata_ptr->q2bs[k] = (uint64_t)PRIMES_VEC[k] << (bs - logQ);
 
-    LOG("\tlevel %6lu output bit-size = %lu\n", n, bs);
+    LOG("\tlevel %6" PRIu64 " output bit-size = %" PRIu64 "\n", n, bs);
   }
 
   // omega powers

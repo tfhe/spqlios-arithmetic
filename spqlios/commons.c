@@ -1,5 +1,6 @@
 #include "commons.h"
 
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -18,3 +19,99 @@ EXPORT void NOT_IMPLEMENTED_v_vp(void* p) { NOT_IMPLEMENTED(); }
 EXPORT void NOT_IMPLEMENTED_v_idpdpdp(int32_t n, double* a, const double* b, const double* c) { NOT_IMPLEMENTED(); }
 EXPORT void NOT_IMPLEMENTED_v_uvpcvpcvp(uint32_t n, void* r, const void* a, const void* b) { NOT_IMPLEMENTED(); }
 EXPORT void NOT_IMPLEMENTED_v_uvpvpcvp(uint32_t n, void* a, void* b, const void* o) { NOT_IMPLEMENTED(); }
+
+#ifdef _WIN32
+EXPORT void* aligned_alloc(size_t align, size_t n) {
+  return malloc(n);
+  // unfortunately, there is no alternative that gets freed with free :(
+}
+#define __always_inline inline __attribute((always_inline))
+#endif
+
+void internal_accurate_sincos(double* rcos, double* rsin, double x) {
+  double _4_x_over_pi = 4 * x / M_PI;
+  int64_t int_part = ((int64_t)rint(_4_x_over_pi)) & 7;
+  double frac_part = _4_x_over_pi - (double)(int_part);
+  double frac_x = M_PI * frac_part / 4.;
+  // compute the taylor series
+  double cosp = 1.;
+  double sinp = 0.;
+  double powx = 1.;
+  int64_t nn = 0;
+  while (fabs(powx) > 1e-20) {
+    ++nn;
+    powx = powx * frac_x / (double)(nn);  // x^n/n!
+    switch (nn & 3) {
+      case 0:
+        cosp += powx;
+        break;
+      case 1:
+        sinp += powx;
+        break;
+      case 2:
+        cosp -= powx;
+        break;
+      case 3:
+        sinp -= powx;
+        break;
+      default:
+        abort();  // impossible
+    }
+  }
+  // final multiplication
+  switch (int_part) {
+    case 0:
+      *rcos = cosp;
+      *rsin = sinp;
+      break;
+    case 1:
+      *rcos = M_SQRT1_2 * (cosp - sinp);
+      *rsin = M_SQRT1_2 * (cosp + sinp);
+      break;
+    case 2:
+      *rcos = -sinp;
+      *rsin = cosp;
+      break;
+    case 3:
+      *rcos = -M_SQRT1_2 * (cosp + sinp);
+      *rsin = M_SQRT1_2 * (cosp - sinp);
+      break;
+    case 4:
+      *rcos = -cosp;
+      *rsin = -sinp;
+      break;
+    case 5:
+      *rcos = -M_SQRT1_2 * (cosp - sinp);
+      *rsin = -M_SQRT1_2 * (cosp + sinp);
+      break;
+    case 6:
+      *rcos = sinp;
+      *rsin = -cosp;
+      break;
+    case 7:
+      *rcos = M_SQRT1_2 * (cosp + sinp);
+      *rsin = -M_SQRT1_2 * (cosp - sinp);
+      break;
+    default:
+      abort();  // impossible
+  }
+  if (fabs(cos(x) - *rcos) > 1e-10 || fabs(sin(x) - *rsin) > 1e-10) {
+    printf("cos(%.17lf) =? %.17lf instead of %.17lf\n", x, *rcos, cos(x));
+    printf("sin(%.17lf) =? %.17lf instead of %.17lf\n", x, *rsin, sin(x));
+    printf("fracx = %.17lf\n", frac_x);
+    printf("cosp = %.17lf\n", cosp);
+    printf("sinp = %.17lf\n", sinp);
+    printf("nn = %d\n", (int)(nn));
+  }
+}
+
+double internal_accurate_cos(double x) {
+  double rcos, rsin;
+  internal_accurate_sincos(&rcos, &rsin, x);
+  return rcos;
+}
+double internal_accurate_sin(double x) {
+  double rcos, rsin;
+  internal_accurate_sincos(&rcos, &rsin, x);
+  return rsin;
+}

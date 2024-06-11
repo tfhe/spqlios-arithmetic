@@ -15,7 +15,7 @@ EXPORT void q120_vec_mat1col_product_baa_avx2(q120_mat1col_product_baa_precomp* 
    */
 
   const uint64_t H = precomp->h;
-  const __m256i MASK = _mm256_set1_epi64x((1ul << H) - 1);
+  const __m256i MASK = _mm256_set1_epi64x((UINT64_C(1) << H) - 1);
 
   __m256i acc1 = _mm256_setzero_si256();
   __m256i acc2 = _mm256_setzero_si256();
@@ -81,7 +81,7 @@ EXPORT void q120_vec_mat1col_product_bbb_avx2(q120_mat1col_product_bbb_precomp* 
    *    - the result will be on 24 + 3 + bit size of primes Q
    */
   const uint64_t H1 = 32;
-  const __m256i MASK1 = _mm256_set1_epi64x((1ul << H1) - 1);
+  const __m256i MASK1 = _mm256_set1_epi64x((UINT64_C(1) << H1) - 1);
 
   __m256i s1 = _mm256_setzero_si256();
   __m256i s2 = _mm256_setzero_si256();
@@ -122,7 +122,7 @@ EXPORT void q120_vec_mat1col_product_bbb_avx2(q120_mat1col_product_bbb_precomp* 
   }
 
   const uint64_t H2 = precomp->h;
-  const __m256i MASK2 = _mm256_set1_epi64x((1ul << H2) - 1);
+  const __m256i MASK2 = _mm256_set1_epi64x((UINT64_C(1) << H2) - 1);
 
   const __m256i S1H_POW_RED = _mm256_loadu_si256((__m256i*)precomp->s1h_pow_red);
   __m256i s1l = _mm256_and_si256(s1, MASK2);
@@ -182,7 +182,7 @@ EXPORT void q120_vec_mat1col_product_bbc_avx2(q120_mat1col_product_bbc_precomp* 
    */
 
   const uint64_t H1 = 32;
-  const __m256i MASK1 = _mm256_set1_epi64x((1ul << H1) - 1);
+  const __m256i MASK1 = _mm256_set1_epi64x((UINT64_C(1) << H1) - 1);
 
   __m256i s1 = _mm256_setzero_si256();
   __m256i s2 = _mm256_setzero_si256();
@@ -213,7 +213,7 @@ EXPORT void q120_vec_mat1col_product_bbc_avx2(q120_mat1col_product_bbc_precomp* 
   }
 
   const uint64_t H2 = precomp->h;
-  const __m256i MASK2 = _mm256_set1_epi64x((1ul << H2) - 1);
+  const __m256i MASK2 = _mm256_set1_epi64x((UINT64_C(1) << H2) - 1);
 
   __m256i t = s1;
 
@@ -332,7 +332,7 @@ EXPORT void q120x2_vec_mat2cols_product_bbc_avx2_old(q120_mat1col_product_bbc_pr
   }
   // final reduction
   const uint64_t H2 = precomp->h;
-  s8 = _mm256_set1_epi64x((1ul << H2) - 1);                  // MASK2
+  s8 = _mm256_set1_epi64x((UINT64_C(1) << H2) - 1);          // MASK2
   s9 = _mm256_loadu_si256((__m256i*)precomp->s2l_pow_red);   // S2L_POW_RED
   s10 = _mm256_loadu_si256((__m256i*)precomp->s2h_pow_red);  // S2H_POW_RED
   //--- s0,s1
@@ -456,7 +456,7 @@ EXPORT void q120x2_vec_mat2cols_product_bbc_avx2(q120_mat1col_product_bbc_precom
   }
   // final reduction
   const uint64_t H2 = precomp->h;
-  s8 = _mm256_set1_epi64x((1ul << H2) - 1);                  // MASK2
+  s8 = _mm256_set1_epi64x((UINT64_C(1) << H2) - 1);          // MASK2
   s9 = _mm256_loadu_si256((__m256i*)precomp->s2l_pow_red);   // S2L_POW_RED
   s10 = _mm256_loadu_si256((__m256i*)precomp->s2h_pow_red);  // S2H_POW_RED
   //--- s0,s1
@@ -545,7 +545,7 @@ EXPORT void q120x2_vec_mat1col_product_bbc_avx2(q120_mat1col_product_bbc_precomp
   }
   // final reduction
   const uint64_t H2 = precomp->h;
-  s8 = _mm256_set1_epi64x((1ul << H2) - 1);                  // MASK2
+  s8 = _mm256_set1_epi64x((UINT64_C(1) << H2) - 1);          // MASK2
   s9 = _mm256_loadu_si256((__m256i*)precomp->s2l_pow_red);   // S2L_POW_RED
   s10 = _mm256_loadu_si256((__m256i*)precomp->s2h_pow_red);  // S2H_POW_RED
   //--- s0,s1

@@ -69,8 +69,8 @@ void cplx_fft16_ref(void* data, const void* omega) {
   citwiddle(d[14], d[15], om[7]);
 }
 
-double cos_2pix(double x) { return cos(2 * M_PI * x); }
-double sin_2pix(double x) { return sin(2 * M_PI * x); }
+double cos_2pix(double x) { return m_accurate_cos(2 * M_PI * x); }
+double sin_2pix(double x) { return m_accurate_sin(2 * M_PI * x); }
 void cplx_set_e2pix(CPLX res, double x) {
   res[0] = cos_2pix(x);
   res[1] = sin_2pix(x);

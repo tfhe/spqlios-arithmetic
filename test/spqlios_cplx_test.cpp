@@ -66,8 +66,8 @@ void halfcfft_naive(uint32_t nn, CPLX* data) {
   CPLX* in = (CPLX*)malloc(N * sizeof(CPLX));
   CPLX* powomega = (CPLX*)malloc(2 * nn * sizeof(CPLX));
   for (uint64_t i = 0; i < (2 * nn); ++i) {
-    powomega[i][0] = cos((M_PI * i) / nn);
-    powomega[i][1] = sin((M_PI * i) / nn);
+    powomega[i][0] = m_accurate_cos((M_PI * i) / nn);
+    powomega[i][1] = m_accurate_sin((M_PI * i) / nn);
   }
   memcpy(in, data, N * sizeof(CPLX));
   for (uint64_t j = 0; j < N; ++j) {
@@ -222,7 +222,7 @@ TEST(fft, halfcfft_ref_vs_naive) {
       if (dre > d) d = dre;
       if (dim > d) d = dim;
     }
-    ASSERT_LE(d, 1e-7);
+    ASSERT_LE(d, nn * 1e-10) << nn;
     free(a);
     free(a1);
     free(a2);
@@ -256,7 +256,7 @@ TEST(fft, halfcfft_fma_vs_ref) {
         if (dre > d) d = dre;
         if (dim > d) d = dim;
       }
-      ASSERT_LE(d, 1e-8);
+      ASSERT_LE(d, nn * 1e-10) << nn;
       free(a);
       free(a1);
       free(a2);

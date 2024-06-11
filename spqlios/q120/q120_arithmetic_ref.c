@@ -48,7 +48,7 @@ void vec_mat1col_product_baa_precomp(q120_mat1col_product_baa_precomp* precomp) 
   assert(min_res_bs < 64);
   precomp->h = min_h;
   for (uint64_t k = 0; k < 4; ++k) {
-    precomp->h_pow_red[k] = MODQ(1ul << precomp->h, qs[k]);
+    precomp->h_pow_red[k] = MODQ(UINT64_C(1) << precomp->h, qs[k]);
   }
 #ifndef NDEBUG
   precomp->res_bit_size = min_res_bs;
@@ -75,7 +75,7 @@ EXPORT void q120_vec_mat1col_product_baa_ref(q120_mat1col_product_baa_precomp* p
    *  - final sum has max(H, 64 - H + bit_size((2^H) % Q)) + log2(10000) + 1 bits
    */
   const uint64_t H = precomp->h;
-  const uint64_t MASK = (1ul << H) - 1;
+  const uint64_t MASK = (UINT64_C(1) << H) - 1;
 
   uint64_t acc1[4] = {0, 0, 0, 0};  // accumulate H least significant bits of product
   uint64_t acc2[4] = {0, 0, 0, 0};  // accumulate 64 - H most significan bits of product
@@ -131,8 +131,8 @@ void vec_mat1col_product_bbb_precomp(q120_mat1col_product_bbb_precomp* precomp) 
   assert(min_res_bs < 64);
   precomp->h = min_h;
   for (uint64_t k = 0; k < 4; ++k) {
-    precomp->s1h_pow_red[k] = 1ul << precomp->h;                                               // 2^24
-    precomp->s2l_pow_red[k] = MODQ(1ul << 32, qs[k]);                                          // 2^32
+    precomp->s1h_pow_red[k] = UINT64_C(1) << precomp->h;                                       // 2^24
+    precomp->s2l_pow_red[k] = MODQ(UINT64_C(1) << 32, qs[k]);                                  // 2^32
     precomp->s2h_pow_red[k] = MODQ(precomp->s2l_pow_red[k] * precomp->s1h_pow_red[k], qs[k]);  // 2^(32+24)
     precomp->s3l_pow_red[k] = MODQ(precomp->s2l_pow_red[k] * precomp->s2l_pow_red[k], qs[k]);  // 2^64 = 2^(32+32)
     precomp->s3h_pow_red[k] = MODQ(precomp->s3l_pow_red[k] * precomp->s1h_pow_red[k], qs[k]);  // 2^(64+24)
@@ -193,7 +193,7 @@ EXPORT void q120_vec_mat1col_product_bbb_ref(q120_mat1col_product_bbb_precomp* p
    *    - the result will be on 24 + 3 + bit size of primes Q
    */
   const uint64_t H1 = 32;
-  const uint64_t MASK1 = (1ul << H1) - 1;
+  const uint64_t MASK1 = (UINT64_C(1) << H1) - 1;
 
   uint64_t s1[4] = {0, 0, 0, 0};
   uint64_t s2[4] = {0, 0, 0, 0};
@@ -234,7 +234,7 @@ EXPORT void q120_vec_mat1col_product_bbb_ref(q120_mat1col_product_bbb_precomp* p
   }
 
   const uint64_t H2 = precomp->h;
-  const uint64_t MASK2 = (1ul << H2) - 1;
+  const uint64_t MASK2 = (UINT64_C(1) << H2) - 1;
 
   uint64_t* const res_ptr = (uint64_t*)res;
   for (uint64_t j = 0; j < 4; ++j) {
@@ -287,8 +287,8 @@ void vec_mat1col_product_bbc_precomp(q120_mat1col_product_bbc_precomp* precomp) 
   assert(min_res_bs < 64);
   precomp->h = min_h;
   for (uint64_t k = 0; k < 4; ++k) {
-    precomp->s2l_pow_red[k] = MODQ(1ul << 32, qs[k]);
-    precomp->s2h_pow_red[k] = MODQ(1ul << (32 + precomp->h), qs[k]);
+    precomp->s2l_pow_red[k] = MODQ(UINT64_C(1) << 32, qs[k]);
+    precomp->s2h_pow_red[k] = MODQ(UINT64_C(1) << (32 + precomp->h), qs[k]);
   }
 #ifndef NDEBUG
   precomp->res_bit_size = min_res_bs;
@@ -333,7 +333,7 @@ EXPORT void q120_vec_mat1col_product_bbc_ref_old(q120_mat1col_product_bbc_precom
    */
 
   const uint64_t H1 = 32;
-  const uint64_t MASK1 = (1ul << H1) - 1;
+  const uint64_t MASK1 = (UINT64_C(1) << H1) - 1;
 
   uint64_t s1[4] = {0, 0, 0, 0};
   uint64_t s2[4] = {0, 0, 0, 0};
@@ -362,7 +362,7 @@ EXPORT void q120_vec_mat1col_product_bbc_ref_old(q120_mat1col_product_bbc_precom
   }
 
   const uint64_t H2 = precomp->h;
-  const uint64_t MASK2 = (1ul << H2) - 1;
+  const uint64_t MASK2 = (UINT64_C(1) << H2) - 1;
 
   uint64_t* const res_ptr = (uint64_t*)res;
   for (uint64_t k = 0; k < 4; ++k) {
@@ -396,7 +396,7 @@ static __always_inline void accum_mul_q120_bc(uint64_t res[8],  //
 static __always_inline void accum_to_q120b(uint64_t res[4],  //
                                            const uint64_t s[8], const q120_mat1col_product_bbc_precomp* precomp) {
   const uint64_t H2 = precomp->h;
-  const uint64_t MASK2 = (1ul << H2) - 1;
+  const uint64_t MASK2 = (UINT64_C(1) << H2) - 1;
   for (uint64_t k = 0; k < 4; ++k) {
     const uint64_t s2l = s[2 * k + 1] & MASK2;
     const uint64_t s2h = s[2 * k + 1] >> H2;

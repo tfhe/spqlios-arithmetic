@@ -63,7 +63,7 @@ void test_reim_from_znx64(reim_from_znx64_f reim_from_znx64, uint64_t maxbnd) {
     for (uint64_t i = 0; i < 2 * m; ++i) {
       int64_t magnitude = int64_t(uniform_u64() % (maxbnd + 1));
       data[i] = uniform_i64() >> (63 - magnitude);
-      REQUIRE_DRAMATICALLY(abs(data[i]) <= (1L << magnitude), "pb");
+      REQUIRE_DRAMATICALLY(abs(data[i]) <= (INT64_C(1) << magnitude), "pb");
     }
     reim_from_znx64(p, dout.data(), data.data());
     for (uint64_t i = 0; i < 2 * m; ++i) {

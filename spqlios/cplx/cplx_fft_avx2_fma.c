@@ -26,15 +26,15 @@ void cplx_fft_avx2_fma_bfs_2(D4MEM* dat, const D4MEM** omg, uint32_t m) {
       D4MEM* const ddend = (dd + nblock);
       D4MEM* ddmid = ddend;
       do {
-        const __m256d b = _mm256_load_pd(ddmid[0]);
+        const __m256d b = _mm256_loadu_pd(ddmid[0]);
         const __m256d t1 = _mm256_mul_pd(b, omre);
         const __m256d barb = _mm256_shuffle_pd(b, b, 5);
         const __m256d t2 = _mm256_fmadd_pd(barb, omim, t1);
-        const __m256d a = _mm256_load_pd(dd[0]);
+        const __m256d a = _mm256_loadu_pd(dd[0]);
         const __m256d newa = _mm256_add_pd(a, t2);
         const __m256d newb = _mm256_sub_pd(a, t2);
-        _mm256_store_pd(dd[0], newa);
-        _mm256_store_pd(ddmid[0], newb);
+        _mm256_storeu_pd(dd[0], newa);
+        _mm256_storeu_pd(ddmid[0], newb);
         dd += 1;
         ddmid += 1;
       } while (dd < ddend);
@@ -50,14 +50,14 @@ void cplx_fft_avx2_fma_bfs_2(D4MEM* dat, const D4MEM** omg, uint32_t m) {
       const __m256d om = _mm256_load_pd(*omg[0]);
       const __m256d omre = _mm256_unpacklo_pd(om, om);
       const __m256d omim = _mm256_unpackhi_pd(om, om);
-      const __m256d ab = _mm256_load_pd(dd[0]);
+      const __m256d ab = _mm256_loadu_pd(dd[0]);
       const __m256d bb = _mm256_permute4x64_pd(ab, 0b11101110);
       const __m256d bbbar = _mm256_permute4x64_pd(ab, 0b10111011);
       const __m256d t1 = _mm256_mul_pd(bbbar, omim);
       const __m256d t2 = _mm256_fmaddsub_pd(bb, omre, t1);
       const __m256d aa = _mm256_permute4x64_pd(ab, 0b01000100);
       const __m256d newab = _mm256_add_pd(aa, t2);
-      _mm256_store_pd(dd[0], newab);
+      _mm256_storeu_pd(dd[0], newab);
       dd += 1;
       *omg += 1;
     } while (dd < finaldd);
@@ -233,15 +233,15 @@ void cplx_fft_avx2_fma_rec_16(D4MEM* dat, const D4MEM** omg, uint32_t m) {
   D4MEM* const ddend = (dd + nblock);
   D4MEM* ddmid = ddend;
   do {
-    const __m256d b = _mm256_load_pd(ddmid[0]);
+    const __m256d b = _mm256_loadu_pd(ddmid[0]);
     const __m256d t1 = _mm256_mul_pd(b, omre);
     const __m256d barb = _mm256_shuffle_pd(b, b, 5);
     const __m256d t2 = _mm256_fmadd_pd(barb, omim, t1);
-    const __m256d a = _mm256_load_pd(dd[0]);
+    const __m256d a = _mm256_loadu_pd(dd[0]);
     const __m256d newa = _mm256_add_pd(a, t2);
     const __m256d newb = _mm256_sub_pd(a, t2);
-    _mm256_store_pd(dd[0], newa);
-    _mm256_store_pd(ddmid[0], newb);
+    _mm256_storeu_pd(dd[0], newa);
+    _mm256_storeu_pd(ddmid[0], newb);
     dd += 1;
     ddmid += 1;
   } while (dd < ddend);

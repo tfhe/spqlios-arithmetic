@@ -9,7 +9,7 @@ EXPORT SVP_PPOL* svp_ppol_alloc(const MODULE* module)  // N
 
 EXPORT SVP_PPOL* fft64_svp_ppol_alloc(const MODULE* module) {
   const uint64_t rsize = module->nn * sizeof(double);
-  SVP_PPOL* reps = aligned_alloc(64, (rsize + 63) & (-64UL));
+  SVP_PPOL* reps = aligned_alloc(64, (rsize + 63) & (UINT64_C(-64)));
   if (reps == 0) FATAL_ERROR("Out of memory");
   return reps;
 }

@@ -15,7 +15,7 @@ EXPORT VMP_PMAT* fft64_vmp_pmat_alloc(const MODULE* module,           // N
                                       uint64_t nrows, uint64_t ncols  // dimensions
 ) {
   const uint64_t rsize = module->nn * nrows * ncols * sizeof(double);
-  VMP_PMAT* reps = aligned_alloc(64, (rsize + 63) & (-64UL));
+  VMP_PMAT* reps = aligned_alloc(64, (rsize + 63) & (UINT64_C(-64)));
   if (reps == 0) FATAL_ERROR("Out of memory");
   return reps;
 }

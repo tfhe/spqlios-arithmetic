@@ -88,7 +88,7 @@ EXPORT void vec_znx_big_automorphism(const MODULE* module,                  // N
 EXPORT VEC_ZNX_BIG* fft64_vec_znx_big_alloc(const MODULE* module,  // N
                                             uint64_t size) {
   const uint64_t rsize = module->nn * size * sizeof(double);
-  VEC_ZNX_BIG* reps = aligned_alloc(64, (rsize + 63) & (-64UL));
+  VEC_ZNX_BIG* reps = aligned_alloc(64, (rsize + 63) & (UINT64_C(-64)));
   if (reps == 0) FATAL_ERROR("Out of memory");
   return reps;
 }

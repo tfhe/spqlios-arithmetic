@@ -121,7 +121,7 @@ std::ostream& operator<<(std::ostream& out, const mod_q120& x) {
 }
 
 mod_q120 mod_q120::from_q120a(const void* addr) {
-  static const uint64_t _2p32 = uint64_t(1) << 32;
+  static const uint64_t _2p32 = UINT64_C(1) << 32;
   const uint64_t* in = (const uint64_t*)addr;
   mod_q120 r;
   for (uint64_t i = 0; i < 4; ++i) {
@@ -157,7 +157,7 @@ mod_q120 mod_q120::from_q120c(const void* addr) {
 __int128_t mod_q120::to_int128() const {
   static const __int128_t qm[] = {(__int128_t(Qi[1]) * Qi[2]) * Qi[3], (__int128_t(Qi[0]) * Qi[2]) * Qi[3],
                                   (__int128_t(Qi[0]) * Qi[1]) * Qi[3], (__int128_t(Qi[0]) * Qi[1]) * Qi[2]};
-  static const __int64_t CRTi[] = {Q1_CRT_CST, Q2_CRT_CST, Q3_CRT_CST, Q4_CRT_CST};
+  static const int64_t CRTi[] = {Q1_CRT_CST, Q2_CRT_CST, Q3_CRT_CST, Q4_CRT_CST};
   static const __int128_t q = qm[0] * Qi[0];
   static const __int128_t qs2 = q / 2;
   __int128_t res = 0;

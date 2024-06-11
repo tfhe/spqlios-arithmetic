@@ -45,8 +45,8 @@ void* init_reim_to_tnx_precomp(REIM_TO_TNX_PRECOMP* const res, uint32_t m, doubl
   dblui64_t ovh_cst;
   ovh_cst.d = 0.5 + (6<<log2overhead);
   res->add_cst = ovh_cst.d * divisor;
-  res->mask_and = ((1UL<<nbits)-1);
-  res->mask_or =  ovh_cst.u & ((-1UL)<<nbits);
+  res->mask_and = ((UINT64_C(1) << nbits) - 1);
+  res->mask_or = ovh_cst.u & ((UINT64_C(-1)) << nbits);
   res->sub_cst = ovh_cst.d;
   // TODO: check selection logic
   if (CPU_SUPPORTS("avx2")) {

@@ -61,29 +61,32 @@ if (VALGRIND_DIR)
 	target_include_directories(spqlios-testlib PRIVATE ${VALGRIND_DIR})
 	target_compile_definitions(spqlios-testlib PRIVATE VALGRIND_MEM_TESTS)
 endif ()
+target_link_libraries(spqlios-testlib libspqlios)
 
 
 
 # main unittest file
 message(STATUS "${gtest_libs}")
-add_executable(spqlios-test
+set(UNITTEST_FILES
 		spqlios_test.cpp
+		spqlios_reim_conversions_test.cpp
+		spqlios_reim_test.cpp
+		spqlios_reim4_arithmetic_test.cpp
 		spqlios_cplx_test.cpp
 		spqlios_cplx_conversions_test.cpp
-		spqlios_reim_test.cpp
-		spqlios_reim_conversions_test.cpp
 		spqlios_q120_ntt_test.cpp
 		spqlios_q120_arithmetic_test.cpp
-		spqlios_znx_small_test.cpp
 		spqlios_coeffs_arithmetic_test.cpp
-		spqlios_reim4_arithmetic_test.cpp
 		spqlios_vec_znx_big_test.cpp
+		spqlios_znx_small_test.cpp
 		spqlios_vmp_product_test.cpp
 		spqlios_vec_znx_dft_test.cpp
-		spqlios_vec_znx_test.cpp
 		spqlios_svp_test.cpp
 		spqlios_svp_product_test.cpp
+		spqlios_vec_znx_test.cpp
 )
+
+add_executable(spqlios-test ${UNITTEST_FILES})
 target_link_libraries(spqlios-test spqlios-testlib libspqlios ${gtest_libs})
 target_include_directories(spqlios-test PRIVATE ${test_incs})
 add_test(NAME spqlios-test COMMAND spqlios-test)
@@ -91,22 +94,21 @@ add_test(NAME spqlios-test COMMAND spqlios-test)
 
 # benchmarks
 add_executable(spqlios-cplx-fft-bench spqlios_cplx_fft_bench.cpp)
-target_link_libraries(spqlios-cplx-fft-bench libspqlios benchmark pthread)
-target_include_directories(spqlios-cplx-fft-bench PRIVATE ../)
+target_link_libraries(spqlios-cplx-fft-bench libspqlios ${benchmark_libs} pthread)
+target_include_directories(spqlios-cplx-fft-bench PRIVATE ${test_incs})
 
-if (${X86})
+if (X86 OR X86_WIN32)
     add_executable(spqlios-q120-ntt-bench spqlios_q120_ntt_bench.cpp)
-    target_link_libraries(spqlios-q120-ntt-bench libspqlios benchmark pthread)
+    target_link_libraries(spqlios-q120-ntt-bench libspqlios ${benchmark_libs} pthread)
     target_include_directories(spqlios-q120-ntt-bench PRIVATE ${test_incs})
 
     add_executable(spqlios-q120-arithmetic-bench spqlios_q120_arithmetic_bench.cpp)
-    target_link_libraries(spqlios-q120-arithmetic-bench libspqlios benchmark pthread)
+    target_link_libraries(spqlios-q120-arithmetic-bench libspqlios  ${benchmark_libs} pthread)
     target_include_directories(spqlios-q120-arithmetic-bench PRIVATE ${test_incs})
 endif ()
 
-if (${X86})
+if (X86 OR X86_WIN32)
 	add_executable(spqlios_reim4_arithmetic_bench spqlios_reim4_arithmetic_bench.cpp)
-	target_compile_options(spqlios_reim4_arithmetic_bench PRIVATE "-march=native")
-	target_link_libraries(spqlios_reim4_arithmetic_bench benchmark libspqlios pthread)
-	target_include_directories(spqlios_reim4_arithmetic_bench PRIVATE ../)
+	target_link_libraries(spqlios_reim4_arithmetic_bench ${benchmark_libs} libspqlios pthread)
+	target_include_directories(spqlios_reim4_arithmetic_bench PRIVATE ${test_incs})
 endif ()
