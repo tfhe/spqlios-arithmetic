@@ -152,7 +152,7 @@ static void test_vec_znx_big_normalize(VEC_ZNX_BIG_NORMALIZE_BASE2K_F normalize,
       uint64_t r_sl = n + 3;
       def_rand_big(a, n, sa);
       znx_vec_i64_layout r(n, sr, r_sl);
-      std::vector<uint8_t> tmp_space(normalize_tmp_bytes(module, sr, sa));
+      std::vector<uint8_t> tmp_space(normalize_tmp_bytes(module));
       normalize(module, k, r.data(), sr, r_sl, a.data, sa, tmp_space.data());
     }
   }
@@ -189,7 +189,7 @@ static void test_vec_znx_big_range_normalize(  //
       znx_vec_i64_layout r(n, sr, r_sl);
       znx_vec_i64_layout r2(n, sr, r_sl);
       // tmp_space is large-enough for both
-      std::vector<uint8_t> tmp_space(normalize_tmp_bytes(module, sr, sa));
+      std::vector<uint8_t> tmp_space(normalize_tmp_bytes(module));
       normalize(module, k, r.data(), sr, r_sl, a.data, a_start, a_end, a_step, tmp_space.data());
       fft64_vec_znx_big_normalize_base2k(module, k, r2.data(), sr, r_sl, aextr.data, range_size, tmp_space.data());
       for (uint64_t i = 0; i < sr; ++i) {

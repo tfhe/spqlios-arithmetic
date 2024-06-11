@@ -107,9 +107,7 @@ EXPORT void vec_znx_normalize_base2k(const MODULE* module,                      
 );
 
 /** @brief returns the minimal byte length of scratch space for vec_znx_normalize_base2k */
-EXPORT uint64_t vec_znx_normalize_base2k_tmp_bytes(const MODULE* module,  // N
-                                                   uint64_t res_size,     // res size
-                                                   uint64_t inp_size      // inp size
+EXPORT uint64_t vec_znx_normalize_base2k_tmp_bytes(const MODULE* module  // N
 );
 
 /** @brief sets res = a . X^p */
@@ -234,9 +232,7 @@ EXPORT void vec_znx_big_normalize_base2k(const MODULE* module,                  
 );
 
 /** @brief returns the minimal byte length of scratch space for vec_znx_big_normalize_base2k */
-EXPORT uint64_t vec_znx_big_normalize_base2k_tmp_bytes(const MODULE* module,  // N
-                                                       uint64_t res_size,     // res size
-                                                       uint64_t inp_size      // inp size
+EXPORT uint64_t vec_znx_big_normalize_base2k_tmp_bytes(const MODULE* module  // N
 );
 
 /** @brief apply a svp product, result = ppol * a, presented in DFT space */
@@ -257,9 +253,7 @@ EXPORT void vec_znx_big_range_normalize_base2k(                                 
 
 /** @brief returns the minimal byte length of scratch space for vec_znx_big_range_normalize_base2k */
 EXPORT uint64_t vec_znx_big_range_normalize_base2k_tmp_bytes(  //
-    const MODULE* module,                                      // N
-    uint64_t res_size,                                         // res size
-    uint64_t inp_size                                          // inp size
+    const MODULE* module                                       // N
 );
 
 /** @brief sets res = a . X^p */

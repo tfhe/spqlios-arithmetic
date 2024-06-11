@@ -472,7 +472,7 @@ void test_vec_znx_normalize_outplace(ACTUAL_FCN test_normalize, TMP_BYTES_FNC tm
           uint64_t b_sl = uniform_u64_bits(3) * 5 + n;
           znx_vec_i64_layout lb(n, sb, b_sl);
 
-          const uint64_t tmp_size = tmp_bytes(mod, sa, sa);
+          const uint64_t tmp_size = tmp_bytes(mod);
           uint8_t* tmp = new uint8_t[tmp_size];
           test_normalize(mod,                  // N
                          base_k,               // base_k
@@ -517,7 +517,7 @@ void test_vec_znx_normalize_inplace(ACTUAL_FCN test_normalize, TMP_BYTES_FNC tmp
         }
         vec_poly_normalize(base_k, la_norm);
 
-        const uint64_t tmp_size = tmp_bytes(mod, sa, sa);
+        const uint64_t tmp_size = tmp_bytes(mod);
         uint8_t* tmp = new uint8_t[tmp_size];
         test_normalize(mod,                  // N
                        base_k,               // base_k
