@@ -1,0 +1,35 @@
+name: CMake-Build-Test-Win64
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  msys-clang64:
+    name: CMake-Build-Test
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - uses: msys2/setup-msys2@v2
+      with:
+        msystem: CLANG64
+        #update: true
+        install: git
+        pacboy: toolchain:p cmake:p gtest:p benchmark:p
+
+    - name: Configure CMake
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING=ON -DWARNING_PARANOID=ON
+
+    - name: Build
+      run: cmake --build build
+
+    - name: Test
+      run: cd build; cp -v ./spqlios/*.dll test/; ctest --output-on-failure
