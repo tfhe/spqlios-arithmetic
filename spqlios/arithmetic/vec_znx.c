@@ -75,13 +75,9 @@ EXPORT void vec_znx_normalize_base2k(const MODULE* module,                      
                                         tmp_space);
 }
 
-EXPORT uint64_t vec_znx_normalize_base2k_tmp_bytes(const MODULE* module,  // N
-                                                   uint64_t res_size,     // res size
-                                                   uint64_t inp_size      // inp size
+EXPORT uint64_t vec_znx_normalize_base2k_tmp_bytes(const MODULE* module  // N
 ) {
-  return module->func.vec_znx_normalize_base2k_tmp_bytes(module,    // N
-                                                         res_size,  // res size
-                                                         inp_size   // inp size
+  return module->func.vec_znx_normalize_base2k_tmp_bytes(module  // N
   );
 }
 
@@ -247,9 +243,7 @@ EXPORT void vec_znx_normalize_base2k_ref(const MODULE* module,                  
   }
 }
 
-EXPORT uint64_t vec_znx_normalize_base2k_tmp_bytes_ref(const MODULE* module,  // N
-                                                       uint64_t res_size,     // res size
-                                                       uint64_t inp_size      // inp size
+EXPORT uint64_t vec_znx_normalize_base2k_tmp_bytes_ref(const MODULE* module  // N
 ) {
   const uint64_t nn = module->nn;
   return nn * sizeof(int64_t);
@@ -257,16 +251,12 @@ EXPORT uint64_t vec_znx_normalize_base2k_tmp_bytes_ref(const MODULE* module,  //
 
 // alias have to be defined in this unit: do not move
 EXPORT uint64_t fft64_vec_znx_big_normalize_base2k_tmp_bytes(  //
-    const MODULE* module,                                      // N
-    uint64_t res_size,                                         // res size
-    uint64_t inp_size                                          // inp size
+    const MODULE* module                                       // N
     ) __attribute((alias("vec_znx_normalize_base2k_tmp_bytes_ref")));
 
 // alias have to be defined in this unit: do not move
 EXPORT uint64_t fft64_vec_znx_big_range_normalize_base2k_tmp_bytes(  //
-    const MODULE* module,                                            // N
-    uint64_t res_size,                                               // res size
-    uint64_t inp_size                                                // inp size
+    const MODULE* module                                             // N
     ) __attribute((alias("vec_znx_normalize_base2k_tmp_bytes_ref")));
 
 EXPORT void std_free(void* addr) { free(addr); }

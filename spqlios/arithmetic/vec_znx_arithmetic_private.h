@@ -215,9 +215,7 @@ EXPORT void vec_znx_normalize_base2k_ref(const MODULE* module,                  
                                          uint8_t* tmp_space                                 // scratch space
 );
 
-EXPORT uint64_t vec_znx_normalize_base2k_tmp_bytes_ref(const MODULE* module,  // N
-                                                       uint64_t res_size,     // res size
-                                                       uint64_t inp_size      // inp size
+EXPORT uint64_t vec_znx_normalize_base2k_tmp_bytes_ref(const MODULE* module  // N
 );
 
 EXPORT void vec_znx_rotate_ref(const MODULE* module,                              // N
@@ -290,9 +288,7 @@ EXPORT void fft64_vec_znx_big_normalize_base2k(const MODULE* module,            
 );
 
 /** @brief returns the minimal byte length of scratch space for vec_znx_big_normalize_base2k */
-EXPORT uint64_t fft64_vec_znx_big_normalize_base2k_tmp_bytes(const MODULE* module,  // N
-                                                             uint64_t res_size,     // res size
-                                                             uint64_t inp_size      // inp size
+EXPORT uint64_t fft64_vec_znx_big_normalize_base2k_tmp_bytes(const MODULE* module  // N
 
 );
 
@@ -306,9 +302,7 @@ EXPORT void fft64_vec_znx_big_range_normalize_base2k(const MODULE* module,      
 );
 
 /** @brief returns the minimal byte length of scratch space for vec_znx_big_range_normalize_base2k */
-EXPORT uint64_t fft64_vec_znx_big_range_normalize_base2k_tmp_bytes(const MODULE* module,  // N
-                                                                   uint64_t res_size,     // res size
-                                                                   uint64_t inp_size      // inp size
+EXPORT uint64_t fft64_vec_znx_big_range_normalize_base2k_tmp_bytes(const MODULE* module  // N
 );
 
 EXPORT void fft64_vec_znx_dft(const MODULE* module,                             // N
