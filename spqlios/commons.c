@@ -117,14 +117,22 @@ EXPORT void spqlios_debug_free(void* addr) { free(addr - 64); }
 EXPORT void* spqlios_debug_alloc(uint64_t size) { return malloc(size + 64) + 64; }
 
 EXPORT void spqlios_free(void* addr) {
+#ifndef NDEBUG
+  // in release mode, the function will free aligned memory
 #ifdef _WIN32
   _aligned_free(addr);
 #else
   free(addr);
 #endif
+#else
+  // in debug mode, we deallocated with spqlios_debug_free()
+  spqlios_debug_free(addr);
+#endif
 }
 
 EXPORT void* spqlios_alloc(uint64_t size) {
+#ifndef NDEBUG
+// in release mode, the function will return 64-bytes aligned memory
 #ifdef _WIN32
   void* reps = _aligned_malloc((size + 63) & (UINT64_C(-64)), 64);
 #else
@@ -132,9 +140,16 @@ EXPORT void* spqlios_alloc(uint64_t size) {
 #endif
   if (reps == 0) FATAL_ERROR("Out of memory");
   return reps;
+#else
+  // in debug mode, the function will not necessarily have any particular alignment
+  // it will also ensure that memory can only be deallocated with spqlios_free()
+  return spqlios_debug_alloc(size);
+#endif
 }
 
 EXPORT void* spqlios_alloc_custom_align(uint64_t align, uint64_t size) {
+#ifndef NDEBUG
+// in release mode, the function will return aligned memory
 #ifdef _WIN32
   void* reps = _aligned_malloc(size, align);
 #else
@@ -142,4 +157,9 @@ EXPORT void* spqlios_alloc_custom_align(uint64_t align, uint64_t size) {
 #endif
   if (reps == 0) FATAL_ERROR("Out of memory");
   return reps;
+#else
+  // in debug mode, the function will not necessarily have any particular alignment
+  // it will also ensure that memory can only be deallocated with spqlios_free()
+  return spqlios_debug_alloc(size);
+#endif
 }
