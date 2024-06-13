@@ -149,9 +149,9 @@ struct module_virtual_functions_t {
   BYTES_OF_SVP_PPOL_F* bytes_of_svp_ppol;
   NEW_SVP_PPOL_F* new_svp_ppol;
   DELETE_SVP_PPOL_F* delete_svp_ppol;
-  BYTES_OF_VMP_PMAT_F * bytes_of_vmp_pmat;
-  NEW_VMP_PMAT_F * new_vmp_pmat;
-  DELETE_VMP_PMAT_F * delete_vmp_pmat;
+  BYTES_OF_VMP_PMAT_F* bytes_of_vmp_pmat;
+  NEW_VMP_PMAT_F* new_vmp_pmat;
+  DELETE_VMP_PMAT_F* delete_vmp_pmat;
 };
 
 union backend_module_info_t {
@@ -170,61 +170,55 @@ struct module_info_t {
   struct module_virtual_functions_t func;
 };
 
+#ifndef NDEBUG
+#define svp_ppol_spqlios_alloc(module) spqlios_debug_alloc(fft64_bytes_of_svp_ppol(module))
+#define svp_ppol_spqlios_free(ppol) spqlios_debug_free(ppol)
+#define vec_znx_big_spqlios_alloc(module, size) spqlios_debug_alloc(fft64_bytes_of_vec_znx_big(module, size))
+#define vec_znx_big_spqlios_free(res) spqlios_debug_free(res)
+#define vec_znx_dft_spqlios_alloc(module, size) spqlios_debug_alloc(fft64_bytes_of_vec_znx_dft(module, size))
+#define vec_znx_dft_spqlios_free(res) spqlios_debug_free(res)
+#define vmp_pmat_spqlios_alloc(module, nrows, ncols) spqlios_debug_alloc(fft64_bytes_of_vmp_pmat(module, nrows, ncols))
+#define vmp_pmat_spqlios_free(res) spqlios_debug_free(res)
+#else
+#define svp_ppol_spqlios_alloc(module) spqlios_alloc(fft64_bytes_of_svp_ppol(module))
+#define svp_ppol_spqlios_free(ppol) spqlios_free(ppol)
+#define vec_znx_big_spqlios_alloc(module, size) spqlios_alloc(fft64_bytes_of_vec_znx_big(module, size))
+#define vec_znx_big_spqlios_free(res) spqlios_free(res)
+#define vec_znx_dft_spqlios_alloc(module, size) spqlios_alloc(fft64_bytes_of_vec_znx_dft(module, size))
+#define vec_znx_dft_spqlios_free(res) spqlios_free(res)
+#define vmp_pmat_spqlios_alloc(module, nrows, ncols) spqlios_alloc(fft64_bytes_of_vmp_pmat(module, nrows, ncols))
+#define vmp_pmat_spqlios_free(res) spqlios_free(res)
+#endif
+
 EXPORT uint64_t fft64_bytes_of_vec_znx_dft(const MODULE* module,  // N
                                            uint64_t size);
 
 EXPORT VEC_ZNX_DFT* fft64_new_vec_znx_dft(const MODULE* module,  // N
-                                             uint64_t size);
+                                          uint64_t size);
 
 EXPORT void fft64_delete_vec_znx_dft(VEC_ZNX_DFT* res);
-
-/** @brief internal function that allocates a vec_znx in DFT space */
-EXPORT VEC_ZNX_DFT* vec_znx_dft_spqlios_alloc(const MODULE* module,  // N
-                                              uint64_t size);
-
-/** @brief internal function that frees memory from a vec_znx in DFT space */
-EXPORT void vec_znx_dft_spqlios_free(VEC_ZNX_DFT* res);
 
 EXPORT uint64_t fft64_bytes_of_vec_znx_big(const MODULE* module,  // N
                                            uint64_t size);
 
 EXPORT VEC_ZNX_BIG* fft64_new_vec_znx_big(const MODULE* module,  // N
-                                             uint64_t size);
+                                          uint64_t size);
 
 EXPORT void fft64_delete_vec_znx_big(VEC_ZNX_BIG* res);
 
-/** @brief internal function that allocates a vec_znx_big */
-EXPORT VEC_ZNX_BIG* vec_znx_big_spqlios_alloc(const MODULE* module,  // N
-                                              uint64_t size);
-/** @brief internal function that frees memory from a vec_znx_big */
-EXPORT void vec_znx_big_spqlios_free(VEC_ZNX_BIG* res);
+EXPORT uint64_t fft64_bytes_of_svp_ppol(const MODULE* module);  // N
 
-EXPORT uint64_t fft64_bytes_of_svp_ppol(const MODULE* module); // N
-
-EXPORT SVP_PPOL* fft64_new_svp_ppol(const MODULE* module); // N
+EXPORT SVP_PPOL* fft64_new_svp_ppol(const MODULE* module);  // N
 
 EXPORT void fft64_delete_svp_ppol(SVP_PPOL* res);
-
-/** @brief internal function that allocates a prepared vector */
-EXPORT SVP_PPOL* svp_ppol_spqlios_alloc(const MODULE* module);  // N
-
-/** @brief internal function that frees memory for a prepared vector */
-EXPORT void svp_ppol_spqlios_free(SVP_PPOL* res);
 
 EXPORT uint64_t fft64_bytes_of_vmp_pmat(const MODULE* module,  // N
                                         uint64_t nrows, uint64_t ncols);
 
 EXPORT VMP_PMAT* fft64_new_vmp_pmat(const MODULE* module,  // N
-                                       uint64_t nrows, uint64_t ncols);
+                                    uint64_t nrows, uint64_t ncols);
 
 EXPORT void fft64_delete_vmp_pmat(VMP_PMAT* res);
-
-/** @brief internal function that allocates a prepared matrix */
-EXPORT VMP_PMAT* vmp_pmat_spqlios_alloc(const MODULE* module,  // N
-                                        uint64_t nrows, uint64_t ncols);
-
-/** @brief internal function that frees memory for a prepared matrix */
-EXPORT void vmp_pmat_spqlios_free(VMP_PMAT* res);
 
 EXPORT void vec_znx_zero_ref(const MODULE* module,                             // N
                              int64_t* res, uint64_t res_size, uint64_t res_sl  // res

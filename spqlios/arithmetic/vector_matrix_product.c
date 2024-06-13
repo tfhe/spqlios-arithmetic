@@ -4,55 +4,33 @@
 #include "vec_znx_arithmetic_private.h"
 
 EXPORT uint64_t bytes_of_vmp_pmat(const MODULE* module,           // N
-                                uint64_t nrows, uint64_t ncols  // dimensions
+                                  uint64_t nrows, uint64_t ncols  // dimensions
 ) {
   return module->func.bytes_of_vmp_pmat(module, nrows, ncols);
 }
 
-EXPORT VMP_PMAT* new_vmp_pmat(const MODULE* module,  // N
-                                             uint64_t nrows, uint64_t ncols  // dimensions
+EXPORT VMP_PMAT* new_vmp_pmat(const MODULE* module,           // N
+                              uint64_t nrows, uint64_t ncols  // dimensions
 ) {
   return module->func.new_vmp_pmat(module, nrows, ncols);
 }
 
-EXPORT void delete_vmp_pmat(VMP_PMAT* res) {
-  spqlios_free(res);
-}
+EXPORT void delete_vmp_pmat(VMP_PMAT* res) { spqlios_free(res); }
 
 // fft64
 EXPORT uint64_t fft64_bytes_of_vmp_pmat(const MODULE* module,           // N
-                                      uint64_t nrows, uint64_t ncols  // dimensions
+                                        uint64_t nrows, uint64_t ncols  // dimensions
 ) {
   return module->nn * nrows * ncols * sizeof(double);
 }
 
-EXPORT VMP_PMAT* fft64_new_vmp_pmat(const MODULE* module,  // N
-                                                   uint64_t nrows, uint64_t ncols  // dimensions
+EXPORT VMP_PMAT* fft64_new_vmp_pmat(const MODULE* module,           // N
+                                    uint64_t nrows, uint64_t ncols  // dimensions
 ) {
   return spqlios_alloc(fft64_bytes_of_vmp_pmat(module, nrows, ncols));
 }
 
-EXPORT void fft64_delete_vmp_pmat(VMP_PMAT* res) {
-  spqlios_free(res);
-}
-
-EXPORT VMP_PMAT* vmp_pmat_spqlios_alloc(const MODULE* module,  // N
-                                        uint64_t nrows, uint64_t ncols  // dimensions
-) {
-#ifndef NDEBUG
-  return spqlios_debug_alloc(fft64_bytes_of_vmp_pmat(module, nrows, ncols));
-#else
-  return spqlios_alloc(fft64_bytes_of_vmp_pmat(module, nrows, ncols));
-#endif
-}
-
-EXPORT void vmp_pmat_spqlios_free(VMP_PMAT* res) {
-#ifndef NDEBUG
-  spqlios_debug_free(res);
-#else
-  spqlios_free(res);
-#endif
-}
+EXPORT void fft64_delete_vmp_pmat(VMP_PMAT* res) { spqlios_free(res); }
 
 /** @brief prepares a vmp matrix (contiguous row-major version) */
 EXPORT void vmp_prepare_contiguous(const MODULE* module,                                // N

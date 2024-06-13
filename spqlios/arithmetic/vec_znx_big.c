@@ -1,18 +1,16 @@
 #include "vec_znx_arithmetic_private.h"
 
 EXPORT uint64_t bytes_of_vec_znx_big(const MODULE* module,  // N
-                                      uint64_t size) {
+                                     uint64_t size) {
   return module->func.bytes_of_vec_znx_big(module, size);
 }
 
 EXPORT VEC_ZNX_BIG* new_vec_znx_big(const MODULE* module,  // N
-                                             uint64_t size) {
+                                    uint64_t size) {
   return module->func.new_vec_znx_big(module, size);
 }
 
-EXPORT void delete_vec_znx_big(VEC_ZNX_BIG* res) {
-  spqlios_free(res);
-}
+EXPORT void delete_vec_znx_big(VEC_ZNX_BIG* res) { spqlios_free(res); }
 
 // public wrappers
 
@@ -100,30 +98,11 @@ EXPORT uint64_t fft64_bytes_of_vec_znx_big(const MODULE* module,  // N
 }
 
 EXPORT VEC_ZNX_BIG* fft64_new_vec_znx_big(const MODULE* module,  // N
-                                                   uint64_t size) {
+                                          uint64_t size) {
   return spqlios_alloc(fft64_bytes_of_vec_znx_big(module, size));
 }
 
-EXPORT void fft64_delete_vec_znx_big(VEC_ZNX_BIG* res) {
-  spqlios_free(res);
-}
-
-EXPORT VEC_ZNX_BIG* vec_znx_big_spqlios_alloc(const MODULE* module,  // N
-uint64_t size) {
-#ifndef NDEBUG
-  return spqlios_debug_alloc(fft64_bytes_of_vec_znx_big(module, size));
-#else
-  return spqlios_alloc(fft64_bytes_of_vec_znx_big(module, size));
-#endif
-}
-
-EXPORT void vec_znx_big_spqlios_free(VEC_ZNX_BIG* res) {
-#ifndef NDEBUG
-  spqlios_debug_free(res);
-#else
-  spqlios_free(res);
-#endif
-}
+EXPORT void fft64_delete_vec_znx_big(VEC_ZNX_BIG* res) { spqlios_free(res); }
 
 /** @brief sets res = a+b */
 EXPORT void fft64_vec_znx_big_add(const MODULE* module,                   // N

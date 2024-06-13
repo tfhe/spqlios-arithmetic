@@ -48,7 +48,7 @@ EXPORT uint64_t bytes_of_vec_znx_dft(const MODULE* module,  // N
 
 /** @brief allocates a vec_znx in DFT space */
 EXPORT VEC_ZNX_DFT* new_vec_znx_dft(const MODULE* module,  // N
-                                     uint64_t size);
+                                    uint64_t size);
 
 /** @brief frees memory from a vec_znx in DFT space */
 EXPORT void delete_vec_znx_dft(VEC_ZNX_DFT* res);
@@ -59,7 +59,7 @@ EXPORT uint64_t bytes_of_vec_znx_big(const MODULE* module,  // N
 
 /** @brief allocates a vec_znx_big */
 EXPORT VEC_ZNX_BIG* new_vec_znx_big(const MODULE* module,  // N
-                                             uint64_t size);
+                                    uint64_t size);
 /** @brief frees memory from a vec_znx_big */
 EXPORT void delete_vec_znx_big(VEC_ZNX_BIG* res);
 
@@ -78,7 +78,7 @@ EXPORT uint64_t bytes_of_vmp_pmat(const MODULE* module,  // N
 
 /** @brief allocates a prepared matrix */
 EXPORT VMP_PMAT* new_vmp_pmat(const MODULE* module,  // N
-                                       uint64_t nrows, uint64_t ncols);
+                              uint64_t nrows, uint64_t ncols);
 
 /** @brief frees memory for a prepared matrix */
 EXPORT void delete_vmp_pmat(VMP_PMAT* res);

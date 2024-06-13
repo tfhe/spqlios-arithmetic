@@ -259,7 +259,6 @@ EXPORT uint64_t fft64_vec_znx_big_range_normalize_base2k_tmp_bytes(  //
     const MODULE* module                                             // N
     ) __attribute((alias("vec_znx_normalize_base2k_tmp_bytes_ref")));
 
-EXPORT void std_free(void* addr) { free(addr); }  // moshih: delete
 EXPORT void spqlios_free(void* addr) { free(addr); }
 
 EXPORT void* spqlios_alloc(uint64_t size) {
