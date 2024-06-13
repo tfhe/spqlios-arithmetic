@@ -2,16 +2,44 @@
 
 #include "vec_znx_arithmetic_private.h"
 
-EXPORT SVP_PPOL* svp_ppol_alloc(const MODULE* module)  // N
-{
-  return module->func.svp_ppol_alloc(module);
+EXPORT uint64_t bytes_of_svp_ppol(const MODULE* module) {
+  return module->func.bytes_of_svp_ppol(module);
 }
 
-EXPORT SVP_PPOL* fft64_svp_ppol_alloc(const MODULE* module) {
-  const uint64_t rsize = module->nn * sizeof(double);
-  SVP_PPOL* reps = aligned_alloc(64, (rsize + 63) & (UINT64_C(-64)));
-  if (reps == 0) FATAL_ERROR("Out of memory");
-  return reps;
+EXPORT SVP_PPOL* new_svp_ppol(const MODULE* module) {
+  return module->func.new_svp_ppol(module);
+}
+
+EXPORT void delete_svp_ppol(SVP_PPOL* ppol) {
+  spqlios_free(ppol);
+}
+
+EXPORT uint64_t fft64_bytes_of_svp_ppol(const MODULE* module) {
+  return module->nn * sizeof(double);
+}
+
+EXPORT SVP_PPOL* fft64_new_svp_ppol(const MODULE* module) {
+  return spqlios_alloc(fft64_bytes_of_svp_ppol(module));
+}
+
+EXPORT void fft64_delete_svp_ppol(SVP_PPOL* ppol) {
+  spqlios_free(ppol);
+}
+
+EXPORT SVP_PPOL* svp_ppol_spqlios_alloc(const MODULE* module) {
+#ifndef NDEBUG
+  return spqlios_debug_alloc(fft64_bytes_of_svp_ppol(module));
+#else
+  return spqlios_alloc(fft64_bytes_of_svp_ppol(module));
+#endif
+}
+
+EXPORT void svp_ppol_spqlios_free(SVP_PPOL* ppol) {
+#ifndef NDEBUG
+  spqlios_debug_free(ppol);
+#else
+  spqlios_free(ppol);
+#endif
 }
 
 // public wrappers

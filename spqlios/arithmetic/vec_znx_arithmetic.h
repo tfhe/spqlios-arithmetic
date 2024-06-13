@@ -34,27 +34,54 @@ typedef struct cnv_pvec_l_t CNV_PVEC_L;
 /** @brief opaque type that represents a prepared right convolution vector product */
 typedef struct cnv_pvec_r_t CNV_PVEC_R;
 
-/** @brief allocates a prepared matrix (release with free) */
-EXPORT VMP_PMAT* vmp_pmat_alloc(const MODULE* module,           // N
-                                uint64_t nrows, uint64_t ncols  // dimensions
-);
+EXPORT void spqlios_free(void* address);
 
-/** @brief allocates a vec_znx in DFT space (release with free) */
-EXPORT VEC_ZNX_DFT* vec_znx_dft_alloc(const MODULE* module,  // N
-                                      uint64_t size);
+EXPORT void* spqlios_alloc(uint64_t size);
 
-/** @brief allocates a vec_znx_big (release with free) */
-EXPORT VEC_ZNX_BIG* vec_znx_big_alloc(const MODULE* module,  // N
-                                      uint64_t size);
+EXPORT void spqlios_debug_free(void* address);
 
-/** @brief allocates a prepared vector (release with free) */
-EXPORT SVP_PPOL* svp_ppol_alloc(const MODULE* module);  // N
+EXPORT void* spqlios_debug_alloc(uint64_t size);
 
-/** @brief free something (vec_znx, pvmp, pcnv...) was allocated
- * It just calls free. It is required to expose it for foreign
- * languages bindings that do cannot call libc directly
- */
-EXPORT void std_free(void* address);
+/** @brief bytes needed for a vec_znx in DFT space */
+EXPORT uint64_t bytes_of_vec_znx_dft(const MODULE* module,  // N
+                                     uint64_t size);
+
+/** @brief allocates a vec_znx in DFT space */
+EXPORT VEC_ZNX_DFT* new_vec_znx_dft(const MODULE* module,  // N
+                                     uint64_t size);
+
+/** @brief frees memory from a vec_znx in DFT space */
+EXPORT void delete_vec_znx_dft(VEC_ZNX_DFT* res);
+
+/** @brief bytes needed for a vec_znx_big */
+EXPORT uint64_t bytes_of_vec_znx_big(const MODULE* module,  // N
+                                     uint64_t size);
+
+/** @brief allocates a vec_znx_big */
+EXPORT VEC_ZNX_BIG* new_vec_znx_big(const MODULE* module,  // N
+                                             uint64_t size);
+/** @brief frees memory from a vec_znx_big */
+EXPORT void delete_vec_znx_big(VEC_ZNX_BIG* res);
+
+/** @brief bytes needed for a prepared vector */
+EXPORT uint64_t bytes_of_svp_ppol(const MODULE* module);  // N
+
+/** @brief allocates a prepared vector */
+EXPORT SVP_PPOL* new_svp_ppol(const MODULE* module);  // N
+
+/** @brief frees memory for a prepared vector */
+EXPORT void delete_svp_ppol(SVP_PPOL* res);
+
+/** @brief bytes needed for a prepared matrix */
+EXPORT uint64_t bytes_of_vmp_pmat(const MODULE* module,  // N
+                                  uint64_t nrows, uint64_t ncols);
+
+/** @brief allocates a prepared matrix */
+EXPORT VMP_PMAT* new_vmp_pmat(const MODULE* module,  // N
+                                       uint64_t nrows, uint64_t ncols);
+
+/** @brief frees memory for a prepared matrix */
+EXPORT void delete_vmp_pmat(VMP_PMAT* res);
 
 /**
  * @brief obtain a module info for ring dimension N

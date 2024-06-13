@@ -24,10 +24,6 @@ static void fill_generic_virtual_table(MODULE* module) {
 static void fill_fft64_virtual_table(MODULE* module) {
   // TODO add default ref handler here
   // module->func.vec_znx_dft = ...;
-  module->func.vmp_pmat_alloc = fft64_vmp_pmat_alloc;
-  module->func.vec_znx_dft_alloc = fft64_vec_znx_dft_alloc;
-  module->func.vec_znx_big_alloc = fft64_vec_znx_big_alloc;
-  module->func.svp_ppol_alloc = fft64_svp_ppol_alloc;
   module->func.vec_znx_big_normalize_base2k = fft64_vec_znx_big_normalize_base2k;
   module->func.vec_znx_big_normalize_base2k_tmp_bytes = fft64_vec_znx_big_normalize_base2k_tmp_bytes;
   module->func.vec_znx_big_range_normalize_base2k = fft64_vec_znx_big_range_normalize_base2k;
@@ -55,6 +51,18 @@ static void fill_fft64_virtual_table(MODULE* module) {
   module->func.vmp_apply_dft_tmp_bytes = fft64_vmp_apply_dft_tmp_bytes;
   module->func.vmp_apply_dft_to_dft = fft64_vmp_apply_dft_to_dft_ref;
   module->func.vmp_apply_dft_to_dft_tmp_bytes = fft64_vmp_apply_dft_to_dft_tmp_bytes;
+  module->func.bytes_of_vec_znx_dft = fft64_bytes_of_vec_znx_dft;
+  module->func.bytes_of_vec_znx_dft = fft64_bytes_of_vec_znx_dft;
+  module->func.bytes_of_vec_znx_dft = fft64_bytes_of_vec_znx_dft;
+  module->func.bytes_of_vec_znx_big = fft64_bytes_of_vec_znx_big;
+  module->func.new_vec_znx_big = fft64_new_vec_znx_big;
+  module->func.delete_vec_znx_big = fft64_delete_vec_znx_big;
+  module->func.bytes_of_svp_ppol = fft64_bytes_of_svp_ppol;
+  module->func.new_svp_ppol = fft64_new_svp_ppol;
+  module->func.delete_svp_ppol = fft64_delete_svp_ppol;
+  module->func.bytes_of_vmp_pmat = fft64_bytes_of_vmp_pmat;
+  module->func.new_vmp_pmat = fft64_new_vmp_pmat;
+  module->func.delete_vmp_pmat = fft64_delete_vmp_pmat;
   if (CPU_SUPPORTS("avx2")) {
     // TODO add avx handlers here
     // TODO: enable when avx implementation is done

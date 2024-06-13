@@ -259,7 +259,18 @@ EXPORT uint64_t fft64_vec_znx_big_range_normalize_base2k_tmp_bytes(  //
     const MODULE* module                                             // N
     ) __attribute((alias("vec_znx_normalize_base2k_tmp_bytes_ref")));
 
-EXPORT void std_free(void* addr) { free(addr); }
+EXPORT void std_free(void* addr) { free(addr); }  // moshih: delete
+EXPORT void spqlios_free(void* addr) { free(addr); }
+
+EXPORT void* spqlios_alloc(uint64_t size) {
+  VEC_ZNX_DFT* reps = aligned_alloc(64, (size + 63) & (UINT64_C(-64)));
+  if (reps == 0) FATAL_ERROR("Out of memory");
+  return reps;
+}
+
+EXPORT void spqlios_debug_free(void* addr) { free(addr - 64); }
+
+EXPORT void* spqlios_debug_alloc(uint64_t size) { return malloc(size + 64) + 64; }
 
 /** @brief sets res = 0 */
 EXPORT void vec_znx_zero(const MODULE* module,                             // N
