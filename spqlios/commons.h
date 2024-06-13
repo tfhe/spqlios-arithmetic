@@ -49,13 +49,15 @@ EXPORT void NOT_IMPLEMENTED_v_uvpcvpcvp(uint32_t n, void* r, const void* a, cons
 EXPORT void NOT_IMPLEMENTED_v_uvpvpcvp(uint32_t n, void* a, void* b, const void* o);
 
 // windows
+
 #ifdef _WIN32
-EXPORT void* aligned_alloc(size_t align, size_t n);
-#ifdef __cplusplus
-#define aligned_alloc ::aligned_alloc
-#endif
 #define __always_inline inline __attribute((always_inline))
 #endif
+
+EXPORT void spqlios_free(void* address);
+
+EXPORT void* spqlios_alloc(uint64_t size);
+EXPORT void* spqlios_alloc_custom_align(uint64_t align, uint64_t size);
 
 #define USE_LIBM_SIN_COS
 #ifndef USE_LIBM_SIN_COS

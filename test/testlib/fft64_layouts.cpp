@@ -7,7 +7,7 @@ void* alloc64(uint64_t size) {
   static uint64_t _msk64 = -64;
   if (size == 0) return nullptr;
   uint64_t rsize = (size + 63) & _msk64;
-  uint8_t* reps = (uint8_t*)aligned_alloc(64, rsize);
+  uint8_t* reps = (uint8_t*)spqlios_alloc(rsize);
   REQUIRE_DRAMATICALLY(reps != 0, "Out of memory");
 #ifdef VALGRIND_MEM_TESTS
   VALGRIND_MAKE_MEM_NOACCESS(reps + size, rsize - size);
@@ -21,7 +21,7 @@ fft64_vec_znx_dft_layout::fft64_vec_znx_dft_layout(uint64_t n, uint64_t size)
       data((VEC_ZNX_DFT*)alloc64(n * size * 8)),  //
       view(n / 2, size, (double*)data) {}
 
-fft64_vec_znx_dft_layout::~fft64_vec_znx_dft_layout() { free(data); }
+fft64_vec_znx_dft_layout::~fft64_vec_znx_dft_layout() { spqlios_free(data); }
 
 double* fft64_vec_znx_dft_layout::get_addr(uint64_t idx) {
   REQUIRE_DRAMATICALLY(idx < size, "index overflow " << idx << " / " << size);
@@ -105,7 +105,7 @@ void fft64_vec_znx_big_layout::fill_random() {
     set(i, znx_i64::random_log2bound(nn, 1));
   }
 }
-fft64_vec_znx_big_layout::~fft64_vec_znx_big_layout() { free(data); }
+fft64_vec_znx_big_layout::~fft64_vec_znx_big_layout() { spqlios_free(data); }
 
 fft64_vmp_pmat_layout::fft64_vmp_pmat_layout(uint64_t n, uint64_t nrows, uint64_t ncols)
     : nn(n),
@@ -147,7 +147,7 @@ void fft64_vmp_pmat_layout::set(uint64_t row, uint64_t col, uint64_t blk, const 
   value.save_as(get_addr(row, col, blk));
 }
 
-fft64_vmp_pmat_layout::~fft64_vmp_pmat_layout() { free(data); }
+fft64_vmp_pmat_layout::~fft64_vmp_pmat_layout() { spqlios_free(data); }
 
 reim_fft64vec fft64_vmp_pmat_layout::get_zext(uint64_t row, uint64_t col) const {
   if (row >= nrows || col >= ncols) {
@@ -208,7 +208,7 @@ void fft64_svp_ppol_layout::fill_dft_random(uint64_t log2bound) { set(reim_fft64
 
 void fft64_svp_ppol_layout::fill_random(double log2bound) { set(reim_fft64vec::random(nn, log2bound)); }
 
-fft64_svp_ppol_layout::~fft64_svp_ppol_layout() { free(data); }
+fft64_svp_ppol_layout::~fft64_svp_ppol_layout() { spqlios_free(data); }
 thash fft64_svp_ppol_layout::content_hash() const { return test_hash(data, nn * sizeof(double)); }
 
 fft64_cnv_left_layout::fft64_cnv_left_layout(uint64_t n, uint64_t size)
@@ -222,7 +222,7 @@ reim4_elem fft64_cnv_left_layout::get(uint64_t idx, uint64_t blk) {
   return reim4_elem(((double*)data) + blk * size + idx);
 }
 
-fft64_cnv_left_layout::~fft64_cnv_left_layout() { free(data); }
+fft64_cnv_left_layout::~fft64_cnv_left_layout() { spqlios_free(data); }
 
 fft64_cnv_right_layout::fft64_cnv_right_layout(uint64_t n, uint64_t size)
     : nn(n),  //
@@ -235,4 +235,4 @@ reim4_elem fft64_cnv_right_layout::get(uint64_t idx, uint64_t blk) {
   return reim4_elem(((double*)data) + blk * size + idx);
 }
 
-fft64_cnv_right_layout::~fft64_cnv_right_layout() { free(data); }
+fft64_cnv_right_layout::~fft64_cnv_right_layout() { spqlios_free(data); }

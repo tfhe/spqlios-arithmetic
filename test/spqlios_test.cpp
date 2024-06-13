@@ -29,10 +29,10 @@ TEST(fft, fftvec_convolution) {
   static const uint64_t k = 18;  // vary from 10 to 20
   // double* buf_fft = fft_precomp_get_buffer(tables, 0);
   // double* buf_ifft = ifft_precomp_get_buffer(itables, 0);
-  double* a = (double*)aligned_alloc(32, nn * 8);
-  double* a2 = (double*)aligned_alloc(32, nn * 8);
-  double* b = (double*)aligned_alloc(32, nn * 8);
-  double* dist_vector = (double*)aligned_alloc(32, nn * 8);
+  double* a = (double*)spqlios_alloc_custom_align(32, nn * 8);
+  double* a2 = (double*)spqlios_alloc_custom_align(32, nn * 8);
+  double* b = (double*)spqlios_alloc_custom_align(32, nn * 8);
+  double* dist_vector = (double*)spqlios_alloc_custom_align(32, nn * 8);
   int64_t p = UINT64_C(1) << k;
   printf("p size: %" PRId64 "\n", p);
   for (uint32_t i = 0; i < nn; i++) {
@@ -69,10 +69,10 @@ TEST(fft, fftvec_convolution) {
   double stdev = sqrt(variance / nn);
   printf("stdev: %lf\n", stdev);
 
-  free(a);
-  free(b);
-  free(a2);
-  free(dist_vector);
+  spqlios_free(a);
+  spqlios_free(b);
+  spqlios_free(a2);
+  spqlios_free(dist_vector);
 }
 
 typedef double CPLX[2];
@@ -156,9 +156,12 @@ TEST(fft, reim_vs_regular_layout_mul_test) {
   double c2[16] __attribute__((aligned(32)));    // for the result
   double c3[8][2] __attribute__((aligned(32)));  // for the result
 
-  double* a2 = (double*)aligned_alloc(32, nn / 2 * 2 * sizeof(double));  // for storing the coefs in reim layout
-  double* b2 = (double*)aligned_alloc(32, nn / 2 * 2 * sizeof(double));  // for storing the coefs in reim layout
-  // double* c2 = (double*)aligned_alloc(32, nn / 2 * sizeof(CPLX)); // for storing the coefs in reim layout
+  double* a2 =
+      (double*)spqlios_alloc_custom_align(32, nn / 2 * 2 * sizeof(double));  // for storing the coefs in reim layout
+  double* b2 =
+      (double*)spqlios_alloc_custom_align(32, nn / 2 * 2 * sizeof(double));  // for storing the coefs in reim layout
+  // double* c2 = (double*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX)); // for storing the coefs in reim
+  // layout
 
   // organise the coefficients in the reim layout
   for (uint32_t i = 0; i < nn / 2; i++) {
@@ -211,17 +214,17 @@ TEST(fft, reim_vs_regular_layout_mul_test) {
   }
   ASSERT_LE(d, 1e-7);
 
-  free(a2);
-  free(b2);
-  // free(c2);
+  spqlios_free(a2);
+  spqlios_free(b2);
+  // spqlios_free(c2);
 }
 
 TEST(fft, fftvec_convolution_recursiveoverk) {
   static const uint64_t nn = 32768;  // vary accross (8192, 16384), 32768, 65536
-  double* a = (double*)aligned_alloc(32, nn * 8);
-  double* a2 = (double*)aligned_alloc(32, nn * 8);
-  double* b = (double*)aligned_alloc(32, nn * 8);
-  double* dist_vector = (double*)aligned_alloc(32, nn * 8);
+  double* a = (double*)spqlios_alloc_custom_align(32, nn * 8);
+  double* a2 = (double*)spqlios_alloc_custom_align(32, nn * 8);
+  double* b = (double*)spqlios_alloc_custom_align(32, nn * 8);
+  double* dist_vector = (double*)spqlios_alloc_custom_align(32, nn * 8);
 
   printf("N size: %" PRId64 "\n", nn);
 
@@ -258,10 +261,10 @@ TEST(fft, fftvec_convolution_recursiveoverk) {
     printf("stdev: %lf\n", stdev);
   }
 
-  free(a);
-  free(b);
-  free(a2);
-  free(dist_vector);
+  spqlios_free(a);
+  spqlios_free(b);
+  spqlios_free(a2);
+  spqlios_free(dist_vector);
 }
 
 #ifdef __x86_64__
@@ -270,9 +273,9 @@ TEST(fft, cplx_fft_ref_vs_fft_reim_ref) {
     uint64_t m = nn / 2;
     CPLX_FFT_PRECOMP* tables = new_cplx_fft_precomp(m, 0);
     REIM_FFT_PRECOMP* reimtables = new_reim_fft_precomp(m, 0);
-    CPLX* a = (CPLX*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
-    CPLX* a1 = (CPLX*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
-    double* a2 = (double*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
+    CPLX* a = (CPLX*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
+    CPLX* a1 = (CPLX*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
+    double* a2 = (double*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
     int64_t p = 1 << 16;
     for (uint32_t i = 0; i < nn / 2; i++) {
       a[i][0] = (rand() % p) - p / 2;  // between -p/2 and p/2
@@ -294,9 +297,9 @@ TEST(fft, cplx_fft_ref_vs_fft_reim_ref) {
       ASSERT_LE(d, 1e-7);
     }
     ASSERT_LE(d, 1e-7);
-    free(a);
-    free(a1);
-    free(a2);
+    spqlios_free(a);
+    spqlios_free(a1);
+    spqlios_free(a2);
     delete_cplx_fft_precomp(tables);
     delete_reim_fft_precomp(reimtables);
   }
@@ -308,9 +311,9 @@ TEST(fft, cplx_ifft_ref_vs_reim_ifft_ref) {
     uint64_t m = nn / 2;
     CPLX_IFFT_PRECOMP* tables = new_cplx_ifft_precomp(m, 0);
     REIM_IFFT_PRECOMP* reimtables = new_reim_ifft_precomp(m, 0);
-    CPLX* a = (CPLX*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
-    CPLX* a1 = (CPLX*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
-    double* a2 = (double*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
+    CPLX* a = (CPLX*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
+    CPLX* a1 = (CPLX*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
+    double* a2 = (double*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
     int64_t p = 1 << 16;
     for (uint32_t i = 0; i < nn / 2; i++) {
       a[i][0] = (rand() % p) - p / 2;  // between -p/2 and p/2
@@ -332,9 +335,9 @@ TEST(fft, cplx_ifft_ref_vs_reim_ifft_ref) {
       ASSERT_LE(d, 1e-7);
     }
     ASSERT_LE(d, 1e-7);
-    free(a);
-    free(a1);
-    free(a2);
+    spqlios_free(a);
+    spqlios_free(a1);
+    spqlios_free(a2);
     delete_cplx_fft_precomp(tables);
     delete_reim_fft_precomp(reimtables);
   }
@@ -346,12 +349,12 @@ TEST(fft, reim4_vecfft_addmul_fma_vs_ref) {
     uint64_t m = nn / 2;
     REIM4_FFTVEC_ADDMUL_PRECOMP* tbl = new_reim4_fftvec_addmul_precomp(m);
     ASSERT_TRUE(tbl != nullptr);
-    double* a1 = (double*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
-    double* a2 = (double*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
-    double* b1 = (double*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
-    double* b2 = (double*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
-    double* r1 = (double*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
-    double* r2 = (double*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
+    double* a1 = (double*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
+    double* a2 = (double*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
+    double* b1 = (double*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
+    double* b2 = (double*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
+    double* r1 = (double*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
+    double* r2 = (double*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
     int64_t p = 1 << 16;
     for (uint32_t i = 0; i < nn; i++) {
       a1[i] = (rand() % p) - p / 2;  // between -p/2 and p/2
@@ -370,12 +373,12 @@ TEST(fft, reim4_vecfft_addmul_fma_vs_ref) {
       ASSERT_LE(d, 1e-8);
     }
     ASSERT_LE(d, 1e-8);
-    free(a1);
-    free(a2);
-    free(b1);
-    free(b2);
-    free(r1);
-    free(r2);
+    spqlios_free(a1);
+    spqlios_free(a2);
+    spqlios_free(b1);
+    spqlios_free(b2);
+    spqlios_free(r1);
+    spqlios_free(r2);
     delete_reim4_fftvec_addmul_precomp(tbl);
   }
 }
@@ -386,12 +389,12 @@ TEST(fft, reim4_vecfft_mul_fma_vs_ref) {
   for (uint64_t nn : {16, 32, 64, 1024, 8192, 65536}) {
     uint64_t m = nn / 2;
     REIM4_FFTVEC_MUL_PRECOMP* tbl = new_reim4_fftvec_mul_precomp(m);
-    double* a1 = (double*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
-    double* a2 = (double*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
-    double* b1 = (double*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
-    double* b2 = (double*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
-    double* r1 = (double*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
-    double* r2 = (double*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
+    double* a1 = (double*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
+    double* a2 = (double*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
+    double* b1 = (double*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
+    double* b2 = (double*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
+    double* r1 = (double*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
+    double* r2 = (double*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
     int64_t p = 1 << 16;
     for (uint32_t i = 0; i < nn; i++) {
       a1[i] = (rand() % p) - p / 2;  // between -p/2 and p/2
@@ -410,12 +413,12 @@ TEST(fft, reim4_vecfft_mul_fma_vs_ref) {
       ASSERT_LE(d, 1e-8);
     }
     ASSERT_LE(d, 1e-8);
-    free(a1);
-    free(a2);
-    free(b1);
-    free(b2);
-    free(r1);
-    free(r2);
+    spqlios_free(a1);
+    spqlios_free(a2);
+    spqlios_free(b1);
+    spqlios_free(b2);
+    spqlios_free(r1);
+    spqlios_free(r2);
     delete_reim_fftvec_mul_precomp(tbl);
   }
 }
@@ -426,10 +429,10 @@ TEST(fft, reim4_from_cplx_fma_vs_ref) {
   for (uint64_t nn : {16, 32, 64, 1024, 8192, 65536}) {
     uint64_t m = nn / 2;
     REIM4_FROM_CPLX_PRECOMP* tbl = new_reim4_from_cplx_precomp(m);
-    double* a1 = (double*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
-    double* a2 = (double*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
-    double* r1 = (double*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
-    double* r2 = (double*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
+    double* a1 = (double*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
+    double* a2 = (double*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
+    double* r1 = (double*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
+    double* r2 = (double*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
     int64_t p = 1 << 16;
     for (uint32_t i = 0; i < nn; i++) {
       a1[i] = (rand() % p) - p / 2;  // between -p/2 and p/2
@@ -446,10 +449,10 @@ TEST(fft, reim4_from_cplx_fma_vs_ref) {
       ASSERT_LE(d, 1e-8);
     }
     ASSERT_LE(d, 1e-8);
-    free(a1);
-    free(a2);
-    free(r1);
-    free(r2);
+    spqlios_free(a1);
+    spqlios_free(a2);
+    spqlios_free(r1);
+    spqlios_free(r2);
     delete_reim4_from_cplx_precomp(tbl);
   }
 }
@@ -460,10 +463,10 @@ TEST(fft, reim4_to_cplx_fma_vs_ref) {
   for (uint64_t nn : {16, 32, 64, 1024, 8192, 65536}) {
     uint64_t m = nn / 2;
     REIM4_TO_CPLX_PRECOMP* tbl = new_reim4_to_cplx_precomp(m);
-    double* a1 = (double*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
-    double* a2 = (double*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
-    double* r1 = (double*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
-    double* r2 = (double*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
+    double* a1 = (double*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
+    double* a2 = (double*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
+    double* r1 = (double*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
+    double* r2 = (double*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
     int64_t p = 1 << 16;
     for (uint32_t i = 0; i < nn; i++) {
       a1[i] = (rand() % p) - p / 2;  // between -p/2 and p/2
@@ -480,10 +483,10 @@ TEST(fft, reim4_to_cplx_fma_vs_ref) {
       ASSERT_LE(d, 1e-8);
     }
     ASSERT_LE(d, 1e-8);
-    free(a1);
-    free(a2);
-    free(r1);
-    free(r2);
+    spqlios_free(a1);
+    spqlios_free(a2);
+    spqlios_free(r1);
+    spqlios_free(r2);
     delete_reim4_from_cplx_precomp(tbl);
   }
 }

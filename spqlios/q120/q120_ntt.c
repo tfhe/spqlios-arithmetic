@@ -13,7 +13,7 @@ q120_ntt_precomp* new_precomp(const uint64_t n) {
   const uint64_t logN = ceil(log2(n));
   precomp->level_metadata = malloc((logN + 2) * sizeof(*precomp->level_metadata));
 
-  precomp->powomega = aligned_alloc(32, 4 * 2 * n * sizeof(*(precomp->powomega)));
+  precomp->powomega = spqlios_alloc_custom_align(32, 4 * 2 * n * sizeof(*(precomp->powomega)));
 
   return precomp;
 }
@@ -330,7 +330,7 @@ EXPORT q120_ntt_precomp* q120_new_intt_bb_precomp(const uint64_t n) {
 }
 
 void del_precomp(q120_ntt_precomp* precomp) {
-  free(precomp->powomega);
+  spqlios_free(precomp->powomega);
   free(precomp->level_metadata);
   free(precomp);
 }

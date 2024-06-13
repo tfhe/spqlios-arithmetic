@@ -22,8 +22,8 @@ TEST(fft, ifft16_fma_vs_ref) {
   for (uint64_t i = 0; i < 16; ++i) {
     double d1 = fabs(data[i][0] - copydata[i][0]);
     double d2 = fabs(data[i][0] - copydata[i][0]);
-    if (d1>distance) distance=d1;
-    if (d2>distance) distance=d2;
+    if (d1 > distance) distance = d1;
+    if (d2 > distance) distance = d2;
   }
   /*
   printf("data:\n");
@@ -201,9 +201,9 @@ TEST(fft, halfcfft_ref_vs_naive) {
   for (uint64_t nn : {4, 8, 16, 64, 256, 8192}) {
     uint64_t m = nn / 2;
     CPLX_FFT_PRECOMP* tables = new_cplx_fft_precomp(m, 0);
-    CPLX* a = (CPLX*)aligned_alloc(32, m * sizeof(CPLX));
-    CPLX* a1 = (CPLX*)aligned_alloc(32, m * sizeof(CPLX));
-    CPLX* a2 = (CPLX*)aligned_alloc(32, m * sizeof(CPLX));
+    CPLX* a = (CPLX*)spqlios_alloc_custom_align(32, m * sizeof(CPLX));
+    CPLX* a1 = (CPLX*)spqlios_alloc_custom_align(32, m * sizeof(CPLX));
+    CPLX* a2 = (CPLX*)spqlios_alloc_custom_align(32, m * sizeof(CPLX));
     int64_t p = 1 << 16;
     for (uint32_t i = 0; i < m; i++) {
       a[i][0] = (rand() % p) - p / 2;  // between -p/2 and p/2
@@ -223,9 +223,9 @@ TEST(fft, halfcfft_ref_vs_naive) {
       if (dim > d) d = dim;
     }
     ASSERT_LE(d, nn * 1e-10) << nn;
-    free(a);
-    free(a1);
-    free(a2);
+    spqlios_free(a);
+    spqlios_free(a1);
+    spqlios_free(a2);
     delete_cplx_fft_precomp(tables);
   }
 }
@@ -237,9 +237,9 @@ TEST(fft, halfcfft_fma_vs_ref) {
     for (uint64_t nn : {8, 16, 32, 64, 1024, 8192, 65536}) {
       uint64_t m = nn / 2;
       CPLX_FFT_PRECOMP* tables = new_cplx_fft_precomp(m, 0);
-      CPLX* a = (CPLX*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
-      CPLX* a1 = (CPLX*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
-      CPLX* a2 = (CPLX*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
+      CPLX* a = (CPLX*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
+      CPLX* a1 = (CPLX*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
+      CPLX* a2 = (CPLX*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
       int64_t p = 1 << 16;
       for (uint32_t i = 0; i < nn / 2; i++) {
         a[i][0] = (rand() % p) - p / 2;  // between -p/2 and p/2
@@ -257,9 +257,9 @@ TEST(fft, halfcfft_fma_vs_ref) {
         if (dim > d) d = dim;
       }
       ASSERT_LE(d, nn * 1e-10) << nn;
-      free(a);
-      free(a1);
-      free(a2);
+      spqlios_free(a);
+      spqlios_free(a1);
+      spqlios_free(a2);
       delete_cplx_fft_precomp(tables);
     }
   }
@@ -271,8 +271,8 @@ TEST(fft, halfcfft_then_ifft_ref) {
     uint64_t m = nn / 2;
     CPLX_FFT_PRECOMP* tables = new_cplx_fft_precomp(m, 0);
     CPLX_IFFT_PRECOMP* itables = new_cplx_ifft_precomp(m, 0);
-    CPLX* a = (CPLX*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
-    CPLX* a1 = (CPLX*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
+    CPLX* a = (CPLX*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
+    CPLX* a1 = (CPLX*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
     int64_t p = 1 << 16;
     for (uint32_t i = 0; i < nn / 2; i++) {
       a[i][0] = (rand() % p) - p / 2;  // between -p/2 and p/2
@@ -289,8 +289,8 @@ TEST(fft, halfcfft_then_ifft_ref) {
       if (dim > d) d = dim;
     }
     ASSERT_LE(d, 1e-8);
-    free(a);
-    free(a1);
+    spqlios_free(a);
+    spqlios_free(a1);
     delete_cplx_fft_precomp(tables);
     delete_cplx_ifft_precomp(itables);
   }
@@ -302,9 +302,9 @@ TEST(fft, halfcfft_ifft_fma_vs_ref) {
     for (uint64_t nn : {8, 16, 32, 1024, 4096, 8192, 65536}) {
       uint64_t m = nn / 2;
       CPLX_IFFT_PRECOMP* itables = new_cplx_ifft_precomp(m, 0);
-      CPLX* a = (CPLX*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
-      CPLX* a1 = (CPLX*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
-      CPLX* a2 = (CPLX*)aligned_alloc(32, nn / 2 * sizeof(CPLX));
+      CPLX* a = (CPLX*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
+      CPLX* a1 = (CPLX*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
+      CPLX* a2 = (CPLX*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
       int64_t p = 1 << 16;
       for (uint32_t i = 0; i < nn / 2; i++) {
         a[i][0] = (rand() % p) - p / 2;  // between -p/2 and p/2
@@ -322,9 +322,9 @@ TEST(fft, halfcfft_ifft_fma_vs_ref) {
         if (dim > d) d = dim;
       }
       ASSERT_LE(d, 1e-8);
-      free(a);
-      free(a1);
-      free(a2);
+      spqlios_free(a);
+      spqlios_free(a1);
+      spqlios_free(a2);
       delete_cplx_ifft_precomp(itables);
     }
   }

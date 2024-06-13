@@ -3,22 +3,26 @@
 #include "../reim4/reim4_arithmetic.h"
 #include "vec_znx_arithmetic_private.h"
 
-EXPORT VMP_PMAT* vmp_pmat_alloc(const MODULE* module,           // N
-                                uint64_t nrows, uint64_t ncols  // dimensions
+EXPORT uint64_t bytes_of_vmp_pmat(const MODULE* module,           // N
+                                  uint64_t nrows, uint64_t ncols  // dimensions
 ) {
-  return module->func.vmp_pmat_alloc(module, nrows, ncols);
+  return module->func.bytes_of_vmp_pmat(module, nrows, ncols);
 }
 
 // fft64
-
-EXPORT VMP_PMAT* fft64_vmp_pmat_alloc(const MODULE* module,           // N
-                                      uint64_t nrows, uint64_t ncols  // dimensions
+EXPORT uint64_t fft64_bytes_of_vmp_pmat(const MODULE* module,           // N
+                                        uint64_t nrows, uint64_t ncols  // dimensions
 ) {
-  const uint64_t rsize = module->nn * nrows * ncols * sizeof(double);
-  VMP_PMAT* reps = aligned_alloc(64, (rsize + 63) & (UINT64_C(-64)));
-  if (reps == 0) FATAL_ERROR("Out of memory");
-  return reps;
+  return module->nn * nrows * ncols * sizeof(double);
 }
+
+EXPORT VMP_PMAT* fft64_new_vmp_pmat(const MODULE* module,           // N
+                                    uint64_t nrows, uint64_t ncols  // dimensions
+) {
+  return spqlios_alloc(fft64_bytes_of_vmp_pmat(module, nrows, ncols));
+}
+
+EXPORT void fft64_delete_vmp_pmat(VMP_PMAT* res) { spqlios_free(res); }
 
 /** @brief prepares a vmp matrix (contiguous row-major version) */
 EXPORT void vmp_prepare_contiguous(const MODULE* module,                                // N

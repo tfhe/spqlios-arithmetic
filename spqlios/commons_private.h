@@ -31,9 +31,9 @@ EXPORT uint64_t is_not_pow2_double(void* doublevalue);
     abort();                                 \
   }
 #define NOT_SUPPORTED()                    \
-  {                                          \
+  {                                        \
     fprintf(stderr, "NOT SUPPORTED!!!\n"); \
-    abort();                                 \
+    abort();                               \
   }
 #define FATAL_ERROR(MESSAGE)                   \
   {                                            \

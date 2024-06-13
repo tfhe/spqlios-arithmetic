@@ -21,10 +21,6 @@ EXPORT void NOT_IMPLEMENTED_v_uvpcvpcvp(uint32_t n, void* r, const void* a, cons
 EXPORT void NOT_IMPLEMENTED_v_uvpvpcvp(uint32_t n, void* a, void* b, const void* o) { NOT_IMPLEMENTED(); }
 
 #ifdef _WIN32
-EXPORT void* aligned_alloc(size_t align, size_t n) {
-  return malloc(n);
-  // unfortunately, there is no alternative that gets freed with free :(
-}
 #define __always_inline inline __attribute((always_inline))
 #endif
 
@@ -114,4 +110,56 @@ double internal_accurate_sin(double x) {
   double rcos, rsin;
   internal_accurate_sincos(&rcos, &rsin, x);
   return rsin;
+}
+
+EXPORT void spqlios_debug_free(void* addr) { free(addr - 64); }
+
+EXPORT void* spqlios_debug_alloc(uint64_t size) { return malloc(size + 64) + 64; }
+
+EXPORT void spqlios_free(void* addr) {
+#ifndef NDEBUG
+  // in release mode, the function will free aligned memory
+#ifdef _WIN32
+  _aligned_free(addr);
+#else
+  free(addr);
+#endif
+#else
+  // in debug mode, we deallocated with spqlios_debug_free()
+  spqlios_debug_free(addr);
+#endif
+}
+
+EXPORT void* spqlios_alloc(uint64_t size) {
+#ifndef NDEBUG
+// in release mode, the function will return 64-bytes aligned memory
+#ifdef _WIN32
+  void* reps = _aligned_malloc((size + 63) & (UINT64_C(-64)), 64);
+#else
+  void* reps = aligned_alloc(64, (size + 63) & (UINT64_C(-64)));
+#endif
+  if (reps == 0) FATAL_ERROR("Out of memory");
+  return reps;
+#else
+  // in debug mode, the function will not necessarily have any particular alignment
+  // it will also ensure that memory can only be deallocated with spqlios_free()
+  return spqlios_debug_alloc(size);
+#endif
+}
+
+EXPORT void* spqlios_alloc_custom_align(uint64_t align, uint64_t size) {
+#ifndef NDEBUG
+// in release mode, the function will return aligned memory
+#ifdef _WIN32
+  void* reps = _aligned_malloc(size, align);
+#else
+  void* reps = aligned_alloc(align, size);
+#endif
+  if (reps == 0) FATAL_ERROR("Out of memory");
+  return reps;
+#else
+  // in debug mode, the function will not necessarily have any particular alignment
+  // it will also ensure that memory can only be deallocated with spqlios_free()
+  return spqlios_debug_alloc(size);
+#endif
 }

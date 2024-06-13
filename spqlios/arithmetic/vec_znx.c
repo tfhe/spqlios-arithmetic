@@ -259,8 +259,6 @@ EXPORT uint64_t fft64_vec_znx_big_range_normalize_base2k_tmp_bytes(  //
     const MODULE* module                                             // N
     ) __attribute((alias("vec_znx_normalize_base2k_tmp_bytes_ref")));
 
-EXPORT void std_free(void* addr) { free(addr); }
-
 /** @brief sets res = 0 */
 EXPORT void vec_znx_zero(const MODULE* module,                             // N
                          int64_t* res, uint64_t res_size, uint64_t res_sl  // res

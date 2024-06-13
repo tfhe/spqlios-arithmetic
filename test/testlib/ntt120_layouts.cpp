@@ -25,7 +25,7 @@ q120x2b* ntt120_vec_znx_dft_layout::get_blk(uint64_t idx, uint64_t blk) {
   uint64_t* d = (uint64_t*)data;
   return (q120x2b*)(d + 4 * nn * idx + 8 * blk);
 }
-ntt120_vec_znx_dft_layout::~ntt120_vec_znx_dft_layout() { free(data); }
+ntt120_vec_znx_dft_layout::~ntt120_vec_znx_dft_layout() { spqlios_free(data); }
 q120_nttvec ntt120_vec_znx_dft_layout::get_copy_zext(uint64_t idx) {
   int64_t* d = (int64_t*)data;
   if (idx < size) {
@@ -63,4 +63,4 @@ __int128* ntt120_vec_znx_big_layout::get_addr(uint64_t index) const {
   return (__int128_t*)data + index * nn;
 }
 void ntt120_vec_znx_big_layout::set(uint64_t index, const znx_i128& value) { value.save_as(get_addr(index)); }
-ntt120_vec_znx_big_layout::~ntt120_vec_znx_big_layout() { free(data); }
+ntt120_vec_znx_big_layout::~ntt120_vec_znx_big_layout() { spqlios_free(data); }

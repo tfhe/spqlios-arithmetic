@@ -495,8 +495,12 @@ void test_vec_znx_normalize_outplace(ACTUAL_FCN test_normalize, TMP_BYTES_FNC tm
   }
 }
 
-TEST(vec_znx, vec_znx_normalize_outplace) { test_vec_znx_normalize_outplace(vec_znx_normalize_base2k, vec_znx_normalize_base2k_tmp_bytes); }
-TEST(vec_znx, vec_znx_normalize_outplace_ref) { test_vec_znx_normalize_outplace(vec_znx_normalize_base2k_ref, vec_znx_normalize_base2k_tmp_bytes_ref); }
+TEST(vec_znx, vec_znx_normalize_outplace) {
+  test_vec_znx_normalize_outplace(vec_znx_normalize_base2k, vec_znx_normalize_base2k_tmp_bytes);
+}
+TEST(vec_znx, vec_znx_normalize_outplace_ref) {
+  test_vec_znx_normalize_outplace(vec_znx_normalize_base2k_ref, vec_znx_normalize_base2k_tmp_bytes_ref);
+}
 
 template <typename ACTUAL_FCN, typename TMP_BYTES_FNC>
 void test_vec_znx_normalize_inplace(ACTUAL_FCN test_normalize, TMP_BYTES_FNC tmp_bytes) {
@@ -534,5 +538,9 @@ void test_vec_znx_normalize_inplace(ACTUAL_FCN test_normalize, TMP_BYTES_FNC tmp
   }
 }
 
-TEST(vec_znx, vec_znx_normalize_inplace) { test_vec_znx_normalize_inplace(vec_znx_normalize_base2k, vec_znx_normalize_base2k_tmp_bytes); }
-TEST(vec_znx, vec_znx_normalize_inplace_ref) { test_vec_znx_normalize_inplace(vec_znx_normalize_base2k_ref, vec_znx_normalize_base2k_tmp_bytes_ref); }
+TEST(vec_znx, vec_znx_normalize_inplace) {
+  test_vec_znx_normalize_inplace(vec_znx_normalize_base2k, vec_znx_normalize_base2k_tmp_bytes);
+}
+TEST(vec_znx, vec_znx_normalize_inplace_ref) {
+  test_vec_znx_normalize_inplace(vec_znx_normalize_base2k_ref, vec_znx_normalize_base2k_tmp_bytes_ref);
+}

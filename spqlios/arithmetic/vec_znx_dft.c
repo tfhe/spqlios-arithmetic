@@ -27,20 +27,23 @@ EXPORT void vec_znx_idft_tmp_a(const MODULE* module,                 // N
   return module->func.vec_znx_idft_tmp_a(module, res, res_size, a_dft, a_size);
 }
 
-EXPORT VEC_ZNX_DFT* vec_znx_dft_alloc(const MODULE* module,  // N
-                                      uint64_t size) {
-  return module->func.vec_znx_dft_alloc(module, size);
+EXPORT uint64_t bytes_of_vec_znx_dft(const MODULE* module,  // N
+                                     uint64_t size) {
+  return module->func.bytes_of_vec_znx_dft(module, size);
 }
 
 // fft64 backend
-
-EXPORT VEC_ZNX_DFT* fft64_vec_znx_dft_alloc(const MODULE* module,  // N
-                                            uint64_t size) {
-  const uint64_t rsize = module->nn * size * sizeof(double);
-  VEC_ZNX_DFT* reps = aligned_alloc(64, (rsize + 63) & (UINT64_C(-64)));
-  if (reps == 0) FATAL_ERROR("Out of memory");
-  return reps;
+EXPORT uint64_t fft64_bytes_of_vec_znx_dft(const MODULE* module,  // N
+                                           uint64_t size) {
+  return module->nn * size * sizeof(double);
 }
+
+EXPORT VEC_ZNX_DFT* fft64_new_vec_znx_dft(const MODULE* module,  // N
+                                          uint64_t size) {
+  return spqlios_alloc(fft64_bytes_of_vec_znx_dft(module, size));
+}
+
+EXPORT void fft64_delete_vec_znx_dft(VEC_ZNX_DFT* res) { spqlios_free(res); }
 
 EXPORT void fft64_vec_znx_dft(const MODULE* module,                             // N
                               VEC_ZNX_DFT* res, uint64_t res_size,              // res
