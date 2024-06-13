@@ -6,9 +6,9 @@ EXPORT uint64_t bytes_of_svp_ppol(const MODULE* module) { return module->func.by
 
 EXPORT uint64_t fft64_bytes_of_svp_ppol(const MODULE* module) { return module->nn * sizeof(double); }
 
-EXPORT SVP_PPOL* fft64_new_svp_ppol(const MODULE* module) { return spqlios_alloc(fft64_bytes_of_svp_ppol(module)); }
+EXPORT SVP_PPOL* new_svp_ppol(const MODULE* module) { return spqlios_alloc(bytes_of_svp_ppol(module)); }
 
-EXPORT void fft64_delete_svp_ppol(SVP_PPOL* ppol) { spqlios_free(ppol); }
+EXPORT void delete_svp_ppol(SVP_PPOL* ppol) { spqlios_free(ppol); }
 
 // public wrappers
 EXPORT void svp_prepare(const MODULE* module,  // N
