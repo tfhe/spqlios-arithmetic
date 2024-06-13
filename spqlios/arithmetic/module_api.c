@@ -55,14 +55,8 @@ static void fill_fft64_virtual_table(MODULE* module) {
   module->func.bytes_of_vec_znx_dft = fft64_bytes_of_vec_znx_dft;
   module->func.bytes_of_vec_znx_dft = fft64_bytes_of_vec_znx_dft;
   module->func.bytes_of_vec_znx_big = fft64_bytes_of_vec_znx_big;
-  module->func.new_vec_znx_big = fft64_new_vec_znx_big;
-  module->func.delete_vec_znx_big = fft64_delete_vec_znx_big;
   module->func.bytes_of_svp_ppol = fft64_bytes_of_svp_ppol;
-  module->func.new_svp_ppol = fft64_new_svp_ppol;
-  module->func.delete_svp_ppol = fft64_delete_svp_ppol;
   module->func.bytes_of_vmp_pmat = fft64_bytes_of_vmp_pmat;
-  module->func.new_vmp_pmat = fft64_new_vmp_pmat;
-  module->func.delete_vmp_pmat = fft64_delete_vmp_pmat;
   if (CPU_SUPPORTS("avx2")) {
     // TODO add avx handlers here
     // TODO: enable when avx implementation is done

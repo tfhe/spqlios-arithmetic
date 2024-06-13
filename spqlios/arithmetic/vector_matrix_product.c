@@ -9,14 +9,6 @@ EXPORT uint64_t bytes_of_vmp_pmat(const MODULE* module,           // N
   return module->func.bytes_of_vmp_pmat(module, nrows, ncols);
 }
 
-EXPORT VMP_PMAT* new_vmp_pmat(const MODULE* module,           // N
-                              uint64_t nrows, uint64_t ncols  // dimensions
-) {
-  return module->func.new_vmp_pmat(module, nrows, ncols);
-}
-
-EXPORT void delete_vmp_pmat(VMP_PMAT* res) { spqlios_free(res); }
-
 // fft64
 EXPORT uint64_t fft64_bytes_of_vmp_pmat(const MODULE* module,           // N
                                         uint64_t nrows, uint64_t ncols  // dimensions

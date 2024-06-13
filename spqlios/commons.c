@@ -21,10 +21,6 @@ EXPORT void NOT_IMPLEMENTED_v_uvpcvpcvp(uint32_t n, void* r, const void* a, cons
 EXPORT void NOT_IMPLEMENTED_v_uvpvpcvp(uint32_t n, void* a, void* b, const void* o) { NOT_IMPLEMENTED(); }
 
 #ifdef _WIN32
-EXPORT void* aligned_alloc(size_t align, size_t n) {
-  return malloc(n);
-  // unfortunately, there is no alternative that gets freed with free :(
-}
 #define __always_inline inline __attribute((always_inline))
 #endif
 
@@ -114,4 +110,36 @@ double internal_accurate_sin(double x) {
   double rcos, rsin;
   internal_accurate_sincos(&rcos, &rsin, x);
   return rsin;
+}
+
+EXPORT void spqlios_debug_free(void* addr) { free(addr - 64); }
+
+EXPORT void* spqlios_debug_alloc(uint64_t size) { return malloc(size + 64) + 64; }
+
+EXPORT void spqlios_free(void* addr) {
+#ifdef _WIN32
+  _aligned_free(addr);
+#else
+  free(addr);
+#endif
+}
+
+EXPORT void* spqlios_alloc(uint64_t size) {
+#ifdef _WIN32
+  void* reps = _aligned_malloc((size + 63) & (UINT64_C(-64)), 64);
+#else
+  void* reps = aligned_alloc(64, (size + 63) & (UINT64_C(-64)));
+#endif
+  if (reps == 0) FATAL_ERROR("Out of memory");
+  return reps;
+}
+
+EXPORT void* spqlios_alloc_custom_align(uint64_t align, uint64_t size) {
+#ifdef _WIN32
+  void* reps = _aligned_malloc(size, align);
+#else
+  void* reps = aligned_alloc(align, size);
+#endif
+  if (reps == 0) FATAL_ERROR("Out of memory");
+  return reps;
 }

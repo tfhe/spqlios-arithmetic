@@ -8,7 +8,7 @@
 #ifdef __x86_64__
 TEST(fft, cplx_from_znx32_ref_vs_fma) {
   const uint32_t m = 128;
-  int32_t* src = (int32_t*)aligned_alloc(32, 10 * m * sizeof(int32_t));
+  int32_t* src = (int32_t*)spqlios_alloc_custom_align(32, 10 * m * sizeof(int32_t));
   CPLX* dst1 = (CPLX*)(src + 2 * m);
   CPLX* dst2 = (CPLX*)(src + 6 * m);
   for (uint64_t i = 0; i < 2 * m; ++i) {
@@ -23,13 +23,14 @@ TEST(fft, cplx_from_znx32_ref_vs_fma) {
     ASSERT_EQ(dst1[i][0], dst2[i][0]);
     ASSERT_EQ(dst1[i][1], dst2[i][1]);
   }
+  spqlios_free(src);
 }
 #endif
 
 #ifdef __x86_64__
 TEST(fft, cplx_from_tnx32_ref_vs_fma) {
   const uint32_t m = 128;
-  int32_t* src = (int32_t*)aligned_alloc(32, 10 * m * sizeof(int32_t));
+  int32_t* src = (int32_t*)spqlios_alloc_custom_align(32, 10 * m * sizeof(int32_t));
   CPLX* dst1 = (CPLX*)(src + 2 * m);
   CPLX* dst2 = (CPLX*)(src + 6 * m);
   for (uint64_t i = 0; i < 2 * m; ++i) {
@@ -44,6 +45,7 @@ TEST(fft, cplx_from_tnx32_ref_vs_fma) {
     ASSERT_EQ(dst1[i][0], dst2[i][0]);
     ASSERT_EQ(dst1[i][1], dst2[i][1]);
   }
+  spqlios_free(src);
 }
 #endif
 
@@ -51,7 +53,7 @@ TEST(fft, cplx_from_tnx32_ref_vs_fma) {
 TEST(fft, cplx_to_tnx32_ref_vs_fma) {
   for (const uint32_t m : {8, 128, 1024, 65536}) {
     for (const double divisor : {double(1), double(m), double(0.5)}) {
-      CPLX* src = (CPLX*)aligned_alloc(32, 10 * m * sizeof(int32_t));
+      CPLX* src = (CPLX*)spqlios_alloc_custom_align(32, 10 * m * sizeof(int32_t));
       int32_t* dst1 = (int32_t*)(src + m);
       int32_t* dst2 = (int32_t*)(src + 2 * m);
       for (uint64_t i = 0; i < 2 * m; ++i) {
@@ -77,7 +79,7 @@ TEST(fft, cplx_to_tnx32_ref_vs_fma) {
               << i << " " << dst1[i] << " " << dst2[i] << " " << truevalue << std::endl;
         }
       }
-      free(src);
+      spqlios_free(src);
     }
   }
 }

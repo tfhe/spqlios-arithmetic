@@ -49,12 +49,34 @@ EXPORT void NOT_IMPLEMENTED_v_uvpcvpcvp(uint32_t n, void* r, const void* a, cons
 EXPORT void NOT_IMPLEMENTED_v_uvpvpcvp(uint32_t n, void* a, void* b, const void* o);
 
 // windows
+
 #ifdef _WIN32
-EXPORT void* aligned_alloc(size_t align, size_t n);
-#ifdef __cplusplus
-#define aligned_alloc ::aligned_alloc
-#endif
 #define __always_inline inline __attribute((always_inline))
+#endif
+
+EXPORT void spqlios_free(void* address);
+
+EXPORT void* spqlios_alloc(uint64_t size);
+EXPORT void* spqlios_alloc_custom_align(uint64_t align, uint64_t size);
+
+#ifndef NDEBUG
+#define svp_ppol_spqlios_alloc(module) spqlios_debug_alloc(fft64_bytes_of_svp_ppol(module))
+#define svp_ppol_spqlios_free(ppol) spqlios_debug_free(ppol)
+#define vec_znx_big_spqlios_alloc(module, size) spqlios_debug_alloc(fft64_bytes_of_vec_znx_big(module, size))
+#define vec_znx_big_spqlios_free(res) spqlios_debug_free(res)
+#define vec_znx_dft_spqlios_alloc(module, size) spqlios_debug_alloc(fft64_bytes_of_vec_znx_dft(module, size))
+#define vec_znx_dft_spqlios_free(res) spqlios_debug_free(res)
+#define vmp_pmat_spqlios_alloc(module, nrows, ncols) spqlios_debug_alloc(fft64_bytes_of_vmp_pmat(module, nrows, ncols))
+#define vmp_pmat_spqlios_free(res) spqlios_debug_free(res)
+#else
+#define svp_ppol_spqlios_alloc(module) spqlios_alloc(fft64_bytes_of_svp_ppol(module))
+#define svp_ppol_spqlios_free(ppol) spqlios_free(ppol)
+#define vec_znx_big_spqlios_alloc(module, size) spqlios_alloc(fft64_bytes_of_vec_znx_big(module, size))
+#define vec_znx_big_spqlios_free(res) spqlios_free(res)
+#define vec_znx_dft_spqlios_alloc(module, size) spqlios_alloc(fft64_bytes_of_vec_znx_dft(module, size))
+#define vec_znx_dft_spqlios_free(res) spqlios_free(res)
+#define vmp_pmat_spqlios_alloc(module, nrows, ncols) spqlios_alloc(fft64_bytes_of_vmp_pmat(module, nrows, ncols))
+#define vmp_pmat_spqlios_free(res) spqlios_free(res)
 #endif
 
 #define USE_LIBM_SIN_COS

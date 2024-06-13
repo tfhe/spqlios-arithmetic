@@ -34,14 +34,6 @@ typedef struct cnv_pvec_l_t CNV_PVEC_L;
 /** @brief opaque type that represents a prepared right convolution vector product */
 typedef struct cnv_pvec_r_t CNV_PVEC_R;
 
-EXPORT void spqlios_free(void* address);
-
-EXPORT void* spqlios_alloc(uint64_t size);
-
-EXPORT void spqlios_debug_free(void* address);
-
-EXPORT void* spqlios_debug_alloc(uint64_t size);
-
 /** @brief bytes needed for a vec_znx in DFT space */
 EXPORT uint64_t bytes_of_vec_znx_dft(const MODULE* module,  // N
                                      uint64_t size);

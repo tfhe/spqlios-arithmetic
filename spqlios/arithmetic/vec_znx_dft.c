@@ -32,13 +32,6 @@ EXPORT uint64_t bytes_of_vec_znx_dft(const MODULE* module,  // N
   return module->func.bytes_of_vec_znx_dft(module, size);
 }
 
-EXPORT VEC_ZNX_DFT* new_vec_znx_dft(const MODULE* module,  // N
-                                    uint64_t size) {
-  return module->func.new_vec_znx_dft(module, size);
-}
-
-EXPORT void delete_vec_znx_dft(VEC_ZNX_DFT* res) { spqlios_free(res); }
-
 // fft64 backend
 EXPORT uint64_t fft64_bytes_of_vec_znx_dft(const MODULE* module,  // N
                                            uint64_t size) {

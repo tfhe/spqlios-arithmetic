@@ -5,13 +5,6 @@ EXPORT uint64_t bytes_of_vec_znx_big(const MODULE* module,  // N
   return module->func.bytes_of_vec_znx_big(module, size);
 }
 
-EXPORT VEC_ZNX_BIG* new_vec_znx_big(const MODULE* module,  // N
-                                    uint64_t size) {
-  return module->func.new_vec_znx_big(module, size);
-}
-
-EXPORT void delete_vec_znx_big(VEC_ZNX_BIG* res) { spqlios_free(res); }
-
 // public wrappers
 
 /** @brief sets res = a+b */

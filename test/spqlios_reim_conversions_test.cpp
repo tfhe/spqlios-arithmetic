@@ -5,8 +5,8 @@
 
 TEST(reim_conversions, reim_to_tnx) {
   for (uint32_t m : {1, 2, 64, 128, 512}) {
-    for (double divisor : {1,2,int(m)}) {
-      for (uint32_t log2overhead : {1,2,10,18,35, 42}) {
+    for (double divisor : {1, 2, int(m)}) {
+      for (uint32_t log2overhead : {1, 2, 10, 18, 35, 42}) {
         double maxdiff = pow(2., log2overhead - 50);
         std::vector<double> data(2 * m);
         std::vector<double> dout(2 * m);
@@ -27,13 +27,12 @@ TEST(reim_conversions, reim_to_tnx) {
   }
 }
 
-
 #ifdef __x86_64__
 TEST(reim_conversions, reim_to_tnx_ref_vs_avx) {
   for (uint32_t m : {8, 16, 64, 128, 512}) {
-    for (double divisor : {1,2,int(m)}) {
-      for (uint32_t log2overhead : {1,2,10,18,35, 42}) {
-        //double maxdiff = pow(2., log2overhead - 50);
+    for (double divisor : {1, 2, int(m)}) {
+      for (uint32_t log2overhead : {1, 2, 10, 18, 35, 42}) {
+        // double maxdiff = pow(2., log2overhead - 50);
         std::vector<double> data(2 * m);
         std::vector<double> dout1(2 * m);
         std::vector<double> dout2(2 * m);
@@ -44,7 +43,7 @@ TEST(reim_conversions, reim_to_tnx_ref_vs_avx) {
         reim_to_tnx_ref(p, dout1.data(), data.data());
         reim_to_tnx_avx(p, dout2.data(), data.data());
         for (uint64_t i = 0; i < 2 * m; ++i) {
-          ASSERT_LE(fabs(dout1[i]-dout2[i]), 0.);
+          ASSERT_LE(fabs(dout1[i] - dout2[i]), 0.);
         }
         delete_reim_to_tnx_precomp(p);
       }

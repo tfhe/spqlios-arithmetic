@@ -90,17 +90,9 @@ typedef typeof(vmp_apply_dft_tmp_bytes) VMP_APPLY_DFT_TMP_BYTES_F;
 typedef typeof(vmp_apply_dft_to_dft) VMP_APPLY_DFT_TO_DFT_F;
 typedef typeof(vmp_apply_dft_to_dft_tmp_bytes) VMP_APPLY_DFT_TO_DFT_TMP_BYTES_F;
 typedef typeof(bytes_of_vec_znx_dft) BYTES_OF_VEC_ZNX_DFT_F;
-typedef typeof(new_vec_znx_dft) NEW_VEC_ZNX_DFT_F;
-typedef typeof(delete_vec_znx_dft) DELETE_VEC_ZNX_DFT_F;
 typedef typeof(bytes_of_vec_znx_big) BYTES_OF_VEC_ZNX_BIG_F;
-typedef typeof(new_vec_znx_big) NEW_VEC_ZNX_BIG_F;
-typedef typeof(delete_vec_znx_big) DELETE_VEC_ZNX_BIG_F;
 typedef typeof(bytes_of_svp_ppol) BYTES_OF_SVP_PPOL_F;
-typedef typeof(new_svp_ppol) NEW_SVP_PPOL_F;
-typedef typeof(delete_svp_ppol) DELETE_SVP_PPOL_F;
 typedef typeof(bytes_of_vmp_pmat) BYTES_OF_VMP_PMAT_F;
-typedef typeof(new_vmp_pmat) NEW_VMP_PMAT_F;
-typedef typeof(delete_vmp_pmat) DELETE_VMP_PMAT_F;
 
 struct module_virtual_functions_t {
   // TODO add functions here
@@ -141,17 +133,9 @@ struct module_virtual_functions_t {
   VMP_APPLY_DFT_TO_DFT_F* vmp_apply_dft_to_dft;
   VMP_APPLY_DFT_TO_DFT_TMP_BYTES_F* vmp_apply_dft_to_dft_tmp_bytes;
   BYTES_OF_VEC_ZNX_DFT_F* bytes_of_vec_znx_dft;
-  NEW_VEC_ZNX_DFT_F* new_vec_znx_dft;
-  DELETE_VEC_ZNX_DFT_F* delete_vec_znx_dft;
   BYTES_OF_VEC_ZNX_BIG_F* bytes_of_vec_znx_big;
-  NEW_VEC_ZNX_BIG_F* new_vec_znx_big;
-  DELETE_VEC_ZNX_BIG_F* delete_vec_znx_big;
   BYTES_OF_SVP_PPOL_F* bytes_of_svp_ppol;
-  NEW_SVP_PPOL_F* new_svp_ppol;
-  DELETE_SVP_PPOL_F* delete_svp_ppol;
   BYTES_OF_VMP_PMAT_F* bytes_of_vmp_pmat;
-  NEW_VMP_PMAT_F* new_vmp_pmat;
-  DELETE_VMP_PMAT_F* delete_vmp_pmat;
 };
 
 union backend_module_info_t {
@@ -169,26 +153,6 @@ struct module_info_t {
   // virtual functions
   struct module_virtual_functions_t func;
 };
-
-#ifndef NDEBUG
-#define svp_ppol_spqlios_alloc(module) spqlios_debug_alloc(fft64_bytes_of_svp_ppol(module))
-#define svp_ppol_spqlios_free(ppol) spqlios_debug_free(ppol)
-#define vec_znx_big_spqlios_alloc(module, size) spqlios_debug_alloc(fft64_bytes_of_vec_znx_big(module, size))
-#define vec_znx_big_spqlios_free(res) spqlios_debug_free(res)
-#define vec_znx_dft_spqlios_alloc(module, size) spqlios_debug_alloc(fft64_bytes_of_vec_znx_dft(module, size))
-#define vec_znx_dft_spqlios_free(res) spqlios_debug_free(res)
-#define vmp_pmat_spqlios_alloc(module, nrows, ncols) spqlios_debug_alloc(fft64_bytes_of_vmp_pmat(module, nrows, ncols))
-#define vmp_pmat_spqlios_free(res) spqlios_debug_free(res)
-#else
-#define svp_ppol_spqlios_alloc(module) spqlios_alloc(fft64_bytes_of_svp_ppol(module))
-#define svp_ppol_spqlios_free(ppol) spqlios_free(ppol)
-#define vec_znx_big_spqlios_alloc(module, size) spqlios_alloc(fft64_bytes_of_vec_znx_big(module, size))
-#define vec_znx_big_spqlios_free(res) spqlios_free(res)
-#define vec_znx_dft_spqlios_alloc(module, size) spqlios_alloc(fft64_bytes_of_vec_znx_dft(module, size))
-#define vec_znx_dft_spqlios_free(res) spqlios_free(res)
-#define vmp_pmat_spqlios_alloc(module, nrows, ncols) spqlios_alloc(fft64_bytes_of_vmp_pmat(module, nrows, ncols))
-#define vmp_pmat_spqlios_free(res) spqlios_free(res)
-#endif
 
 EXPORT uint64_t fft64_bytes_of_vec_znx_dft(const MODULE* module,  // N
                                            uint64_t size);
