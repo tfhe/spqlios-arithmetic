@@ -157,32 +157,13 @@ struct module_info_t {
 EXPORT uint64_t fft64_bytes_of_vec_znx_dft(const MODULE* module,  // N
                                            uint64_t size);
 
-EXPORT VEC_ZNX_DFT* new_vec_znx_dft(const MODULE* module,  // N
-                                          uint64_t size);
-
-EXPORT void delete_vec_znx_dft(VEC_ZNX_DFT* res);
-
 EXPORT uint64_t fft64_bytes_of_vec_znx_big(const MODULE* module,  // N
                                            uint64_t size);
 
-EXPORT VEC_ZNX_BIG* new_vec_znx_big(const MODULE* module,  // N
-                                          uint64_t size);
-
-EXPORT void delete_vec_znx_big(VEC_ZNX_BIG* res);
-
 EXPORT uint64_t fft64_bytes_of_svp_ppol(const MODULE* module);  // N
-
-EXPORT SVP_PPOL* new_svp_ppol(const MODULE* module);  // N
-
-EXPORT void delete_svp_ppol(SVP_PPOL* res);
 
 EXPORT uint64_t fft64_bytes_of_vmp_pmat(const MODULE* module,  // N
                                         uint64_t nrows, uint64_t ncols);
-
-EXPORT VMP_PMAT* new_vmp_pmat(const MODULE* module,  // N
-                                    uint64_t nrows, uint64_t ncols);
-
-EXPORT void delete_vmp_pmat(VMP_PMAT* res);
 
 EXPORT void vec_znx_zero_ref(const MODULE* module,                             // N
                              int64_t* res, uint64_t res_size, uint64_t res_sl  // res
