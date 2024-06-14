@@ -16,13 +16,13 @@ EXPORT uint64_t fft64_bytes_of_vmp_pmat(const MODULE* module,           // N
   return module->nn * nrows * ncols * sizeof(double);
 }
 
-EXPORT VMP_PMAT* fft64_new_vmp_pmat(const MODULE* module,           // N
+EXPORT VMP_PMAT* new_vmp_pmat(const MODULE* module,           // N
                                     uint64_t nrows, uint64_t ncols  // dimensions
 ) {
-  return spqlios_alloc(fft64_bytes_of_vmp_pmat(module, nrows, ncols));
+  return spqlios_alloc(bytes_of_vmp_pmat(module, nrows, ncols));
 }
 
-EXPORT void fft64_delete_vmp_pmat(VMP_PMAT* res) { spqlios_free(res); }
+EXPORT void delete_vmp_pmat(VMP_PMAT* res) { spqlios_free(res); }
 
 /** @brief prepares a vmp matrix (contiguous row-major version) */
 EXPORT void vmp_prepare_contiguous(const MODULE* module,                                // N

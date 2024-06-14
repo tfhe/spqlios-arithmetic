@@ -112,9 +112,9 @@ double internal_accurate_sin(double x) {
   return rsin;
 }
 
-EXPORT void spqlios_debug_free(void* addr) { free(addr - 64); }
+EXPORT void spqlios_debug_free(void* addr) { free((uint8_t* ) addr - 64); }
 
-EXPORT void* spqlios_debug_alloc(uint64_t size) { return malloc(size + 64) + 64; }
+EXPORT void* spqlios_debug_alloc(uint64_t size) { return (uint8_t* ) malloc(size + 64) + 64; }
 
 EXPORT void spqlios_free(void* addr) {
 #ifndef NDEBUG
