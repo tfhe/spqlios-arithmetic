@@ -208,6 +208,34 @@ EXPORT void znx_rotate_inplace_i64(uint64_t nn, int64_t p, int64_t* res) {
   }
 }
 
+EXPORT void rnx_mul_xp_minus_one_inplace(uint64_t nn, int64_t p, double* res) {
+  const uint64_t _2mn = 2 * nn - 1;
+  const uint64_t _mn = nn - 1;
+  uint64_t nb_modif = 0;
+  uint64_t j_start = 0;
+  while (nb_modif < nn) {
+    // follow the cycle that start with j_start
+    uint64_t j = j_start;
+    double tmp1 = res[j];
+    do {
+      // find where the value should go, and with which sign
+      uint64_t new_j = (j + p) & _2mn;  // mod 2n to get the position and sign
+      uint64_t new_j_n = new_j & _mn;   // mod n to get just the position
+      // exchange this position with tmp1 (and take care of the sign)
+      double tmp2 = res[new_j_n] - tmp1;
+      res[new_j_n] = (new_j < nn) ? tmp1 : -tmp1;
+      tmp1 = tmp2;
+      // move to the new location, and store the number of items modified
+      ++nb_modif;
+      j = new_j_n;
+    } while (j != j_start);
+    // move to the start of the next cycle:
+    // we need to find an index that has not been touched yet, and pick it as next j_start.
+    // in practice, it is enough to do +1, because the group of rotations is cyclic and 1 is a generator.
+    ++j_start;
+  }
+}
+
 __always_inline int64_t get_base_k_digit(const int64_t x, const uint64_t base_k) {
   return (x << (64 - base_k)) >> (64 - base_k);
 }
