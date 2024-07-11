@@ -249,15 +249,28 @@ EXPORT uint64_t vec_znx_normalize_base2k_tmp_bytes_ref(const MODULE* module  // 
   return nn * sizeof(int64_t);
 }
 
-// alias have to be defined in this unit: do not move
-EXPORT uint64_t fft64_vec_znx_big_normalize_base2k_tmp_bytes(  //
-    const MODULE* module                                       // N
-    ) __attribute((alias("vec_znx_normalize_base2k_tmp_bytes_ref")));
 
 // alias have to be defined in this unit: do not move
+#ifdef __APPLE__
 EXPORT uint64_t fft64_vec_znx_big_range_normalize_base2k_tmp_bytes(  //
     const MODULE* module                                             // N
-    ) __attribute((alias("vec_znx_normalize_base2k_tmp_bytes_ref")));
+        ) {
+  return vec_znx_normalize_base2k_tmp_bytes_ref(module);
+}
+EXPORT uint64_t fft64_vec_znx_big_normalize_base2k_tmp_bytes(  //
+    const MODULE* module                                             // N
+) {
+  return vec_znx_normalize_base2k_tmp_bytes_ref(module);
+}
+#else
+EXPORT uint64_t fft64_vec_znx_big_normalize_base2k_tmp_bytes(  //
+    const MODULE* module                                             // N
+) __attribute((alias("vec_znx_normalize_base2k_tmp_bytes_ref")));
+
+EXPORT uint64_t fft64_vec_znx_big_range_normalize_base2k_tmp_bytes(  //
+    const MODULE* module                                             // N
+) __attribute((alias("vec_znx_normalize_base2k_tmp_bytes_ref")));
+#endif
 
 /** @brief sets res = 0 */
 EXPORT void vec_znx_zero(const MODULE* module,                             // N

@@ -50,7 +50,7 @@ EXPORT void NOT_IMPLEMENTED_v_uvpvpcvp(uint32_t n, void* a, void* b, const void*
 
 // windows
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__APPLE__)
 #define __always_inline inline __attribute((always_inline))
 #endif
 
