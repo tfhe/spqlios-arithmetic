@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.8)
 project(spqlios)
 
 # read the current version from the manifest file
@@ -14,6 +14,7 @@ message(STATUS "Compiling spqlios-fft version: ${SPQLIOS_VERSION_MAJOR}.${SPQLIO
 #set(ENABLE_SPQLIOS_F128 ON CACHE BOOL "Enable float128 via libquadmath")
 set(WARNING_PARANOID ON CACHE BOOL "Treat all warnings as errors")
 set(ENABLE_TESTING ON CACHE BOOL "Compiles unittests and integration tests")
+set(DEVMODE_INSTALL OFF CACHE BOOL "Install private headers and testlib (mainly for CI)")
 
 if (NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type: Release or Debug" FORCE)
@@ -56,7 +57,6 @@ message(STATUS "--> WIN32: ${WIN32}")
 message(STATUS "--> X86_WIN32: ${X86_WIN32}")
 message(STATUS "--> X86_LINUX: ${X86}")
 message(STATUS "--> AARCH64: ${AARCH64}")
-
 
 # compiles the main library in spqlios
 add_subdirectory(spqlios)

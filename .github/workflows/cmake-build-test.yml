@@ -17,10 +17,16 @@ jobs:
     - uses: actions/checkout@v3
 
     - name: Configure CMake
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING=ON -DWARNING_PARANOID=ON
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING=ON -DWARNING_PARANOID=ON -DDEVMODE_INSTALL=ON
 
     - name: Build
       run: cmake --build ${{github.workspace}}/build
 
     - name: Test
       run: cd ${{github.workspace}}/build; ctest
+    
+    - name: Package
+      env: 
+        CI_CREDS: ${{ secrets.CICREDS }}
+      run: ./scripts/ci-pkg create
+
