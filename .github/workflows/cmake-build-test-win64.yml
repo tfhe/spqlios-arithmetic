@@ -9,14 +9,14 @@ on:
 
 jobs:
   build-msys-clang64:
-    name: CMake-Build-Test
+    name: CMake-Build-Test-Win64
     runs-on: windows-latest
     defaults:
       run:
         shell: msys2 {0}
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - uses: msys2/setup-msys2@v2
       with:
@@ -35,6 +35,7 @@ jobs:
       run: cd build; cp -v ./spqlios/*.dll test/; ctest --output-on-failure
     
     - name: CI Package
+      if: github.event_name != 'pull_request'
       env: 
         CI_CREDS: ${{ secrets.CICREDS }}
       run: ./scripts/ci-pkg create

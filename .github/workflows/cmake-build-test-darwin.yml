@@ -13,7 +13,7 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Brew
       run: brew install cmake googletest google-benchmark
@@ -28,6 +28,7 @@ jobs:
       run: cd build; ctest
     
     - name: Package
+      if: github.event_name != 'pull_request'
       env: 
         CI_CREDS: ${{ secrets.CICREDS }}
       run: ./scripts/ci-pkg create
