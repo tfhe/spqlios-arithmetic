@@ -35,7 +35,7 @@ else ()
     set(X86 OFF)
     # set(ENABLE_SPQLIOS_F128 OFF) # float128 are only supported for x86 targets
 endif ()
-if (CMAKE_SYSTEM_PROCESSOR MATCHES "(aarch64)")
+if (CMAKE_SYSTEM_PROCESSOR MATCHES "(aarch64)|(arm64)")
     set(AARCH64 ON)
 endif ()
 

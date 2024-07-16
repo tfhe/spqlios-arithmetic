@@ -1,5 +1,5 @@
 #include <errno.h>
-#include <malloc.h>
+#include <memory.h>
 #include <stdlib.h>
 #include <string.h>
 

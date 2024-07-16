@@ -469,10 +469,14 @@ EXPORT void q120x2_extract_1blk_from_q120b_ref(uint64_t nn, uint64_t blk,
 }
 
 // function on layout c is the exact same as on layout b
+#ifdef __APPLE__
+#pragma weak q120x2_extract_1blk_from_q120c_ref = q120x2_extract_1blk_from_q120b_ref
+#else
 EXPORT void q120x2_extract_1blk_from_q120c_ref(uint64_t nn, uint64_t blk,
                                                q120x2c* const dst,     // 8 doubles
                                                const q120c* const src  // a q120c vector
                                                ) __attribute__((alias("q120x2_extract_1blk_from_q120b_ref")));
+#endif
 
 EXPORT void q120x2_extract_1blk_from_contiguous_q120b_ref(
     uint64_t nn, uint64_t nrows, uint64_t blk,
