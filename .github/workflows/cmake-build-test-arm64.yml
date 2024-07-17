@@ -9,19 +9,26 @@ on:
     types: [ labeled, opened, synchronize, reopened ]
 
 jobs:
-  build:
+  build-arm64:
     name: CMake-Build-Test-Arm64
     if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'check-on-arm64')
     runs-on: self-hosted-arm64
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Configure CMake
-        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING=ON -DWARNING_PARANOID=ON
+        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING=ON -DWARNING_PARANOID=ON -DDEVMODE_INSTALL=ON
 
       - name: Build
         run: cmake --build ${{github.workspace}}/build
 
       - name: Test
         run: cd ${{github.workspace}}/build; ctest
+    
+      - name: Ci Package
+        if: github.event_name != 'pull_request'
+        env: 
+          CI_CREDS: ${{ secrets.CICREDS }}
+        run: ./scripts/ci-pkg create
+

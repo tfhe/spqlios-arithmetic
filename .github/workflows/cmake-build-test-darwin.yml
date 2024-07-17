@@ -1,4 +1,4 @@
-name: CMake-Build-Test
+name: CMake-Build-Test-Darwin
 
 on:
   workflow_dispatch:
@@ -8,22 +8,24 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
-    name: CMake-Build-Test
-    runs-on: ubuntu-latest
-    container: ngama75/spqlios-ci:latest
+  build-darwin:
+    name: CMake-Build-Test-Darwin
+    runs-on: macos-latest
 
     steps:
     - uses: actions/checkout@v4
 
+    - name: Brew
+      run: brew install cmake googletest google-benchmark
+
     - name: Configure CMake
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING=ON -DWARNING_PARANOID=ON -DDEVMODE_INSTALL=ON
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING=ON -DWARNING_PARANOID=ON -DDEVMODE_INSTALL=ON
 
     - name: Build
-      run: cmake --build ${{github.workspace}}/build
+      run: cmake --build build
 
     - name: Test
-      run: cd ${{github.workspace}}/build; ctest
+      run: cd build; ctest
     
     - name: Package
       if: github.event_name != 'pull_request'

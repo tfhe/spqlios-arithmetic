@@ -185,8 +185,8 @@ target_link_options(libspqlios PUBLIC -Wl,--no-undefined)
 endif()
 target_link_libraries(libspqlios ${SPQLIOSLIBDEP})
 target_link_libraries(libspqlios-static ${SPQLIOSLIBDEP})
-install(TARGETS libspqlios-static DESTINATION lib)
-install(TARGETS libspqlios DESTINATION lib)
+install(TARGETS libspqlios-static)
+install(TARGETS libspqlios)
 
 # install the public headers only
 foreach (file ${HEADERSPUBLIC})

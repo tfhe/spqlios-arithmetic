@@ -112,3 +112,7 @@ if (X86 OR X86_WIN32)
     target_link_libraries(spqlios_reim4_arithmetic_bench ${benchmark_libs} libspqlios pthread)
     target_include_directories(spqlios_reim4_arithmetic_bench PRIVATE ${test_incs})
 endif ()
+
+if (DEVMODE_INSTALL)
+    install(TARGETS spqlios-testlib)
+endif()

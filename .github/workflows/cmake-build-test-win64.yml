@@ -8,15 +8,15 @@ on:
     branches: [ "main" ]
 
 jobs:
-  msys-clang64:
-    name: CMake-Build-Test
+  build-msys-clang64:
+    name: CMake-Build-Test-Win64
     runs-on: windows-latest
     defaults:
       run:
         shell: msys2 {0}
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - uses: msys2/setup-msys2@v2
       with:
@@ -26,10 +26,17 @@ jobs:
         pacboy: toolchain:p cmake:p gtest:p benchmark:p
 
     - name: Configure CMake
-      run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING=ON -DWARNING_PARANOID=ON
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING=ON -DWARNING_PARANOID=ON -DDEVMODE_INSTALL=ON
 
     - name: Build
       run: cmake --build build
 
     - name: Test
       run: cd build; cp -v ./spqlios/*.dll test/; ctest --output-on-failure
+    
+    - name: CI Package
+      if: github.event_name != 'pull_request'
+      env: 
+        CI_CREDS: ${{ secrets.CICREDS }}
+      run: ./scripts/ci-pkg create
+
