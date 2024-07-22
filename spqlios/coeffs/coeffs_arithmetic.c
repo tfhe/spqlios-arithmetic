@@ -222,8 +222,8 @@ EXPORT void rnx_mul_xp_minus_one_inplace(uint64_t nn, int64_t p, double* res) {
       uint64_t new_j = (j + p) & _2mn;  // mod 2n to get the position and sign
       uint64_t new_j_n = new_j & _mn;   // mod n to get just the position
       // exchange this position with tmp1 (and take care of the sign)
-      double tmp2 = res[new_j_n] - tmp1;
-      res[new_j_n] = (new_j < nn) ? tmp1 : -tmp1;
+      double tmp2 = res[new_j_n];
+      res[new_j_n] = ((new_j < nn) ? tmp1 : -tmp1) - res[new_j_n];
       tmp1 = tmp2;
       // move to the new location, and store the number of items modified
       ++nb_modif;
