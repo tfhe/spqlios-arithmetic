@@ -47,6 +47,7 @@ EXPORT void znx_automorphism_inplace_i64(uint64_t nn, int64_t p, int64_t* res);
  */
 EXPORT void rnx_mul_xp_minus_one(uint64_t nn, int64_t p, double* res, const double* in);
 EXPORT void znx_mul_xp_minus_one(uint64_t nn, int64_t p, int64_t* res, const int64_t* in);
+EXPORT void rnx_mul_xp_minus_one_inplace(uint64_t nn, int64_t p, double* res);
 
 /**
  * @brief      Normalize input plus carry mod-2^k. The following

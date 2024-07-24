@@ -124,6 +124,55 @@ TEST(coeffs_arithmetic, rnx_rotate_inplace_f64) { test_rotation_inplace<double>(
 
 TEST(coeffs_arithmetic, znx_rotate_inplace_i64) { test_rotation_inplace<int64_t>(znx_rotate_inplace_i64); }
 
+/// tests of the rotations out of place
+template <typename T, typename F>
+void test_mul_xp_minus_one_outplace(F rotate) {
+  for (uint64_t n : {1, 2, 4, 8, 16, 64, 256, 4096}) {
+    polynomial<T> poly = polynomial<T>::random(n);
+    polynomial<T> expect(n);
+    polynomial<T> actual(n);
+    for (uint64_t trial = 0; trial < 10; ++trial) {
+      int64_t p = uniform_i64_bits(32);
+      // rotate by p
+      for (uint64_t i = 0; i < n; ++i) {
+        expect.set_coeff(i, poly.get_coeff(i - p) - poly.get_coeff(i));
+      }
+      // rotate using the function
+      rotate(n, p, actual.data(), poly.data());
+      ASSERT_EQ(actual, expect);
+    }
+  }
+}
+
+TEST(coeffs_arithmetic, rnx_mul_xp_minus_one_f64) { test_mul_xp_minus_one_outplace<double>(rnx_mul_xp_minus_one); }
+TEST(coeffs_arithmetic, znx_mul_xp_minus_one_i64) { test_mul_xp_minus_one_outplace<int64_t>(znx_mul_xp_minus_one); }
+
+/// tests of the rotations out of place
+template <typename T, typename F>
+void test_mul_xp_minus_one_inplace(F rotate) {
+  for (uint64_t n : {1, 2, 4, 8, 16, 64, 256, 4096}) {
+    polynomial<T> poly = polynomial<T>::random(n);
+    polynomial<T> expect(n);
+    for (uint64_t trial = 0; trial < 10; ++trial) {
+      polynomial<T> actual = poly;
+      int64_t p = uniform_i64_bits(32);
+      // rotate by p
+      for (uint64_t i = 0; i < n; ++i) {
+        expect.set_coeff(i, poly.get_coeff(i - p) - poly.get_coeff(i));
+      }
+      // rotate using the function
+      rotate(n, p, actual.data());
+      ASSERT_EQ(actual, expect);
+    }
+  }
+}
+
+TEST(coeffs_arithmetic, rnx_mul_xp_minus_one_inplace_f64) {
+  test_mul_xp_minus_one_inplace<double>(rnx_mul_xp_minus_one_inplace);
+}
+
+// TEST(coeffs_arithmetic, znx_mul_xp_minus_one_inplace_i64) {
+// test_mul_xp_minus_one_inplace<int64_t>(znx_rotate_inplace_i64); }
 /// tests of the automorphisms out of place
 template <typename T, typename F>
 void test_automorphism_outplace(F automorphism) {
