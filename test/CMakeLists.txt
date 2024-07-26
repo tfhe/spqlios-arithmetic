@@ -90,7 +90,17 @@ add_executable(spqlios-test ${UNITTEST_FILES})
 target_link_libraries(spqlios-test spqlios-testlib libspqlios ${gtest_libs})
 target_include_directories(spqlios-test PRIVATE ${test_incs})
 add_test(NAME spqlios-test COMMAND spqlios-test)
-
+if (WIN32)
+    # copy the dlls to the test directory
+    cmake_minimum_required(VERSION 3.26)
+    add_custom_command(
+            POST_BUILD
+            TARGET spqlios-test
+            COMMAND ${CMAKE_COMMAND} -E copy
+            -t $<TARGET_FILE_DIR:spqlios-test> $<TARGET_RUNTIME_DLLS:spqlios-testlib> $<TARGET_RUNTIME_DLLS:libspqlios>
+            COMMAND_EXPAND_LISTS
+    )
+endif()
 
 # benchmarks
 add_executable(spqlios-cplx-fft-bench spqlios_cplx_fft_bench.cpp)

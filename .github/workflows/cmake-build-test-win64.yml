@@ -32,7 +32,8 @@ jobs:
       run: cmake --build build
 
     - name: Test
-      run: cd build; cp -v ./spqlios/*.dll test/; ctest --output-on-failure
+      working-directory: build
+      run: ctest --output-on-failure
     
     - name: CI Package
       if: github.event_name != 'pull_request'
