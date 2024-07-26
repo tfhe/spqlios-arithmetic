@@ -67,11 +67,13 @@ EXPORT void reim_ifft_avx2_fma(const REIM_IFFT_PRECOMP* itables, double* data);
 EXPORT void reim_naive_fft(uint64_t m, double entry_pwr, double* re, double* im);
 
 /** @brief 16-dimensional FFT with precomputed omegas */
+EXPORT void reim_fft16_neon(double* dre, double* dim, const void* omega);
 EXPORT void reim_fft16_avx_fma(double* dre, double* dim, const void* omega);
 EXPORT void reim_fft16_ref(double* dre, double* dim, const void* omega);
 
 /** @brief precompute omegas so that reim_fft16 functions */
 EXPORT void fill_reim_fft16_omegas(const double entry_pwr, double** omg);
+EXPORT void fill_reim_fft16_omegas_neon(const double entry_pwr, double** omg);
 
 /** @brief 8-dimensional FFT with precomputed omegas */
 EXPORT void reim_fft8_avx_fma(double* dre, double* dim, const void* omega);

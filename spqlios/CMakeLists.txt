@@ -45,7 +45,8 @@ set(SRCS_AARCH64
         reim/reim_fallbacks_aarch64.c
         reim4/reim4_fallbacks_aarch64.c
         q120/q120_fallbacks_aarch64.c
-        )
+        reim/reim_fft_neon.c
+)
 
 # C or assembly source files compiled only on x86: avx, avx2, fma targets
 set(SRCS_FMA_C
