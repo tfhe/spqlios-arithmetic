@@ -2063,3 +2063,222 @@ void ZfN(iFFT)(fpr *f, const unsigned logn)
  }
 }
 #endif
+
+// generic fft stuff
+
+#include "../commons_private.h"
+#include "reim_fft_internal.h"
+#include "reim_fft_private.h"
+
+void reim_ctwiddle(double* ra, double* ia, double* rb, double* ib, double omre, double omim);
+void reim_citwiddle(double* ra, double* ia, double* rb, double* ib, double omre, double omim);
+
+void reim_fft16_ref(double* dre, double* dim, const void* pom);
+void fill_reim_fft16_omegas(const double entry_pwr, double** omg);
+void reim_fft8_ref(double* dre, double* dim, const void* pom);
+void reim_twiddle_fft_ref(uint64_t h, double* re, double* im, double om[2]);
+void fill_reim_twiddle_fft_ref(const double s, double** omg);
+void reim_bitwiddle_fft_ref(uint64_t h, double* re, double* im, double om[4]);
+void fill_reim_bitwiddle_fft_ref(const double s, double** omg);
+void reim_fft_rec_16_ref(uint64_t m, double* re, double* im, double** omg);
+void fill_reim_fft_rec_16_omegas(uint64_t m, double entry_pwr, double** omg);
+
+void fill_reim_twiddle_fft_omegas_ref(const double rs0, double** omg) {
+  (*omg)[0] = cos(2 * M_PI * rs0);
+  (*omg)[1] = sin(2 * M_PI * rs0);
+  *omg += 2;
+}
+
+void fill_reim_bitwiddle_fft_omegas_ref(const double rs0, double** omg) {
+  double rs1 = 2. * rs0;
+  (*omg)[0] = cos(2 * M_PI * rs1);
+  (*omg)[1] = sin(2 * M_PI * rs1);
+  (*omg)[2] = cos(2 * M_PI * rs0);
+  (*omg)[3] = sin(2 * M_PI * rs0);
+  *omg += 4;
+}
+
+#define reim_fft16_f reim_fft16_neon
+#define reim_fft16_pom_offset 16
+#define fill_reim_fft16_omegas_f fill_reim_fft16_omegas_neon
+// TODO!!
+#define reim_fft8_f reim_fft16_ref
+#define reim_fft8_pom_offset 8
+#define fill_reim_fft8_omegas_f fill_reim_fft8_omegas
+// TODO!!
+#define reim_fft4_f reim_fft4_ref
+#define reim_fft4_pom_offset 4
+#define fill_reim_fft4_omegas_f fill_reim_fft4_omegas
+// TODO!!
+#define reim_fft2_f reim_fft2_ref
+#define reim_fft2_pom_offset 2
+#define fill_reim_fft2_omegas_f fill_reim_fft2_omegas
+// TODO!!
+#define reim_twiddle_fft_f reim_twiddle_fft_ref
+#define reim_twiddle_fft_pom_offset 2
+#define fill_reim_twiddle_fft_omegas_f fill_reim_twiddle_fft_omegas_ref
+// TODO!!
+#define reim_bitwiddle_fft_f reim_bitwiddle_fft_ref
+#define reim_bitwiddle_fft_pom_offset 4
+#define fill_reim_bitwiddle_fft_omegas_f fill_reim_bitwiddle_fft_omegas_ref
+// template functions to produce
+#define reim_fft_bfs_16_f reim_fft_bfs_16_neon
+#define fill_reim_fft_bfs_16_omegas_f fill_reim_fft_bfs_16_omegas_neon
+#define reim_fft_rec_16_f reim_fft_rec_16_neon
+#define fill_reim_fft_rec_16_omegas_f fill_reim_fft_rec_16_omegas_neon
+#define reim_fft_f reim_fft_neon
+#define fill_reim_fft_omegas_f fill_reim_fft_omegas_neon
+
+void reim_fft_bfs_16_f(uint64_t m, double* re, double* im, double** omg) {
+  uint64_t log2m = log2(m);
+  uint64_t mm = m;
+  if (log2m % 2 != 0) {
+    uint64_t h = mm >> 1;
+    // do the first twiddle iteration normally
+    reim_twiddle_fft_f(h, re, im, *omg);
+    *omg += reim_twiddle_fft_pom_offset;
+    mm = h;
+  }
+  while (mm > 16) {
+    uint64_t h = mm >> 2;
+    for (uint64_t off = 0; off < m; off += mm) {
+      reim_bitwiddle_fft_f(h, re + off, im + off, *omg);
+      *omg += reim_bitwiddle_fft_pom_offset;
+    }
+    mm = h;
+  }
+  if (mm != 16) abort();  // bug!
+  for (uint64_t off = 0; off < m; off += 16) {
+    reim_fft16_f(re + off, im + off, *omg);
+    *omg += reim_fft16_pom_offset;
+  }
+}
+
+void fill_reim_fft_bfs_16_omegas_f(uint64_t m, double entry_pwr, double** omg) {
+  uint64_t log2m = log2(m);
+  uint64_t mm = m;
+  double ss = entry_pwr;
+  if (log2m % 2 != 0) {
+    uint64_t h = mm >> 1;
+    double s = ss / 2.;
+    // do the first twiddle iteration normally
+    fill_reim_twiddle_fft_omegas_f(s, omg);
+    mm = h;
+    ss = s;
+  }
+  while (mm > 16) {
+    uint64_t h = mm >> 2;
+    double s = ss / 4.;
+    for (uint64_t off = 0; off < m; off += mm) {
+      double rs0 = s + fracrevbits(off / mm) / 4.;
+      fill_reim_bitwiddle_fft_omegas_f(rs0, omg);
+    }
+    mm = h;
+    ss = s;
+  }
+  if (mm != 16) abort();  // bug!
+  for (uint64_t off = 0; off < m; off += 16) {
+    double s = ss + fracrevbits(off / 16);
+    fill_reim_fft16_omegas_f(s, omg);
+  }
+}
+
+void reim_fft_rec_16_f(uint64_t m, double* re, double* im, double** omg) {
+  if (m <= 2048) return reim_fft_bfs_16_f(m, re, im, omg);
+  const uint32_t h = m / 2;
+  reim_twiddle_fft_f(h, re, im, *omg);
+  *omg += reim_twiddle_fft_pom_offset;
+  reim_fft_rec_16_f(h, re, im, omg);
+  reim_fft_rec_16_f(h, re + h, im + h, omg);
+}
+
+void fill_reim_fft_rec_16_omegas_f(uint64_t m, double entry_pwr, double** omg) {
+  if (m <= 2048) return fill_reim_fft_bfs_16_omegas_f(m, entry_pwr, omg);
+  const uint64_t h = m / 2;
+  const double s = entry_pwr / 2;
+  fill_reim_twiddle_fft_omegas_f(s, omg);
+  fill_reim_fft_rec_16_omegas_f(h, s, omg);
+  fill_reim_fft_rec_16_omegas_f(h, s + 0.5, omg);
+}
+
+void reim_fft_f(const REIM_FFT_PRECOMP* precomp, double* dat) {
+  const int32_t m = precomp->m;
+  double* omg = precomp->powomegas;
+  double* re = dat;
+  double* im = dat + m;
+  if (m <= 16) {
+    switch (m) {
+      case 1:
+        return;
+      case 2:
+        return reim_fft2_f(re, im, omg);
+      case 4:
+        return reim_fft4_f(re, im, omg);
+      case 8:
+        return reim_fft8_f(re, im, omg);
+      case 16:
+        return reim_fft16_f(re, im, omg);
+      default:
+        abort();  // m is not a power of 2
+    }
+  }
+  if (m <= 2048) return reim_fft_bfs_16_f(m, re, im, &omg);
+  return reim_fft_rec_16_f(m, re, im, &omg);
+}
+
+void fill_reim_fft_omegas_f(uint64_t m, double entry_pwr, double** omg) {
+  if (m <= 16) {
+    switch (m) {
+      case 1:
+        break;
+      case 2:
+        fill_reim_fft2_omegas_f(entry_pwr, omg);
+        break;
+      case 4:
+        fill_reim_fft4_omegas_f(entry_pwr, omg);
+        break;
+      case 8:
+        fill_reim_fft8_omegas_f(entry_pwr, omg);
+        break;
+      case 16:
+        fill_reim_fft16_omegas_f(entry_pwr, omg);
+        break;
+      default:
+        abort();  // m is not a power of 2
+    }
+  } else if (m <= 2048) {
+    fill_reim_fft_bfs_16_omegas_f(m, entry_pwr, omg);
+  } else {
+    fill_reim_fft_rec_16_omegas_f(m, entry_pwr, omg);
+  }
+}
+
+EXPORT REIM_FFT_PRECOMP* new_reim_fft_precomp_neon(uint32_t m, uint32_t num_buffers) {
+  const uint64_t OMG_SPACE = ceilto64b(2 * m * sizeof(double));
+  const uint64_t BUF_SIZE = ceilto64b(2 * m * sizeof(double));
+  void* reps = malloc(sizeof(REIM_FFT_PRECOMP)  // base
+                      + 63                      // padding
+                      + OMG_SPACE               // tables //TODO 16?
+                      + num_buffers * BUF_SIZE  // buffers
+  );
+  uint64_t aligned_addr = ceilto64b((uint64_t)(reps) + sizeof(REIM_FFT_PRECOMP));
+  REIM_FFT_PRECOMP* r = (REIM_FFT_PRECOMP*)reps;
+  r->m = m;
+  r->buf_size = BUF_SIZE;
+  r->powomegas = (double*)aligned_addr;
+  r->aligned_buffers = (void*)(aligned_addr + OMG_SPACE);
+  // fill in powomegas
+  double* omg = (double*)r->powomegas;
+  fill_reim_fft_omegas_f(m, 0.25, &omg);
+  if (((uint64_t)omg) - aligned_addr > OMG_SPACE) abort();
+  // dispatch the right implementation
+  //{
+  //  if (CPU_SUPPORTS("fma")) {
+  //    r->function = reim_fft_avx2_fma;
+  //  } else {
+  //    r->function = reim_fft_ref;
+  //  }
+  //}
+  r->function = reim_fft_f;
+  return reps;
+}
