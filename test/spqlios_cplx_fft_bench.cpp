@@ -56,6 +56,24 @@ void benchmark_reim_fft(benchmark::State& state) {
   delete_reim_fft_precomp(a);
 }
 
+#ifdef __aarch64__
+EXPORT REIM_FFT_PRECOMP* new_reim_fft_precomp_neon(uint32_t m, uint32_t num_buffers);
+EXPORT void reim_fft_neon(const REIM_FFT_PRECOMP* precomp, double* d);
+
+void benchmark_reim_fft_neon(benchmark::State& state) {
+  const int32_t nn = state.range(0);
+  const uint32_t m = nn / 2;
+  REIM_FFT_PRECOMP* a = new_reim_fft_precomp_neon(m, 1);
+  double* c = reim_fft_precomp_get_buffer(a, 0);
+  init_random_values(nn, c);
+  for (auto _ : state) {
+    // cplx_fft_simple(nn/2, c);
+    reim_fft_neon(a, c);
+  }
+  delete_reim_fft_precomp(a);
+}
+#endif
+
 void benchmark_reim_ifft(benchmark::State& state) {
   const int32_t nn = state.range(0);
   const uint32_t m = nn / 2;
@@ -80,6 +98,9 @@ int main(int argc, char** argv) {
   BENCHMARK(benchmark_cplx_fft)->ARGS;
   BENCHMARK(benchmark_cplx_ifft)->ARGS;
   BENCHMARK(benchmark_reim_fft)->ARGS;
+#ifdef __aarch64__
+  BENCHMARK(benchmark_reim_fft_neon)->ARGS;
+#endif
   BENCHMARK(benchmark_reim_ifft)->ARGS;
   // if (CPU_SUPPORTS("avx512f")) {
   //  BENCHMARK(bench_cplx_fftvec_twiddle_avx512)->ARGS;

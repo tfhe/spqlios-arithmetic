@@ -315,6 +315,31 @@ TEST(fft, reim_fft_ref_vs_naive) {
   }
 }
 
+#ifdef __aarch64__
+EXPORT REIM_FFT_PRECOMP* new_reim_fft_precomp_neon(uint32_t m, uint32_t num_buffers);
+EXPORT void reim_fft_neon(const REIM_FFT_PRECOMP* precomp, double* d);
+TEST(fft, reim_fft_neon_vs_naive) {
+  for (const uint64_t m : {1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 32768, 65536}) {
+    std::vector<double> om(2 * m);
+    std::vector<double> data(2 * m);
+    std::vector<double> datacopy(2 * m);
+    REIM_FFT_PRECOMP* precomp = new_reim_fft_precomp_neon(m, 0);
+    for (uint64_t i = 0; i < m; ++i) {
+      datacopy[i] = data[i] = (rand() % 100) - 50;
+      datacopy[m + i] = data[m + i] = (rand() % 100) - 50;
+    }
+    reim_fft_neon(precomp, datacopy.data());
+    reim_naive_fft(m, 0.25, data.data(), data.data() + m);
+    double d = 0;
+    for (uint64_t i = 0; i < 2 * m; ++i) {
+      d += fabs(datacopy[i] - data[i]);
+    }
+    ASSERT_LE(d, 1e-5) << m;
+    delete_reim_fft_precomp(precomp);
+  }
+}
+#endif
+
 typedef void (*FILL_REIM_IFFT_OMG_F)(const double entry_pwr, double** omg);
 typedef void (*REIM_IFFT_F)(double* dre, double* dim, const void* omega);
 
