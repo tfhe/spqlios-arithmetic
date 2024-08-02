@@ -132,7 +132,8 @@ set(HEADERSPRIVATE
         q120/q120_ntt_private.h
         arithmetic/vec_znx_arithmetic.h
         coeffs/coeffs_arithmetic.h
-        )
+        reim/reim_fft_core_template.h
+)
 
 set(SPQLIOSSOURCES
         ${SRCS_GENERIC}
