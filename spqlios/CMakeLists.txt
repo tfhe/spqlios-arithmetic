@@ -45,7 +45,8 @@ set(SRCS_AARCH64
         reim/reim_fallbacks_aarch64.c
         reim4/reim4_fallbacks_aarch64.c
         q120/q120_fallbacks_aarch64.c
-        )
+        reim/reim_fft_neon.c
+)
 
 # C or assembly source files compiled only on x86: avx, avx2, fma targets
 set(SRCS_FMA_C
@@ -131,7 +132,8 @@ set(HEADERSPRIVATE
         q120/q120_ntt_private.h
         arithmetic/vec_znx_arithmetic.h
         coeffs/coeffs_arithmetic.h
-        )
+        reim/reim_fft_core_template.h
+)
 
 set(SPQLIOSSOURCES
         ${SRCS_GENERIC}

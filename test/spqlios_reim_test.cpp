@@ -211,9 +211,27 @@ void test_reim_fft_ref_vs_accel(REIM_FFT_F reim_fft_ref_f, REIM_FFT_F reim_fft_a
 }
 
 TEST(fft, reim_fft16_ref_vs_naive) { test_reim_fft_ref_vs_naive<16>(fill_reim_fft16_omegas, reim_fft16_ref); }
+#ifdef __aarch64__
+TEST(fft, reim_fft16_neon_vs_naive) { test_reim_fft_ref_vs_naive<16>(fill_reim_fft16_omegas_neon, reim_fft16_neon); }
+#endif
 
 #ifdef __x86_64__
 TEST(fft, reim_fft16_ref_vs_fma) { test_reim_fft_ref_vs_accel<16>(reim_fft16_ref, reim_fft16_avx_fma); }
+#endif
+
+#ifdef __aarch64__
+static void reim_fft16_ref_neon_pom(double* dre, double* dim, const void* omega) {
+  const double* pom = (double*) omega;
+  // put the omegas in neon order
+  double x_pom[] = {
+    pom[0], pom[1], pom[2], pom[3],
+    pom[4],pom[5], pom[6], pom[7],
+    pom[8], pom[10],pom[12], pom[14],
+    pom[9], pom[11],pom[13], pom[15]
+  };
+  reim_fft16_ref(dre, dim, x_pom);
+}
+TEST(fft, reim_fft16_ref_vs_neon) { test_reim_fft_ref_vs_accel<16>(reim_fft16_ref_neon_pom, reim_fft16_neon); }
 #endif
 
 TEST(fft, reim_fft8_ref_vs_naive) { test_reim_fft_ref_vs_naive<8>(fill_reim_fft8_omegas, reim_fft8_ref); }
@@ -296,6 +314,31 @@ TEST(fft, reim_fft_ref_vs_naive) {
     delete_reim_fft_precomp(precomp);
   }
 }
+
+#ifdef __aarch64__
+EXPORT REIM_FFT_PRECOMP* new_reim_fft_precomp_neon(uint32_t m, uint32_t num_buffers);
+EXPORT void reim_fft_neon(const REIM_FFT_PRECOMP* precomp, double* d);
+TEST(fft, reim_fft_neon_vs_naive) {
+  for (const uint64_t m : {1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 32768, 65536}) {
+    std::vector<double> om(2 * m);
+    std::vector<double> data(2 * m);
+    std::vector<double> datacopy(2 * m);
+    REIM_FFT_PRECOMP* precomp = new_reim_fft_precomp_neon(m, 0);
+    for (uint64_t i = 0; i < m; ++i) {
+      datacopy[i] = data[i] = (rand() % 100) - 50;
+      datacopy[m + i] = data[m + i] = (rand() % 100) - 50;
+    }
+    reim_fft_neon(precomp, datacopy.data());
+    reim_naive_fft(m, 0.25, data.data(), data.data() + m);
+    double d = 0;
+    for (uint64_t i = 0; i < 2 * m; ++i) {
+      d += fabs(datacopy[i] - data[i]);
+    }
+    ASSERT_LE(d, 1e-5) << m;
+    delete_reim_fft_precomp(precomp);
+  }
+}
+#endif
 
 typedef void (*FILL_REIM_IFFT_OMG_F)(const double entry_pwr, double** omg);
 typedef void (*REIM_IFFT_F)(double* dre, double* dim, const void* omega);
