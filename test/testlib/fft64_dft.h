@@ -9,7 +9,7 @@ class reim_fft64vec {
 
  public:
   reim_fft64vec() = default;
-  reim_fft64vec(uint64_t n);
+  explicit reim_fft64vec(uint64_t n);
   reim_fft64vec(uint64_t n, const double* data);
   uint64_t nn() const;
   static reim_fft64vec zero(uint64_t n);
@@ -27,6 +27,7 @@ class reim_fft64vec {
 reim_fft64vec operator+(const reim_fft64vec& a, const reim_fft64vec& b);
 reim_fft64vec operator-(const reim_fft64vec& a, const reim_fft64vec& b);
 reim_fft64vec operator*(const reim_fft64vec& a, const reim_fft64vec& b);
+reim_fft64vec operator*(double coeff, const reim_fft64vec& v);
 reim_fft64vec& operator+=(reim_fft64vec& a, const reim_fft64vec& b);
 reim_fft64vec& operator-=(reim_fft64vec& a, const reim_fft64vec& b);
 
@@ -36,5 +37,7 @@ double infty_dist(const reim_fft64vec& a, const reim_fft64vec& b);
 reim_fft64vec simple_fft64(const znx_i64& polynomial);
 znx_i64 simple_rint_ifft64(const reim_fft64vec& fftvec);
 rnx_f64 naive_ifft64(const reim_fft64vec& fftvec);
+reim_fft64vec simple_fft64(const rnx_f64& polynomial);
+rnx_f64 simple_ifft64(const reim_fft64vec& v);
 
 #endif  // SPQLIOS_FFT64_DFT_H

@@ -17,6 +17,10 @@ EXPORT void znx_copy_i64_ref(uint64_t nn, int64_t* res, const int64_t* a);
 /** res = 0 */
 EXPORT void znx_zero_i64_ref(uint64_t nn, int64_t* res);
 
+/** res = a / m where m is a power of 2 */
+EXPORT void rnx_divide_by_m_ref(uint64_t nn, double m, double* res, const double* a);
+EXPORT void rnx_divide_by_m_avx(uint64_t nn, double m, double* res, const double* a);
+
 /**
  * @param res = X^p *in mod X^nn +1
  * @param nn the ring dimension

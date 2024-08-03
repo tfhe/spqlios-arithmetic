@@ -12,7 +12,7 @@ class q120_nttvec {
  public:
   std::vector<mod_q120> v;
   q120_nttvec() = default;
-  q120_nttvec(uint64_t n);
+  explicit q120_nttvec(uint64_t n);
   q120_nttvec(uint64_t n, const q120b* data);
   q120_nttvec(uint64_t n, const q120c* data);
   uint64_t nn() const;

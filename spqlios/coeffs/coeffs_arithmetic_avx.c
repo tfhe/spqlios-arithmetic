@@ -1,5 +1,6 @@
 #include <immintrin.h>
 
+#include "../commons_private.h"
 #include "coeffs_arithmetic.h"
 
 // res = a + b. dimension n must be a power of 2
@@ -81,4 +82,43 @@ EXPORT void znx_negate_i64_avx(uint64_t nn, int64_t* res, const int64_t* a) {
       ++aa;
     } while (rr < rrend);
   }
+}
+
+EXPORT void rnx_divide_by_m_avx(uint64_t n, double m, double* res, const double* a) {
+  // TODO: see if there is a faster way of dividing by a power of 2?
+  const double invm = 1. / m;
+  if (n < 8) {
+    switch (n) {
+      case 1:
+        *res = *a * invm;
+        break;
+      case 2:
+        _mm_storeu_pd(res,                         //
+                      _mm_mul_pd(_mm_loadu_pd(a),  //
+                                 _mm_set1_pd(invm)));
+        break;
+      case 4:
+        _mm256_storeu_pd(res,                               //
+                         _mm256_mul_pd(_mm256_loadu_pd(a),  //
+                                       _mm256_set1_pd(invm)));
+        break;
+      default:
+        NOT_SUPPORTED();  // non-power of 2
+    }
+    return;
+  }
+  const __m256d invm256 = _mm256_set1_pd(invm);
+  double* rr = res;
+  const double* aa = a;
+  const double* const aaend = a + n;
+  do {
+    _mm256_storeu_pd(rr,                                 //
+                     _mm256_mul_pd(_mm256_loadu_pd(aa),  //
+                                   invm256));
+    _mm256_storeu_pd(rr + 4,                                 //
+                     _mm256_mul_pd(_mm256_loadu_pd(aa + 4),  //
+                                   invm256));
+    rr += 8;
+    aa += 8;
+  } while (aa < aaend);
 }

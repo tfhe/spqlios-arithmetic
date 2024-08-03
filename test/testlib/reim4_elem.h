@@ -11,7 +11,7 @@ class reim4_elem {
   /** @brief constructs from 4 real parts and 4 imaginary parts */
   reim4_elem(const double* re, const double* im);
   /** @brief constructs from 8 components */
-  reim4_elem(const double* layout);
+  explicit reim4_elem(const double* layout);
   /** @brief zero */
   reim4_elem();
   /** @brief saves the real parts to re and the 4 imag to im */
