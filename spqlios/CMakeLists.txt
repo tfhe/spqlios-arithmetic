@@ -32,6 +32,13 @@ set(SRCS_GENERIC
         arithmetic/vec_znx_big.c
         arithmetic/znx_small.c
         arithmetic/module_api.c
+        arithmetic/zn_vmp_int8_ref.c
+        arithmetic/zn_vmp_int16_ref.c
+        arithmetic/zn_vmp_int32_ref.c
+        arithmetic/zn_vmp_ref.c
+        arithmetic/zn_api.c
+        arithmetic/zn_conversions_ref.c
+        arithmetic/zn_approxdecomp_ref.c
         reim/reim_execute.c
         cplx/cplx_execute.c
         reim4/reim4_execute.c
@@ -95,6 +102,9 @@ set(SRCS_AVX2
         arithmetic/vec_znx_avx.c
         coeffs/coeffs_arithmetic_avx.c
         arithmetic/vec_znx_dft_avx2.c
+        arithmetic/zn_vmp_int8_avx.c
+        arithmetic/zn_vmp_int16_avx.c
+        arithmetic/zn_vmp_int32_avx.c
         q120/q120_arithmetic_avx2.c
         q120/q120_ntt_avx2.c
         )
