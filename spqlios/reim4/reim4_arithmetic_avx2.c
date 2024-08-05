@@ -26,6 +26,19 @@ void reim4_extract_1blk_from_contiguous_reim_avx(uint64_t m, uint64_t nrows, uin
   }
 }
 
+EXPORT void reim4_extract_1blk_from_contiguous_reim_sl_avx(uint64_t m, uint64_t sl, uint64_t nrows, uint64_t blk,
+                                                           double* const dst, const double* const src) {
+  assert(blk < (m >> 2));
+  const double* src_ptr = src + (blk << 2);
+  double* dst_ptr = dst;
+  for (uint64_t i = 0; i < nrows; ++i) {
+    _mm256_storeu_pd(dst_ptr, _mm256_loadu_pd(src_ptr));
+    _mm256_storeu_pd(dst_ptr + 4, _mm256_loadu_pd(src_ptr + m));
+    dst_ptr += 8;
+    src_ptr += sl;
+  }
+}
+
 void reim4_save_1blk_to_reim_avx(uint64_t m, uint64_t blk,
                                  double* dst,       // 1 reim vector of length m
                                  const double* src  // 8 doubles

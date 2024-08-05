@@ -14,8 +14,8 @@ struct mod_q120x2 {
   mod_q120x2();
   mod_q120x2(const mod_q120& a, const mod_q120& b);
   mod_q120x2(__int128_t value);
-  mod_q120x2(q120x2b* addr);
-  mod_q120x2(q120x2c* addr);
+  explicit mod_q120x2(q120x2b* addr);
+  explicit mod_q120x2(q120x2c* addr);
   void save_as(q120x2b* addr) const;
   void save_as(q120x2c* addr) const;
   static mod_q120x2 random();

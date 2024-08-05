@@ -25,6 +25,13 @@ EXPORT void znx_copy_i64_ref(uint64_t nn, int64_t* res, const int64_t* a) { memc
 
 EXPORT void znx_zero_i64_ref(uint64_t nn, int64_t* res) { memset(res, 0, nn * sizeof(int64_t)); }
 
+EXPORT void rnx_divide_by_m_ref(uint64_t n, double m, double* res, const double* a) {
+  const double invm = 1. / m;
+  for (uint64_t i = 0; i < n; ++i) {
+    res[i] = a[i] * invm;
+  }
+}
+
 EXPORT void rnx_rotate_f64(uint64_t nn, int64_t p, double* res, const double* in) {
   uint64_t a = (-p) & (2 * nn - 1);  // a= (-p) (pos)mod (2*nn)
 

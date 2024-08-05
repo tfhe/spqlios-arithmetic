@@ -38,6 +38,29 @@ EXPORT void reim4_extract_1blk_from_contiguous_reim_ref(uint64_t m, uint64_t nro
   }
 }
 
+EXPORT void reim4_extract_1blk_from_contiguous_reim_sl_ref(uint64_t m, uint64_t sl, uint64_t nrows, uint64_t blk,
+                                                           double* const dst, const double* const src) {
+  assert(blk < (m >> 2));
+
+  const double* src_ptr = src + (blk << 2);
+  double* dst_ptr = dst;
+  const uint64_t sl_minus_m = sl - m;
+  for (uint64_t i = 0; i < nrows; ++i) {
+    dst_ptr[0] = src_ptr[0];
+    dst_ptr[1] = src_ptr[1];
+    dst_ptr[2] = src_ptr[2];
+    dst_ptr[3] = src_ptr[3];
+    dst_ptr += 4;
+    src_ptr += m;
+    dst_ptr[0] = src_ptr[0];
+    dst_ptr[1] = src_ptr[1];
+    dst_ptr[2] = src_ptr[2];
+    dst_ptr[3] = src_ptr[3];
+    dst_ptr += 4;
+    src_ptr += sl_minus_m;
+  }
+}
+
 // dest(i)=src
 // use scalar or sse or avx? Code
 // should be the inverse of reim4_extract_1col_from_reim

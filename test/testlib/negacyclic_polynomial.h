@@ -63,4 +63,7 @@ polynomial<T> operator-(const polynomial<T>& a);
 template <typename T>
 polynomial<T> naive_product(const polynomial<T>& a, const polynomial<T>& b);
 
+/** @brief distance between two real polynomials (used during tests) */
+double infty_dist(const rnx_f64& a, const rnx_f64& b);
+
 #endif  // SPQLIOS_NEGACYCLIC_POLYNOMIAL_H

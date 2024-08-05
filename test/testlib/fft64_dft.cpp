@@ -137,3 +137,32 @@ double infty_dist(const reim_fft64vec& a, const reim_fft64vec& b) {
   }
   return d;
 }
+
+reim_fft64vec simple_fft64(const rnx_f64& polynomial) {
+  const uint64_t nn = polynomial.nn();
+  const uint64_t m = nn / 2;
+  reim_fft64vec res(nn);
+  double* dat = res.data();
+  for (uint64_t i = 0; i < nn; ++i) dat[i] = polynomial.get_coeff(i);
+  reim_fft_simple(m, dat);
+  return res;
+}
+
+reim_fft64vec operator*(double coeff, const reim_fft64vec& v) {
+  const uint64_t nn = v.nn();
+  reim_fft64vec res(nn);
+  double* rr = res.data();
+  const double* vv = v.data();
+  for (uint64_t i = 0; i < nn; ++i) rr[i] = coeff * vv[i];
+  return res;
+}
+
+rnx_f64 simple_ifft64(const reim_fft64vec& v) {
+  const uint64_t nn = v.nn();
+  const uint64_t m = nn / 2;
+  rnx_f64 res(nn);
+  double* dat = res.data();
+  memcpy(dat, v.data(), nn * sizeof(double));
+  reim_ifft_simple(m, dat);
+  return res;
+}

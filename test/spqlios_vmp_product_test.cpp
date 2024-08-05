@@ -86,7 +86,7 @@ static void test_vmp_apply(VMP_APPLY_DFT_TO_DFT_F* apply, VMP_APPLY_DFT_TO_DFT_T
             in.fill_random(0);
             pmat.fill_random(0);
             // naive computation of the product
-            std::vector<reim_fft64vec> expect(out_size, nn);
+            std::vector<reim_fft64vec> expect(out_size, reim_fft64vec(nn));
             for (uint64_t col = 0; col < out_size; ++col) {
               reim_fft64vec ex = reim_fft64vec::zero(nn);
               for (uint64_t row = 0; row < std::min(mat_nrows, in_size); ++row) {
