@@ -110,6 +110,8 @@ set(SRCS_F128
 set(HEADERSPUBLIC
         commons.h
         arithmetic/vec_znx_arithmetic.h
+        arithmetic/vec_rnx_arithmetic.h
+        arithmetic/zn_arithmetic.h
         cplx/cplx_fft.h
         reim/reim_fft.h
         q120/q120_common.h
@@ -131,6 +133,10 @@ set(HEADERSPRIVATE
         q120/q120_arithmetic_private.h
         q120/q120_ntt_private.h
         arithmetic/vec_znx_arithmetic.h
+        arithmetic/vec_rnx_arithmetic_private.h
+        arithmetic/vec_rnx_arithmetic_plugin.h
+        arithmetic/zn_arithmetic_private.h
+        arithmetic/zn_arithmetic_plugin.h
         coeffs/coeffs_arithmetic.h
         reim/reim_fft_core_template.h
 )
