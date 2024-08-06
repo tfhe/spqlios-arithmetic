@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#include "spqlios/commons.h"
+#include "../commons.h"
 
 /**
  * We support the following module families:

@@ -42,6 +42,8 @@ set(SRCS_GENERIC
         reim/reim_execute.c
         cplx/cplx_execute.c
         reim4/reim4_execute.c
+        arithmetic/vec_rnx_arithmetic.c
+        arithmetic/vec_rnx_approxdecomp_ref.c
 )
 # C or assembly source files compiled only on x86 targets
 set(SRCS_X86
@@ -107,7 +109,9 @@ set(SRCS_AVX2
         arithmetic/zn_vmp_int32_avx.c
         q120/q120_arithmetic_avx2.c
         q120/q120_ntt_avx2.c
-        )
+        arithmetic/vec_rnx_arithmetic_avx.c
+        arithmetic/vec_rnx_approxdecomp_avx.c
+)
 set_source_files_properties(${SRCS_AVX2} PROPERTIES COMPILE_OPTIONS "-mbmi2;-mavx2")
 
 # C source files on float128 via libquadmath on x86 targets targets

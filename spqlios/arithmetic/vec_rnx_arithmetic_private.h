@@ -1,8 +1,8 @@
 #ifndef SPQLIOS_VEC_RNX_ARITHMETIC_PRIVATE_H
 #define SPQLIOS_VEC_RNX_ARITHMETIC_PRIVATE_H
 
-#include "spqlios/commons_private.h"
-#include "spqlios/reim/reim_fft.h"
+#include "../commons_private.h"
+#include "../reim/reim_fft.h"
 #include "vec_rnx_arithmetic.h"
 #include "vec_rnx_arithmetic_plugin.h"
 
