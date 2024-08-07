@@ -44,6 +44,7 @@ set(SRCS_GENERIC
         reim4/reim4_execute.c
         arithmetic/vec_rnx_arithmetic.c
         arithmetic/vec_rnx_approxdecomp_ref.c
+        arithmetic/vec_rnx_vmp_ref.c
 )
 # C or assembly source files compiled only on x86 targets
 set(SRCS_X86
@@ -111,6 +112,8 @@ set(SRCS_AVX2
         q120/q120_ntt_avx2.c
         arithmetic/vec_rnx_arithmetic_avx.c
         arithmetic/vec_rnx_approxdecomp_avx.c
+        arithmetic/vec_rnx_vmp_avx.c
+        
 )
 set_source_files_properties(${SRCS_AVX2} PROPERTIES COMPILE_OPTIONS "-mbmi2;-mavx2")
 
