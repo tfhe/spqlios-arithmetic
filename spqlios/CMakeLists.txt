@@ -39,6 +39,9 @@ set(SRCS_GENERIC
         arithmetic/zn_api.c
         arithmetic/zn_conversions_ref.c
         arithmetic/zn_approxdecomp_ref.c
+        arithmetic/vec_rnx_api.c
+        arithmetic/vec_rnx_conversions_ref.c
+        arithmetic/vec_rnx_svp_ref.c
         reim/reim_execute.c
         cplx/cplx_execute.c
         reim4/reim4_execute.c
