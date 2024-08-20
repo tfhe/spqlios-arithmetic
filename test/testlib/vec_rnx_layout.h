@@ -2,10 +2,10 @@
 #define SPQLIOS_EXT_VEC_RNX_LAYOUT_H
 
 #include "../../spqlios/arithmetic/vec_rnx_arithmetic.h"
-#include "testlib/fft64_dft.h"
-#include "testlib/negacyclic_polynomial.h"
-#include "testlib/reim4_elem.h"
-#include "testlib/test_commons.h"
+#include "fft64_dft.h"
+#include "negacyclic_polynomial.h"
+#include "reim4_elem.h"
+#include "test_commons.h"
 
 /** @brief a test memory layout for rnx i64 polynomials vectors */
 class rnx_vec_f64_layout {

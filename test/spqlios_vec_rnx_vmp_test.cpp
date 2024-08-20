@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
-#include "spqlios/arithmetic/vec_rnx_arithmetic_private.h"
-#include "spqlios/reim/reim_fft.h"
-#include "test/testlib/vec_rnx_layout.h"
+#include "../spqlios/arithmetic/vec_rnx_arithmetic_private.h"
+#include "../spqlios/reim/reim_fft.h"
+#include "testlib/vec_rnx_layout.h"
 
 static void test_vmp_apply_dft_to_dft_outplace(  //
     RNX_VMP_APPLY_DFT_TO_DFT_F* apply,           //
@@ -171,14 +171,14 @@ static void test_vmp_prepare_contiguous(RNX_VMP_PREPARE_CONTIGUOUS_F* prepare_co
   }
 }
 
-TEST(vec_znx, vmp_prepare_contiguous) {
+TEST(vec_rnx, vmp_prepare_contiguous) {
   test_vmp_prepare_contiguous(rnx_vmp_prepare_contiguous, rnx_vmp_prepare_contiguous_tmp_bytes);
 }
-TEST(vec_znx, fft64_vmp_prepare_contiguous_ref) {
+TEST(vec_rnx, fft64_vmp_prepare_contiguous_ref) {
   test_vmp_prepare_contiguous(fft64_rnx_vmp_prepare_contiguous_ref, fft64_rnx_vmp_prepare_contiguous_tmp_bytes_ref);
 }
 #ifdef __x86_64__
-TEST(vec_znx, fft64_vmp_prepare_contiguous_avx) {
+TEST(vec_rnx, fft64_vmp_prepare_contiguous_avx) {
   test_vmp_prepare_contiguous(fft64_rnx_vmp_prepare_contiguous_avx, fft64_rnx_vmp_prepare_contiguous_tmp_bytes_avx);
 }
 #endif

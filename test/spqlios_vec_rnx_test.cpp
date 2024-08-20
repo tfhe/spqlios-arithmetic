@@ -2,7 +2,7 @@
 
 #include "spqlios/arithmetic/vec_rnx_arithmetic_private.h"
 #include "spqlios/reim/reim_fft.h"
-#include "test/testlib/vec_rnx_layout.h"
+#include "testlib/vec_rnx_layout.h"
 
 // disabling this test by default, since it depicts on purpose wrong accesses
 #if 0
@@ -31,7 +31,7 @@ TEST(rnx_layout, valgrind_antipattern_test) {
 
 // test for out of place calls
 template <typename ACTUAL_FCN, typename EXPECT_FCN>
-void test_vec_znx_elemw_binop_outplace(ACTUAL_FCN binop, EXPECT_FCN ref_binop) {
+void test_vec_rnx_elemw_binop_outplace(ACTUAL_FCN binop, EXPECT_FCN ref_binop) {
   for (uint64_t n : {2, 4, 8, 128}) {
     RNX_MODULE_TYPE mtype = FFT64;
     MOD_RNX* mod = new_rnx_module_info(n, mtype);
@@ -69,7 +69,7 @@ void test_vec_znx_elemw_binop_outplace(ACTUAL_FCN binop, EXPECT_FCN ref_binop) {
 }
 // test for inplace1 calls
 template <typename ACTUAL_FCN, typename EXPECT_FCN>
-void test_vec_znx_elemw_binop_inplace1(ACTUAL_FCN binop, EXPECT_FCN ref_binop) {
+void test_vec_rnx_elemw_binop_inplace1(ACTUAL_FCN binop, EXPECT_FCN ref_binop) {
   for (uint64_t n : {2, 4, 64}) {
     RNX_MODULE_TYPE mtype = FFT64;
     MOD_RNX* mod = new_rnx_module_info(n, mtype);
@@ -103,7 +103,7 @@ void test_vec_znx_elemw_binop_inplace1(ACTUAL_FCN binop, EXPECT_FCN ref_binop) {
 }
 // test for inplace2 calls
 template <typename ACTUAL_FCN, typename EXPECT_FCN>
-void test_vec_znx_elemw_binop_inplace2(ACTUAL_FCN binop, EXPECT_FCN ref_binop) {
+void test_vec_rnx_elemw_binop_inplace2(ACTUAL_FCN binop, EXPECT_FCN ref_binop) {
   for (uint64_t n : {4, 32, 64}) {
     RNX_MODULE_TYPE mtype = FFT64;
     MOD_RNX* mod = new_rnx_module_info(n, mtype);
@@ -137,7 +137,7 @@ void test_vec_znx_elemw_binop_inplace2(ACTUAL_FCN binop, EXPECT_FCN ref_binop) {
 }
 // test for inplace3 calls
 template <typename ACTUAL_FCN, typename EXPECT_FCN>
-void test_vec_znx_elemw_binop_inplace3(ACTUAL_FCN binop, EXPECT_FCN ref_binop) {
+void test_vec_rnx_elemw_binop_inplace3(ACTUAL_FCN binop, EXPECT_FCN ref_binop) {
   for (uint64_t n : {2, 16, 1024}) {
     RNX_MODULE_TYPE mtype = FFT64;
     MOD_RNX* mod = new_rnx_module_info(n, mtype);
@@ -163,24 +163,24 @@ void test_vec_znx_elemw_binop_inplace3(ACTUAL_FCN binop, EXPECT_FCN ref_binop) {
   }
 }
 template <typename ACTUAL_FCN, typename EXPECT_FCN>
-void test_vec_znx_elemw_binop(ACTUAL_FCN binop, EXPECT_FCN ref_binop) {
-  test_vec_znx_elemw_binop_outplace(binop, ref_binop);
-  test_vec_znx_elemw_binop_inplace1(binop, ref_binop);
-  test_vec_znx_elemw_binop_inplace2(binop, ref_binop);
-  test_vec_znx_elemw_binop_inplace3(binop, ref_binop);
+void test_vec_rnx_elemw_binop(ACTUAL_FCN binop, EXPECT_FCN ref_binop) {
+  test_vec_rnx_elemw_binop_outplace(binop, ref_binop);
+  test_vec_rnx_elemw_binop_inplace1(binop, ref_binop);
+  test_vec_rnx_elemw_binop_inplace2(binop, ref_binop);
+  test_vec_rnx_elemw_binop_inplace3(binop, ref_binop);
 }
 
 static rnx_f64 poly_add(const rnx_f64& a, const rnx_f64& b) { return a + b; }
 static rnx_f64 poly_sub(const rnx_f64& a, const rnx_f64& b) { return a - b; }
-TEST(vec_znx, vec_znx_add) { test_vec_znx_elemw_binop(vec_rnx_add, poly_add); }
-TEST(vec_znx, vec_znx_add_ref) { test_vec_znx_elemw_binop(vec_rnx_add_ref, poly_add); }
+TEST(vec_rnx, vec_rnx_add) { test_vec_rnx_elemw_binop(vec_rnx_add, poly_add); }
+TEST(vec_rnx, vec_rnx_add_ref) { test_vec_rnx_elemw_binop(vec_rnx_add_ref, poly_add); }
 #ifdef __x86_64__
-TEST(vec_znx, vec_znx_add_avx) { test_vec_znx_elemw_binop(vec_rnx_add_avx, poly_add); }
+TEST(vec_rnx, vec_rnx_add_avx) { test_vec_rnx_elemw_binop(vec_rnx_add_avx, poly_add); }
 #endif
-TEST(vec_znx, vec_znx_sub) { test_vec_znx_elemw_binop(vec_rnx_sub, poly_sub); }
-TEST(vec_znx, vec_znx_sub_ref) { test_vec_znx_elemw_binop(vec_rnx_sub_ref, poly_sub); }
+TEST(vec_rnx, vec_rnx_sub) { test_vec_rnx_elemw_binop(vec_rnx_sub, poly_sub); }
+TEST(vec_rnx, vec_rnx_sub_ref) { test_vec_rnx_elemw_binop(vec_rnx_sub_ref, poly_sub); }
 #ifdef __x86_64__
-TEST(vec_znx, vec_znx_sub_avx) { test_vec_znx_elemw_binop(vec_rnx_sub_avx, poly_sub); }
+TEST(vec_rnx, vec_rnx_sub_avx) { test_vec_rnx_elemw_binop(vec_rnx_sub_avx, poly_sub); }
 #endif
 
 // test for out of place calls

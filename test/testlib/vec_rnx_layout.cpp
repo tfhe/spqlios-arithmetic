@@ -2,7 +2,7 @@
 
 #include <cstring>
 
-#include "spqlios/arithmetic/vec_rnx_arithmetic.h"
+#include "../../spqlios/arithmetic/vec_rnx_arithmetic.h"
 
 #ifdef VALGRIND_MEM_TESTS
 #include "valgrind/memcheck.h"

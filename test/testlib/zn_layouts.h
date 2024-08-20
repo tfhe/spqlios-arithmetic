@@ -1,8 +1,8 @@
 #ifndef SPQLIOS_EXT_ZN_LAYOUTS_H
 #define SPQLIOS_EXT_ZN_LAYOUTS_H
 
-#include "spqlios/arithmetic/zn_arithmetic.h"
-#include "testlib/test_commons.h"
+#include "../../spqlios/arithmetic/zn_arithmetic.h"
+#include "test_commons.h"
 
 class zn32_pmat_layout {
  public:
