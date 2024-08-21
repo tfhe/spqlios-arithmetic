@@ -32,9 +32,22 @@ set(SRCS_GENERIC
         arithmetic/vec_znx_big.c
         arithmetic/znx_small.c
         arithmetic/module_api.c
+        arithmetic/zn_vmp_int8_ref.c
+        arithmetic/zn_vmp_int16_ref.c
+        arithmetic/zn_vmp_int32_ref.c
+        arithmetic/zn_vmp_ref.c
+        arithmetic/zn_api.c
+        arithmetic/zn_conversions_ref.c
+        arithmetic/zn_approxdecomp_ref.c
+        arithmetic/vec_rnx_api.c
+        arithmetic/vec_rnx_conversions_ref.c
+        arithmetic/vec_rnx_svp_ref.c
         reim/reim_execute.c
         cplx/cplx_execute.c
         reim4/reim4_execute.c
+        arithmetic/vec_rnx_arithmetic.c
+        arithmetic/vec_rnx_approxdecomp_ref.c
+        arithmetic/vec_rnx_vmp_ref.c
 )
 # C or assembly source files compiled only on x86 targets
 set(SRCS_X86
@@ -95,9 +108,16 @@ set(SRCS_AVX2
         arithmetic/vec_znx_avx.c
         coeffs/coeffs_arithmetic_avx.c
         arithmetic/vec_znx_dft_avx2.c
+        arithmetic/zn_vmp_int8_avx.c
+        arithmetic/zn_vmp_int16_avx.c
+        arithmetic/zn_vmp_int32_avx.c
         q120/q120_arithmetic_avx2.c
         q120/q120_ntt_avx2.c
-        )
+        arithmetic/vec_rnx_arithmetic_avx.c
+        arithmetic/vec_rnx_approxdecomp_avx.c
+        arithmetic/vec_rnx_vmp_avx.c
+        
+)
 set_source_files_properties(${SRCS_AVX2} PROPERTIES COMPILE_OPTIONS "-mbmi2;-mavx2")
 
 # C source files on float128 via libquadmath on x86 targets targets
@@ -110,6 +130,8 @@ set(SRCS_F128
 set(HEADERSPUBLIC
         commons.h
         arithmetic/vec_znx_arithmetic.h
+        arithmetic/vec_rnx_arithmetic.h
+        arithmetic/zn_arithmetic.h
         cplx/cplx_fft.h
         reim/reim_fft.h
         q120/q120_common.h
@@ -131,6 +153,10 @@ set(HEADERSPRIVATE
         q120/q120_arithmetic_private.h
         q120/q120_ntt_private.h
         arithmetic/vec_znx_arithmetic.h
+        arithmetic/vec_rnx_arithmetic_private.h
+        arithmetic/vec_rnx_arithmetic_plugin.h
+        arithmetic/zn_arithmetic_private.h
+        arithmetic/zn_arithmetic_plugin.h
         coeffs/coeffs_arithmetic.h
         reim/reim_fft_core_template.h
 )

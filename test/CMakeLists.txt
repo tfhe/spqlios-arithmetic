@@ -56,6 +56,10 @@ add_library(spqlios-testlib SHARED
         testlib/sha3.c
         testlib/polynomial_vector.h
         testlib/polynomial_vector.cpp
+        testlib/vec_rnx_layout.h
+        testlib/vec_rnx_layout.cpp
+        testlib/zn_layouts.h
+        testlib/zn_layouts.cpp
 )
 if (VALGRIND_DIR)
     target_include_directories(spqlios-testlib PRIVATE ${VALGRIND_DIR})
@@ -84,6 +88,16 @@ set(UNITTEST_FILES
         spqlios_svp_test.cpp
         spqlios_svp_product_test.cpp
         spqlios_vec_znx_test.cpp
+        spqlios_vec_rnx_test.cpp
+        spqlios_vec_rnx_vmp_test.cpp
+        spqlios_vec_rnx_conversions_test.cpp
+        spqlios_vec_rnx_ppol_test.cpp
+        spqlios_vec_rnx_approxdecomp_tnxdbl_test.cpp
+        spqlios_zn_approxdecomp_test.cpp
+        spqlios_zn_conversions_test.cpp
+        spqlios_zn_vmp_test.cpp
+        
+
 )
 
 add_executable(spqlios-test ${UNITTEST_FILES})
