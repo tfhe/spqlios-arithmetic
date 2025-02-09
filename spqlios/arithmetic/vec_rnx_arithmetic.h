@@ -289,8 +289,16 @@ EXPORT void rnx_vmp_prepare_contiguous(               //
     uint8_t* tmp_space                                // scratch space
 );
 
+/** @brief prepares a vmp matrix (mat[row]+col*N points to the item) */
+EXPORT void rnx_vmp_prepare_dblptr(                   //
+    const MOD_RNX* module,                            // N
+    RNX_VMP_PMAT* pmat,                               // output
+    const double** a, uint64_t nrows, uint64_t ncols, // a
+    uint8_t* tmp_space                                // scratch space
+);
+
 /** @brief number of scratch bytes necessary to prepare a matrix */
-EXPORT uint64_t rnx_vmp_prepare_contiguous_tmp_bytes(const MOD_RNX* module);
+EXPORT uint64_t rnx_vmp_prepare_tmp_bytes(const MOD_RNX* module);
 
 /** @brief applies a vmp product res = a x pmat */
 EXPORT void rnx_vmp_apply_tmp_a(                               //

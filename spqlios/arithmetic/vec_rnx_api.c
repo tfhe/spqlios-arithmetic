@@ -33,8 +33,9 @@ void fft64_init_rnx_module_vtable(MOD_RNX* module) {
   module->vtable.rnx_vmp_apply_dft_to_dft = fft64_rnx_vmp_apply_dft_to_dft_ref;
   module->vtable.rnx_vmp_apply_tmp_a_tmp_bytes = fft64_rnx_vmp_apply_tmp_a_tmp_bytes_ref;
   module->vtable.rnx_vmp_apply_tmp_a = fft64_rnx_vmp_apply_tmp_a_ref;
-  module->vtable.rnx_vmp_prepare_contiguous_tmp_bytes = fft64_rnx_vmp_prepare_contiguous_tmp_bytes_ref;
+  module->vtable.rnx_vmp_prepare_tmp_bytes = fft64_rnx_vmp_prepare_tmp_bytes_ref;
   module->vtable.rnx_vmp_prepare_contiguous = fft64_rnx_vmp_prepare_contiguous_ref;
+  module->vtable.rnx_vmp_prepare_dblptr = fft64_rnx_vmp_prepare_dblptr_ref;
   module->vtable.bytes_of_rnx_vmp_pmat = fft64_bytes_of_rnx_vmp_pmat;
   module->vtable.rnx_approxdecomp_from_tnxdbl = rnx_approxdecomp_from_tnxdbl_ref;
   module->vtable.vec_rnx_to_znx32 = vec_rnx_to_znx32_ref;
@@ -55,8 +56,9 @@ void fft64_init_rnx_module_vtable(MOD_RNX* module) {
     module->vtable.rnx_vmp_apply_dft_to_dft = fft64_rnx_vmp_apply_dft_to_dft_avx;
     module->vtable.rnx_vmp_apply_tmp_a_tmp_bytes = fft64_rnx_vmp_apply_tmp_a_tmp_bytes_avx;
     module->vtable.rnx_vmp_apply_tmp_a = fft64_rnx_vmp_apply_tmp_a_avx;
-    module->vtable.rnx_vmp_prepare_contiguous_tmp_bytes = fft64_rnx_vmp_prepare_contiguous_tmp_bytes_avx;
+    module->vtable.rnx_vmp_prepare_tmp_bytes = fft64_rnx_vmp_prepare_tmp_bytes_avx;
     module->vtable.rnx_vmp_prepare_contiguous = fft64_rnx_vmp_prepare_contiguous_avx;
+    module->vtable.rnx_vmp_prepare_dblptr = fft64_rnx_vmp_prepare_dblptr_avx;
     module->vtable.rnx_approxdecomp_from_tnxdbl = rnx_approxdecomp_from_tnxdbl_avx;
   }
 }
@@ -201,9 +203,19 @@ EXPORT void rnx_vmp_prepare_contiguous(               //
   module->vtable.rnx_vmp_prepare_contiguous(module, pmat, a, nrows, ncols, tmp_space);
 }
 
+/** @brief prepares a vmp matrix (mat[row]+col*N points to the item) */
+EXPORT void rnx_vmp_prepare_dblptr(                   //
+    const MOD_RNX* module,                            // N
+    RNX_VMP_PMAT* pmat,                               // output
+    const double** a, uint64_t nrows, uint64_t ncols, // a
+    uint8_t* tmp_space                                // scratch space
+) {
+  module->vtable.rnx_vmp_prepare_dblptr(module, pmat, a, nrows, ncols, tmp_space);
+}
+
 /** @brief number of scratch bytes necessary to prepare a matrix */
-EXPORT uint64_t rnx_vmp_prepare_contiguous_tmp_bytes(const MOD_RNX* module) {
-  return module->vtable.rnx_vmp_prepare_contiguous_tmp_bytes(module);
+EXPORT uint64_t rnx_vmp_prepare_tmp_bytes(const MOD_RNX* module) {
+  return module->vtable.rnx_vmp_prepare_tmp_bytes(module);
 }
 
 /** @brief applies a vmp product res = a x pmat */

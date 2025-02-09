@@ -113,7 +113,7 @@ TEST(vec_rnx, fft64_vmp_apply_dft_to_dft_avx) {
 /// rnx_vmp_prepare
 
 static void test_vmp_prepare_contiguous(RNX_VMP_PREPARE_CONTIGUOUS_F* prepare_contiguous,
-                                        RNX_VMP_PREPARE_CONTIGUOUS_TMP_BYTES_F* tmp_bytes) {
+                                        RNX_VMP_PREPARE_TMP_BYTES_F* tmp_bytes) {
   // tests when n < 8
   for (uint64_t nn : {2, 4}) {
     const double one_over_m = 2. / nn;
@@ -172,14 +172,14 @@ static void test_vmp_prepare_contiguous(RNX_VMP_PREPARE_CONTIGUOUS_F* prepare_co
 }
 
 TEST(vec_rnx, vmp_prepare_contiguous) {
-  test_vmp_prepare_contiguous(rnx_vmp_prepare_contiguous, rnx_vmp_prepare_contiguous_tmp_bytes);
+  test_vmp_prepare_contiguous(rnx_vmp_prepare_contiguous, rnx_vmp_prepare_tmp_bytes);
 }
 TEST(vec_rnx, fft64_vmp_prepare_contiguous_ref) {
-  test_vmp_prepare_contiguous(fft64_rnx_vmp_prepare_contiguous_ref, fft64_rnx_vmp_prepare_contiguous_tmp_bytes_ref);
+  test_vmp_prepare_contiguous(fft64_rnx_vmp_prepare_contiguous_ref, fft64_rnx_vmp_prepare_tmp_bytes_ref);
 }
 #ifdef __x86_64__
 TEST(vec_rnx, fft64_vmp_prepare_contiguous_avx) {
-  test_vmp_prepare_contiguous(fft64_rnx_vmp_prepare_contiguous_avx, fft64_rnx_vmp_prepare_contiguous_tmp_bytes_avx);
+  test_vmp_prepare_contiguous(fft64_rnx_vmp_prepare_contiguous_avx, fft64_rnx_vmp_prepare_tmp_bytes_avx);
 }
 #endif
 

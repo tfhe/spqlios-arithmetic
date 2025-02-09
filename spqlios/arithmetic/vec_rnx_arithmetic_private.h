@@ -183,8 +183,20 @@ EXPORT void fft64_rnx_vmp_prepare_contiguous_avx(       //
     const double* mat, uint64_t nrows, uint64_t ncols,  // a
     uint8_t* tmp_space                                  // scratch space
 );
-EXPORT uint64_t fft64_rnx_vmp_prepare_contiguous_tmp_bytes_ref(const MOD_RNX* module);
-EXPORT uint64_t fft64_rnx_vmp_prepare_contiguous_tmp_bytes_avx(const MOD_RNX* module);
+EXPORT void fft64_rnx_vmp_prepare_dblptr_ref(           //
+    const MOD_RNX* module,                              // N
+    RNX_VMP_PMAT* pmat,                                 // output
+    const double** mat, uint64_t nrows, uint64_t ncols, // a
+    uint8_t* tmp_space                                  // scratch space
+);
+EXPORT void fft64_rnx_vmp_prepare_dblptr_avx(           //
+    const MOD_RNX* module,                              // N
+    RNX_VMP_PMAT* pmat,                                 // output
+    const double** mat, uint64_t nrows, uint64_t ncols, // a
+    uint8_t* tmp_space                                  // scratch space
+);
+EXPORT uint64_t fft64_rnx_vmp_prepare_tmp_bytes_ref(const MOD_RNX* module);
+EXPORT uint64_t fft64_rnx_vmp_prepare_tmp_bytes_avx(const MOD_RNX* module);
 
 EXPORT void fft64_rnx_vmp_apply_tmp_a_ref(                     //
     const MOD_RNX* module,                                     // N

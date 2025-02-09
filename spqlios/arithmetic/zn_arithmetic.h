@@ -65,6 +65,12 @@ EXPORT void zn32_vmp_prepare_contiguous(  //
     ZN32_VMP_PMAT* pmat,                                  // output
     const int32_t* mat, uint64_t nrows, uint64_t ncols);  // a
 
+/** @brief prepares a vmp matrix (mat[row]+col*N points to the item) */
+EXPORT void zn32_vmp_prepare_dblptr(  //
+    const MOD_Z* module,
+    ZN32_VMP_PMAT* pmat,                                  // output
+    const int32_t** mat, uint64_t nrows, uint64_t ncols);  // a
+
 /** @brief applies a vmp product (int32_t* input) */
 EXPORT void zn32_vmp_apply_i32(                                  //
     const MOD_Z* module,                                         //

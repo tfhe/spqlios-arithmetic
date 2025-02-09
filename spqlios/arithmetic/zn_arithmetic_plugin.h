@@ -8,6 +8,7 @@ typedef typeof(i16_approxdecomp_from_tndbl) I16_APPROXDECOMP_FROM_TNDBL_F;
 typedef typeof(i32_approxdecomp_from_tndbl) I32_APPROXDECOMP_FROM_TNDBL_F;
 typedef typeof(bytes_of_zn32_vmp_pmat) BYTES_OF_ZN32_VMP_PMAT_F;
 typedef typeof(zn32_vmp_prepare_contiguous) ZN32_VMP_PREPARE_CONTIGUOUS_F;
+typedef typeof(zn32_vmp_prepare_dblptr) ZN32_VMP_PREPARE_DBLPTR_F;
 typedef typeof(zn32_vmp_apply_i32) ZN32_VMP_APPLY_I32_F;
 typedef typeof(zn32_vmp_apply_i16) ZN32_VMP_APPLY_I16_F;
 typedef typeof(zn32_vmp_apply_i8) ZN32_VMP_APPLY_I8_F;
@@ -25,6 +26,7 @@ struct z_module_vtable_t {
   I32_APPROXDECOMP_FROM_TNDBL_F* i32_approxdecomp_from_tndbl;
   BYTES_OF_ZN32_VMP_PMAT_F* bytes_of_zn32_vmp_pmat;
   ZN32_VMP_PREPARE_CONTIGUOUS_F* zn32_vmp_prepare_contiguous;
+  ZN32_VMP_PREPARE_DBLPTR_F* zn32_vmp_prepare_dblptr;
   ZN32_VMP_APPLY_I32_F* zn32_vmp_apply_i32;
   ZN32_VMP_APPLY_I16_F* zn32_vmp_apply_i16;
   ZN32_VMP_APPLY_I8_F* zn32_vmp_apply_i8;

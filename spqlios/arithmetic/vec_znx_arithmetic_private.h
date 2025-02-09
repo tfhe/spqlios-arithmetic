@@ -84,7 +84,8 @@ typedef typeof(svp_apply_dft) SVP_APPLY_DFT_F;
 typedef typeof(znx_small_single_product) ZNX_SMALL_SINGLE_PRODUCT_F;
 typedef typeof(znx_small_single_product_tmp_bytes) ZNX_SMALL_SINGLE_PRODUCT_TMP_BYTES_F;
 typedef typeof(vmp_prepare_contiguous) VMP_PREPARE_CONTIGUOUS_F;
-typedef typeof(vmp_prepare_contiguous_tmp_bytes) VMP_PREPARE_CONTIGUOUS_TMP_BYTES_F;
+typedef typeof(vmp_prepare_dblptr) VMP_PREPARE_DBLPTR_F;
+typedef typeof(vmp_prepare_tmp_bytes) VMP_PREPARE_TMP_BYTES_F;
 typedef typeof(vmp_apply_dft) VMP_APPLY_DFT_F;
 typedef typeof(vmp_apply_dft_tmp_bytes) VMP_APPLY_DFT_TMP_BYTES_F;
 typedef typeof(vmp_apply_dft_to_dft) VMP_APPLY_DFT_TO_DFT_F;
@@ -127,7 +128,8 @@ struct module_virtual_functions_t {
   ZNX_SMALL_SINGLE_PRODUCT_F* znx_small_single_product;
   ZNX_SMALL_SINGLE_PRODUCT_TMP_BYTES_F* znx_small_single_product_tmp_bytes;
   VMP_PREPARE_CONTIGUOUS_F* vmp_prepare_contiguous;
-  VMP_PREPARE_CONTIGUOUS_TMP_BYTES_F* vmp_prepare_contiguous_tmp_bytes;
+  VMP_PREPARE_DBLPTR_F* vmp_prepare_dblptr;
+  VMP_PREPARE_TMP_BYTES_F* vmp_prepare_tmp_bytes;
   VMP_APPLY_DFT_F* vmp_apply_dft;
   VMP_APPLY_DFT_TMP_BYTES_F* vmp_apply_dft_tmp_bytes;
   VMP_APPLY_DFT_TO_DFT_F* vmp_apply_dft_to_dft;
@@ -420,6 +422,13 @@ EXPORT void fft64_vmp_prepare_contiguous_ref(const MODULE* module,              
                                              uint8_t* tmp_space                                   // scratch space
 );
 
+/** @brief prepares a vmp matrix (mat[row]+col*N points to the item) */
+EXPORT void fft64_vmp_prepare_dblptr_ref(const MODULE* module,                                    // N
+                                             VMP_PMAT* pmat,                                      // output
+                                             const int64_t** mat, uint64_t nrows, uint64_t ncols, // a
+                                             uint8_t* tmp_space                                   // scratch space
+);
+
 /** @brief prepares a vmp matrix (contiguous row-major version) */
 EXPORT void fft64_vmp_prepare_contiguous_avx(const MODULE* module,                                // N
                                              VMP_PMAT* pmat,                                      // output
@@ -427,8 +436,15 @@ EXPORT void fft64_vmp_prepare_contiguous_avx(const MODULE* module,              
                                              uint8_t* tmp_space                                   // scratch space
 );
 
+/** @brief prepares a vmp matrix (mat[row]+col*N points to the item) */
+EXPORT void fft64_vmp_prepare_dblptr_avx(const MODULE* module,                                    // N
+                                             VMP_PMAT* pmat,                                      // output
+                                             const int64_t** mat, uint64_t nrows, uint64_t ncols, // a
+                                             uint8_t* tmp_space                                   // scratch space
+);
+
 /** @brief minimal scratch space byte-size required for the vmp_prepare function */
-EXPORT uint64_t fft64_vmp_prepare_contiguous_tmp_bytes(const MODULE* module,  // N
+EXPORT uint64_t fft64_vmp_prepare_tmp_bytes(const MODULE* module,  // N
                                                        uint64_t nrows, uint64_t ncols);
 
 /** @brief applies a vmp product (result in DFT space) */

@@ -57,6 +57,56 @@ EXPORT void fft64_rnx_vmp_prepare_contiguous_avx(       //
   }
 }
 
+/** @brief prepares a vmp matrix (mat[row]+col*N points to the item) */
+EXPORT void fft64_rnx_vmp_prepare_dblptr_avx(           //
+    const MOD_RNX* module,                              // N
+    RNX_VMP_PMAT* pmat,                                 // output
+    const double** mat, uint64_t nrows, uint64_t ncols, // a
+    uint8_t* tmp_space                                  // scratch space
+) {
+  // there is an edge case if nn < 8
+  const uint64_t nn = module->n;
+  const uint64_t m = module->m;
+
+  double* const dtmp = (double*)tmp_space;
+  double* const output_mat = (double*)pmat;
+  double* start_addr = (double*)pmat;
+  uint64_t offset = nrows * ncols * 8;
+
+  if (nn >= 8) {
+    for (uint64_t row_i = 0; row_i < nrows; row_i++) {
+      for (uint64_t col_i = 0; col_i < ncols; col_i++) {
+        rnx_divide_by_m_avx(nn, m, dtmp, mat[row_i] + col_i*nn);
+        reim_fft(module->precomp.fft64.p_fft, dtmp);
+
+        if (col_i == (ncols - 1) && (ncols % 2 == 1)) {
+          // special case: last column out of an odd column number
+          start_addr = output_mat + col_i * nrows * 8  // col == ncols-1
+                       + row_i * 8;
+        } else {
+          // general case: columns go by pair
+          start_addr = output_mat + (col_i / 2) * (2 * nrows) * 8  // second: col pair index
+                       + row_i * 2 * 8                             // third: row index
+                       + (col_i % 2) * 8;
+        }
+
+        for (uint64_t blk_i = 0; blk_i < m / 4; blk_i++) {
+          // extract blk from tmp and save it
+          reim4_extract_1blk_from_reim_avx(m, blk_i, start_addr + blk_i * offset, dtmp);
+        }
+      }
+    }
+  } else {
+    for (uint64_t row_i = 0; row_i < nrows; row_i++) {
+      for (uint64_t col_i = 0; col_i < ncols; col_i++) {
+        double* res = output_mat + (col_i * nrows + row_i) * nn;
+        rnx_divide_by_m_avx(nn, m, res, mat[row_i] + col_i*nn);
+        reim_fft(module->precomp.fft64.p_fft, res);
+      }
+    }
+  }
+}
+
 /** @brief minimal size of the tmp_space */
 EXPORT void fft64_rnx_vmp_apply_dft_to_dft_avx(                //
     const MOD_RNX* module,                                     // N
