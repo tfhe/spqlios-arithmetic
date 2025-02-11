@@ -36,6 +36,7 @@ typedef typeof(rnx_svp_apply) RNX_SVP_APPLY_F;
 typedef typeof(bytes_of_rnx_vmp_pmat) BYTES_OF_RNX_VMP_PMAT_F;
 typedef typeof(rnx_vmp_prepare_contiguous) RNX_VMP_PREPARE_CONTIGUOUS_F;
 typedef typeof(rnx_vmp_prepare_dblptr) RNX_VMP_PREPARE_DBLPTR_F;
+typedef typeof(rnx_vmp_prepare_row) RNX_VMP_PREPARE_ROW_F;
 typedef typeof(rnx_vmp_prepare_tmp_bytes) RNX_VMP_PREPARE_TMP_BYTES_F;
 typedef typeof(rnx_vmp_apply_tmp_a) RNX_VMP_APPLY_TMP_A_F;
 typedef typeof(rnx_vmp_apply_tmp_a_tmp_bytes) RNX_VMP_APPLY_TMP_A_TMP_BYTES_F;
@@ -78,6 +79,7 @@ struct rnx_module_vtable_t {
   BYTES_OF_RNX_VMP_PMAT_F* bytes_of_rnx_vmp_pmat;
   RNX_VMP_PREPARE_CONTIGUOUS_F* rnx_vmp_prepare_contiguous;
   RNX_VMP_PREPARE_DBLPTR_F* rnx_vmp_prepare_dblptr;
+  RNX_VMP_PREPARE_ROW_F* rnx_vmp_prepare_row;
   RNX_VMP_PREPARE_TMP_BYTES_F* rnx_vmp_prepare_tmp_bytes;
   RNX_VMP_APPLY_TMP_A_F* rnx_vmp_apply_tmp_a;
   RNX_VMP_APPLY_TMP_A_TMP_BYTES_F* rnx_vmp_apply_tmp_a_tmp_bytes;

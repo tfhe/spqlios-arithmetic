@@ -32,9 +32,9 @@ static void test_zn_vmp_prepare(ZN32_VMP_PREPARE_DBLPTR_F prepare_dblptr) {
       std::vector<int32_t> src(nrows * ncols);
       zn32_pmat_layout out(nrows, ncols);
       for (int32_t& x : src) x = uniform_i64_bits(32);
-      const int32_t** mat_dblptr = (const int32_t**)malloc(nrows*sizeof(int32_t*));
-      for (size_t row_i = 0; row_i < nrows; row_i++){
-        mat_dblptr[row_i] = &src.data()[row_i*ncols];
+      const int32_t** mat_dblptr = (const int32_t**)malloc(nrows * sizeof(int32_t*));
+      for (size_t row_i = 0; row_i < nrows; row_i++) {
+        mat_dblptr[row_i] = &src.data()[row_i * ncols];
       };
       prepare_dblptr(module, out.data, mat_dblptr, nrows, ncols);
       for (uint64_t i = 0; i < nrows; ++i) {

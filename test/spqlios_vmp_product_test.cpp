@@ -61,9 +61,7 @@ static void test_vmp_prepare_contiguous(VMP_PREPARE_CONTIGUOUS_F* prepare_contig
   }
 }
 
-TEST(vec_znx, vmp_prepare_contiguous) {
-  test_vmp_prepare_contiguous(vmp_prepare_contiguous, vmp_prepare_tmp_bytes);
-}
+TEST(vec_znx, vmp_prepare_contiguous) { test_vmp_prepare_contiguous(vmp_prepare_contiguous, vmp_prepare_tmp_bytes); }
 TEST(vec_znx, fft64_vmp_prepare_contiguous_ref) {
   test_vmp_prepare_contiguous(fft64_vmp_prepare_contiguous_ref, fft64_vmp_prepare_tmp_bytes);
 }
@@ -73,8 +71,7 @@ TEST(vec_znx, fft64_vmp_prepare_contiguous_avx) {
 }
 #endif
 
-static void test_vmp_prepare_dblptr(VMP_PREPARE_DBLPTR_F* prepare_dblptr,
-                                        VMP_PREPARE_TMP_BYTES_F* tmp_bytes) {
+static void test_vmp_prepare_dblptr(VMP_PREPARE_DBLPTR_F* prepare_dblptr, VMP_PREPARE_TMP_BYTES_F* tmp_bytes) {
   // tests when n < 8
   for (uint64_t nn : {2, 4}) {
     MODULE* module = new_module_info(nn, FFT64);
@@ -85,9 +82,9 @@ static void test_vmp_prepare_dblptr(VMP_PREPARE_DBLPTR_F* prepare_dblptr,
         mat.fill_random(30);
         std::vector<uint8_t> tmp_space(fft64_vmp_prepare_tmp_bytes(module, nrows, ncols));
         thash hash_before = mat.content_hash();
-        const int64_t** mat_dblptr = (const int64_t**)malloc(nrows*sizeof(int64_t*));
-        for (size_t row_i = 0; row_i < nrows; row_i++){
-          mat_dblptr[row_i] = &mat.data()[row_i*ncols*nn];
+        const int64_t** mat_dblptr = (const int64_t**)malloc(nrows * sizeof(int64_t*));
+        for (size_t row_i = 0; row_i < nrows; row_i++) {
+          mat_dblptr[row_i] = &mat.data()[row_i * ncols * nn];
         };
         prepare_dblptr(module, pmat.data, mat_dblptr, nrows, ncols, tmp_space.data());
         ASSERT_EQ(mat.content_hash(), hash_before);
@@ -116,9 +113,9 @@ static void test_vmp_prepare_dblptr(VMP_PREPARE_DBLPTR_F* prepare_dblptr,
         mat.fill_random(30);
         std::vector<uint8_t> tmp_space(tmp_bytes(module, nrows, ncols));
         thash hash_before = mat.content_hash();
-        const int64_t** mat_dblptr = (const int64_t**)malloc(nrows*sizeof(int64_t*));
-        for (size_t row_i = 0; row_i < nrows; row_i++){
-          mat_dblptr[row_i] = &mat.data()[row_i*ncols*nn];
+        const int64_t** mat_dblptr = (const int64_t**)malloc(nrows * sizeof(int64_t*));
+        for (size_t row_i = 0; row_i < nrows; row_i++) {
+          mat_dblptr[row_i] = &mat.data()[row_i * ncols * nn];
         };
         prepare_dblptr(module, pmat.data, mat_dblptr, nrows, ncols, tmp_space.data());
         ASSERT_EQ(mat.content_hash(), hash_before);
@@ -138,9 +135,7 @@ static void test_vmp_prepare_dblptr(VMP_PREPARE_DBLPTR_F* prepare_dblptr,
   }
 }
 
-TEST(vec_znx, vmp_prepare_dblptr) {
-  test_vmp_prepare_dblptr(vmp_prepare_dblptr, vmp_prepare_tmp_bytes);
-}
+TEST(vec_znx, vmp_prepare_dblptr) { test_vmp_prepare_dblptr(vmp_prepare_dblptr, vmp_prepare_tmp_bytes); }
 TEST(vec_znx, fft64_vmp_prepare_dblptr_ref) {
   test_vmp_prepare_dblptr(fft64_vmp_prepare_dblptr_ref, fft64_vmp_prepare_tmp_bytes);
 }

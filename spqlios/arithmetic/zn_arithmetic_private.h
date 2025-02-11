@@ -70,8 +70,15 @@ EXPORT void default_zn32_vmp_prepare_contiguous_ref(  //
 /** @brief prepares a vmp matrix (mat[row]+col*N points to the item) */
 EXPORT void default_zn32_vmp_prepare_dblptr_ref(  //
     const MOD_Z* module,
-    ZN32_VMP_PMAT* pmat,                                // output
+    ZN32_VMP_PMAT* pmat,                                 // output
     const int32_t** mat, uint64_t nrows, uint64_t ncols  // a
+);
+
+/** @brief prepares the ith-row of a vmp matrix with nrows and ncols */
+EXPORT void default_zn32_vmp_prepare_row_ref(  //
+    const MOD_Z* module,
+    ZN32_VMP_PMAT* pmat,                                                // output
+    const int32_t* row, uint64_t row_i, uint64_t nrows, uint64_t ncols  // a
 );
 
 /** @brief applies a vmp product (int32_t* input) */

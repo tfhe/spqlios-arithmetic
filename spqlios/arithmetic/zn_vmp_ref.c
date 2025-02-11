@@ -63,32 +63,39 @@ EXPORT void default_zn32_vmp_prepare_contiguous_ref(  //
 /** @brief prepares a vmp matrix (mat[row]+col*N points to the item) */
 EXPORT void default_zn32_vmp_prepare_dblptr_ref(  //
     const MOD_Z* module,
-    ZN32_VMP_PMAT* pmat,                                // output
+    ZN32_VMP_PMAT* pmat,                                 // output
     const int32_t** mat, uint64_t nrows, uint64_t ncols  // a
+) {
+  for (uint64_t row_i = 0; row_i < nrows; ++row_i) {
+    default_zn32_vmp_prepare_row_ref(module, pmat, mat[row_i], row_i, nrows, ncols);
+  }
+}
+
+/** @brief prepares the ith-row of a vmp matrix with nrows and ncols */
+EXPORT void default_zn32_vmp_prepare_row_ref(  //
+    const MOD_Z* module,
+    ZN32_VMP_PMAT* pmat,                                                // output
+    const int32_t* row, uint64_t row_i, uint64_t nrows, uint64_t ncols  // a
 ) {
   int32_t* const out = (int32_t*)pmat;
   const uint64_t nblk = ncols >> 5;
   const uint64_t ncols_rem = ncols & 31;
-  const uint64_t final_elems = (8 - nrows * ncols) & 7;
+  const uint64_t final_elems = (row_i == nrows - 1) && (8 - nrows * ncols) & 7;
   for (uint64_t blk = 0; blk < nblk; ++blk) {
     int32_t* outblk = out + blk * nrows * 32;
-    for (uint64_t row = 0; row < nrows; ++row) {
-      int32_t* dest = outblk + row * 32;
-      const int32_t* src = mat[row] + blk * 32;
-      for (uint64_t i = 0; i < 32; ++i) {
-        dest[i] = src[i];
-      }
+    int32_t* dest = outblk + row_i * 32;
+    const int32_t* src = row + blk * 32;
+    for (uint64_t i = 0; i < 32; ++i) {
+      dest[i] = src[i];
     }
   }
   // copy the last block if any
   if (ncols_rem) {
     int32_t* outblk = out + nblk * nrows * 32;
-    for (uint64_t row = 0; row < nrows; ++row) {
-      int32_t* dest = outblk + row * ncols_rem;
-      const int32_t* src = mat[row] + nblk * 32;
-      for (uint64_t i = 0; i < ncols_rem; ++i) {
-        dest[i] = src[i];
-      }
+    int32_t* dest = outblk + row_i * ncols_rem;
+    const int32_t* src = row + nblk * 32;
+    for (uint64_t i = 0; i < ncols_rem; ++i) {
+      dest[i] = src[i];
     }
   }
   // zero-out the final elements that may be accessed

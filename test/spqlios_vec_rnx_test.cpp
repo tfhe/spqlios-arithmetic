@@ -239,8 +239,8 @@ void test_vec_rnx_elemw_unop_param_inplace(ACTUAL_FCN actual_function, EXPECT_FC
         }
         actual_function(mod,                  // N
                         p,                    //;
-                              la.data(), sa, a_sl,  // res
-                              la.data(), sa, a_sl   // a
+                        la.data(), sa, a_sl,  // res
+                        la.data(), sa, a_sl   // a
         );
         for (uint64_t i = 0; i < sa; ++i) {
           ASSERT_EQ(la.get_copy_zext(i), expect[i]) << n << " " << sa << " " << i;

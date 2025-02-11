@@ -221,14 +221,10 @@ TEST(fft, reim_fft16_ref_vs_fma) { test_reim_fft_ref_vs_accel<16>(reim_fft16_ref
 
 #ifdef __aarch64__
 static void reim_fft16_ref_neon_pom(double* dre, double* dim, const void* omega) {
-  const double* pom = (double*) omega;
+  const double* pom = (double*)omega;
   // put the omegas in neon order
-  double x_pom[] = {
-    pom[0], pom[1], pom[2], pom[3],
-    pom[4],pom[5], pom[6], pom[7],
-    pom[8], pom[10],pom[12], pom[14],
-    pom[9], pom[11],pom[13], pom[15]
-  };
+  double x_pom[] = {pom[0], pom[1],  pom[2],  pom[3],  pom[4], pom[5],  pom[6],  pom[7],
+                    pom[8], pom[10], pom[12], pom[14], pom[9], pom[11], pom[13], pom[15]};
   reim_fft16_ref(dre, dim, x_pom);
 }
 TEST(fft, reim_fft16_ref_vs_neon) { test_reim_fft_ref_vs_accel<16>(reim_fft16_ref_neon_pom, reim_fft16_neon); }

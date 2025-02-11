@@ -17,6 +17,7 @@ void default_init_z_module_vtable(MOD_Z* module) {
   module->vtable.i32_approxdecomp_from_tndbl = default_i32_approxdecomp_from_tndbl_ref;
   module->vtable.zn32_vmp_prepare_contiguous = default_zn32_vmp_prepare_contiguous_ref;
   module->vtable.zn32_vmp_prepare_dblptr = default_zn32_vmp_prepare_dblptr_ref;
+  module->vtable.zn32_vmp_prepare_row = default_zn32_vmp_prepare_row_ref;
   module->vtable.zn32_vmp_apply_i8 = default_zn32_vmp_apply_i8_ref;
   module->vtable.zn32_vmp_apply_i16 = default_zn32_vmp_apply_i16_ref;
   module->vtable.zn32_vmp_apply_i32 = default_zn32_vmp_apply_i32_ref;
@@ -98,19 +99,24 @@ EXPORT void i32_approxdecomp_from_tndbl(const MOD_Z* module,                    
 }
 
 /** @brief prepares a vmp matrix (contiguous row-major version) */
-EXPORT void zn32_vmp_prepare_contiguous(
-    const MOD_Z* module,
-    ZN32_VMP_PMAT* pmat,                                   // output
-    const int32_t* mat, uint64_t nrows, uint64_t ncols) {  // a
+EXPORT void zn32_vmp_prepare_contiguous(const MOD_Z* module,
+                                        ZN32_VMP_PMAT* pmat,                                   // output
+                                        const int32_t* mat, uint64_t nrows, uint64_t ncols) {  // a
   module->vtable.zn32_vmp_prepare_contiguous(module, pmat, mat, nrows, ncols);
 }
 
 /** @brief prepares a vmp matrix (mat[row]+col*N points to the item) */
-EXPORT void zn32_vmp_prepare_dblptr(
-    const MOD_Z* module,
-    ZN32_VMP_PMAT* pmat,                                    // output
-    const int32_t** mat, uint64_t nrows, uint64_t ncols) {  // a
+EXPORT void zn32_vmp_prepare_dblptr(const MOD_Z* module,
+                                    ZN32_VMP_PMAT* pmat,                                    // output
+                                    const int32_t** mat, uint64_t nrows, uint64_t ncols) {  // a
   module->vtable.zn32_vmp_prepare_dblptr(module, pmat, mat, nrows, ncols);
+}
+
+/** @brief prepares the ith-row of a vmp matrix with nrows and ncols */
+EXPORT void zn32_vmp_prepare_row(const MOD_Z* module,
+                                 ZN32_VMP_PMAT* pmat,                                                   // output
+                                 const int32_t* row, uint64_t row_i, uint64_t nrows, uint64_t ncols) {  // a
+  module->vtable.zn32_vmp_prepare_row(module, pmat, row, row_i, nrows, ncols);
 }
 
 /** @brief applies a vmp product (int32_t* input) */

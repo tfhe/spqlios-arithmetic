@@ -300,7 +300,7 @@ EXPORT uint64_t znx_small_single_product_tmp_bytes(const MODULE* module);
 
 /** @brief minimal scratch space byte-size required for the vmp_prepare function */
 EXPORT uint64_t vmp_prepare_tmp_bytes(const MODULE* module,  // N
-                                                 uint64_t nrows, uint64_t ncols);
+                                      uint64_t nrows, uint64_t ncols);
 
 /** @brief prepares a vmp matrix (contiguous row-major version) */
 EXPORT void vmp_prepare_contiguous(const MODULE* module,                                // N
@@ -310,10 +310,17 @@ EXPORT void vmp_prepare_contiguous(const MODULE* module,                        
 );
 
 /** @brief prepares a vmp matrix (mat[row]+col*N points to the item) */
-EXPORT void vmp_prepare_dblptr(const MODULE* module,                                    // N
-                                   VMP_PMAT* pmat,                                      // output
-                                   const int64_t** mat, uint64_t nrows, uint64_t ncols, // a
-                                   uint8_t* tmp_space                                   // scratch space
+EXPORT void vmp_prepare_dblptr(const MODULE* module,                                 // N
+                               VMP_PMAT* pmat,                                       // output
+                               const int64_t** mat, uint64_t nrows, uint64_t ncols,  // a
+                               uint8_t* tmp_space                                    // scratch space
+);
+
+/** @brief prepares the ith-row of a vmp matrix with nrows and ncols */
+EXPORT void vmp_prepare_row(const MODULE* module,                                                // N
+                            VMP_PMAT* pmat,                                                      // output
+                            const int64_t* row, uint64_t row_i, uint64_t nrows, uint64_t ncols,  // a
+                            uint8_t* tmp_space                                                   // scratch space
 );
 
 /** @brief applies a vmp product (result in DFT space) */

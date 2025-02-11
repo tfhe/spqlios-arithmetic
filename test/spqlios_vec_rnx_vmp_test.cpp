@@ -1,6 +1,6 @@
-#include "gtest/gtest.h"
 #include "../spqlios/arithmetic/vec_rnx_arithmetic_private.h"
 #include "../spqlios/reim/reim_fft.h"
+#include "gtest/gtest.h"
 #include "testlib/vec_rnx_layout.h"
 
 static void test_vmp_apply_dft_to_dft_outplace(  //
@@ -185,8 +185,7 @@ TEST(vec_rnx, fft64_vmp_prepare_contiguous_avx) {
 
 /// rnx_vmp_prepare_dblptr
 
-static void test_vmp_prepare_dblptr(RNX_VMP_PREPARE_DBLPTR_F* prepare_dblptr,
-                                        RNX_VMP_PREPARE_TMP_BYTES_F* tmp_bytes) {
+static void test_vmp_prepare_dblptr(RNX_VMP_PREPARE_DBLPTR_F* prepare_dblptr, RNX_VMP_PREPARE_TMP_BYTES_F* tmp_bytes) {
   // tests when n < 8
   for (uint64_t nn : {2, 4}) {
     const double one_over_m = 2. / nn;
@@ -198,9 +197,9 @@ static void test_vmp_prepare_dblptr(RNX_VMP_PREPARE_DBLPTR_F* prepare_dblptr,
         mat.fill_random(0);
         std::vector<uint8_t> tmp_space(tmp_bytes(module));
         thash hash_before = mat.content_hash();
-        const double** mat_dblptr = (const double**)malloc(nrows*sizeof(double*));
-        for (size_t row_i = 0; row_i < nrows; row_i++){
-          mat_dblptr[row_i] = &mat.data()[row_i*ncols*nn];
+        const double** mat_dblptr = (const double**)malloc(nrows * sizeof(double*));
+        for (size_t row_i = 0; row_i < nrows; row_i++) {
+          mat_dblptr[row_i] = &mat.data()[row_i * ncols * nn];
         };
         prepare_dblptr(module, pmat.data, mat_dblptr, nrows, ncols, tmp_space.data());
         ASSERT_EQ(mat.content_hash(), hash_before);
@@ -230,9 +229,9 @@ static void test_vmp_prepare_dblptr(RNX_VMP_PREPARE_DBLPTR_F* prepare_dblptr,
         mat.fill_random(0);
         std::vector<uint8_t> tmp_space(tmp_bytes(module));
         thash hash_before = mat.content_hash();
-        const double** mat_dblptr = (const double**)malloc(nrows*sizeof(double*));
-        for (size_t row_i = 0; row_i < nrows; row_i++){
-          mat_dblptr[row_i] = &mat.data()[row_i*ncols*nn];
+        const double** mat_dblptr = (const double**)malloc(nrows * sizeof(double*));
+        for (size_t row_i = 0; row_i < nrows; row_i++) {
+          mat_dblptr[row_i] = &mat.data()[row_i * ncols * nn];
         };
         prepare_dblptr(module, pmat.data, mat_dblptr, nrows, ncols, tmp_space.data());
         ASSERT_EQ(mat.content_hash(), hash_before);
@@ -252,9 +251,7 @@ static void test_vmp_prepare_dblptr(RNX_VMP_PREPARE_DBLPTR_F* prepare_dblptr,
   }
 }
 
-TEST(vec_rnx, vmp_prepare_dblptr) {
-  test_vmp_prepare_dblptr(rnx_vmp_prepare_dblptr, rnx_vmp_prepare_tmp_bytes);
-}
+TEST(vec_rnx, vmp_prepare_dblptr) { test_vmp_prepare_dblptr(rnx_vmp_prepare_dblptr, rnx_vmp_prepare_tmp_bytes); }
 TEST(vec_rnx, fft64_vmp_prepare_dblptr_ref) {
   test_vmp_prepare_dblptr(fft64_rnx_vmp_prepare_dblptr_ref, fft64_rnx_vmp_prepare_tmp_bytes_ref);
 }

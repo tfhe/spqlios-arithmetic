@@ -17,7 +17,7 @@ EXPORT uint64_t fft64_bytes_of_vmp_pmat(const MODULE* module,           // N
 }
 
 EXPORT VMP_PMAT* new_vmp_pmat(const MODULE* module,           // N
-                                    uint64_t nrows, uint64_t ncols  // dimensions
+                              uint64_t nrows, uint64_t ncols  // dimensions
 ) {
   return spqlios_alloc(bytes_of_vmp_pmat(module, nrows, ncols));
 }
@@ -34,17 +34,26 @@ EXPORT void vmp_prepare_contiguous(const MODULE* module,                        
 }
 
 /** @brief prepares a vmp matrix (mat[row]+col*N points to the item) */
-EXPORT void vmp_prepare_dblptr(const MODULE* module,                                    // N
-                                   VMP_PMAT* pmat,                                      // output
-                                   const int64_t** mat, uint64_t nrows, uint64_t ncols, // a
-                                   uint8_t* tmp_space                                   // scratch space
+EXPORT void vmp_prepare_dblptr(const MODULE* module,                                 // N
+                               VMP_PMAT* pmat,                                       // output
+                               const int64_t** mat, uint64_t nrows, uint64_t ncols,  // a
+                               uint8_t* tmp_space                                    // scratch space
 ) {
   module->func.vmp_prepare_dblptr(module, pmat, mat, nrows, ncols, tmp_space);
 }
 
+/** @brief prepares the ith-row of a vmp matrix with nrows and ncols */
+EXPORT void vmp_prepare_row(const MODULE* module,                                                // N
+                            VMP_PMAT* pmat,                                                      // output
+                            const int64_t* row, uint64_t row_i, uint64_t nrows, uint64_t ncols,  // a
+                            uint8_t* tmp_space                                                   // scratch space
+) {
+  module->func.vmp_prepare_row(module, pmat, row, row_i, nrows, ncols, tmp_space);
+}
+
 /** @brief minimal scratch space byte-size required for the vmp_prepare function */
 EXPORT uint64_t vmp_prepare_tmp_bytes(const MODULE* module,  // N
-                                                 uint64_t nrows, uint64_t ncols) {
+                                      uint64_t nrows, uint64_t ncols) {
   return module->func.vmp_prepare_tmp_bytes(module, nrows, ncols);
 }
 
@@ -97,10 +106,21 @@ EXPORT void fft64_vmp_prepare_contiguous_ref(const MODULE* module,              
 }
 
 /** @brief prepares a vmp matrix (mat[row]+col*N points to the item) */
-EXPORT void fft64_vmp_prepare_dblptr_ref(const MODULE* module,                                    // N
-                                             VMP_PMAT* pmat,                                      // output
-                                             const int64_t** mat, uint64_t nrows, uint64_t ncols, // a
-                                             uint8_t* tmp_space                                   // scratch space
+EXPORT void fft64_vmp_prepare_dblptr_ref(const MODULE* module,                                 // N
+                                         VMP_PMAT* pmat,                                       // output
+                                         const int64_t** mat, uint64_t nrows, uint64_t ncols,  // a
+                                         uint8_t* tmp_space                                    // scratch space
+) {
+  for (uint64_t row_i = 0; row_i < nrows; row_i++) {
+    fft64_vmp_prepare_row_ref(module, pmat, mat[row_i], row_i, nrows, ncols, tmp_space);
+  }
+}
+
+/** @brief prepares the ith-row of a vmp matrix with nrows and ncols */
+EXPORT void fft64_vmp_prepare_row_ref(const MODULE* module,                                                // N
+                                      VMP_PMAT* pmat,                                                      // output
+                                      const int64_t* row, uint64_t row_i, uint64_t nrows, uint64_t ncols,  // a
+                                      uint8_t* tmp_space  // scratch space
 ) {
   // there is an edge case if nn < 8
   const uint64_t nn = module->nn;
@@ -111,42 +131,38 @@ EXPORT void fft64_vmp_prepare_dblptr_ref(const MODULE* module,                  
   uint64_t offset = nrows * ncols * 8;
 
   if (nn >= 8) {
-    for (uint64_t row_i = 0; row_i < nrows; row_i++) {
-      for (uint64_t col_i = 0; col_i < ncols; col_i++) {
-        reim_from_znx64(module->mod.fft64.p_conv, (SVP_PPOL*)tmp_space, mat[row_i] + col_i*nn);
-        reim_fft(module->mod.fft64.p_fft, (double*)tmp_space);
+    for (uint64_t col_i = 0; col_i < ncols; col_i++) {
+      reim_from_znx64(module->mod.fft64.p_conv, (SVP_PPOL*)tmp_space, row + col_i * nn);
+      reim_fft(module->mod.fft64.p_fft, (double*)tmp_space);
 
-        if (col_i == (ncols - 1) && (ncols % 2 == 1)) {
-          // special case: last column out of an odd column number
-          start_addr = output_mat + col_i * nrows * 8  // col == ncols-1
-                       + row_i * 8;
-        } else {
-          // general case: columns go by pair
-          start_addr = output_mat + (col_i / 2) * (2 * nrows) * 8  // second: col pair index
-                       + row_i * 2 * 8                             // third: row index
-                       + (col_i % 2) * 8;
-        }
+      if (col_i == (ncols - 1) && (ncols % 2 == 1)) {
+        // special case: last column out of an odd column number
+        start_addr = output_mat + col_i * nrows * 8  // col == ncols-1
+                     + row_i * 8;
+      } else {
+        // general case: columns go by pair
+        start_addr = output_mat + (col_i / 2) * (2 * nrows) * 8  // second: col pair index
+                     + row_i * 2 * 8                             // third: row index
+                     + (col_i % 2) * 8;
+      }
 
-        for (uint64_t blk_i = 0; blk_i < m / 4; blk_i++) {
-          // extract blk from tmp and save it
-          reim4_extract_1blk_from_reim_ref(m, blk_i, start_addr + blk_i * offset, (double*)tmp_space);
-        }
+      for (uint64_t blk_i = 0; blk_i < m / 4; blk_i++) {
+        // extract blk from tmp and save it
+        reim4_extract_1blk_from_reim_ref(m, blk_i, start_addr + blk_i * offset, (double*)tmp_space);
       }
     }
   } else {
-    for (uint64_t row_i = 0; row_i < nrows; row_i++) {
-      for (uint64_t col_i = 0; col_i < ncols; col_i++) {
-        double* res = (double*)pmat + (col_i * nrows + row_i) * nn;
-        reim_from_znx64(module->mod.fft64.p_conv, (SVP_PPOL*)res, mat[row_i] + col_i*nn);
-        reim_fft(module->mod.fft64.p_fft, res);
-      }
+    for (uint64_t col_i = 0; col_i < ncols; col_i++) {
+      double* res = (double*)pmat + (col_i * nrows + row_i) * nn;
+      reim_from_znx64(module->mod.fft64.p_conv, (SVP_PPOL*)res, row + col_i * nn);
+      reim_fft(module->mod.fft64.p_fft, res);
     }
   }
 }
 
 /** @brief minimal scratch space byte-size required for the vmp_prepare function */
 EXPORT uint64_t fft64_vmp_prepare_tmp_bytes(const MODULE* module,  // N
-                                                       uint64_t nrows, uint64_t ncols) {
+                                            uint64_t nrows, uint64_t ncols) {
   const uint64_t nn = module->nn;
   return nn * sizeof(int64_t);
 }

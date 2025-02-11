@@ -91,7 +91,7 @@ EXPORT uint64_t fft64_bytes_of_vec_znx_big(const MODULE* module,  // N
 }
 
 EXPORT VEC_ZNX_BIG* new_vec_znx_big(const MODULE* module,  // N
-                                          uint64_t size) {
+                                    uint64_t size) {
   return spqlios_alloc(bytes_of_vec_znx_big(module, size));
 }
 
