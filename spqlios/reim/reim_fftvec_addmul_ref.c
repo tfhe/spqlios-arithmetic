@@ -51,4 +51,3 @@ EXPORT REIM_FFTVEC_MUL_PRECOMP* new_reim_fftvec_mul_precomp(uint32_t m) {
   }
   return reps;
 }
-

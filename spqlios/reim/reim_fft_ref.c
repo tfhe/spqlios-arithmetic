@@ -234,27 +234,27 @@ void fill_reim_fft2_omegas(const double entry_pwr, double** omg) {
 }
 
 void reim_twiddle_fft_ref(uint64_t h, double* re, double* im, double om[2]) {
-  for (uint64_t i=0; i<h; ++i) {
-    reim_ctwiddle(&re[i],&im[i],&re[h+i],&im[h+i], om[0], om[1]);
+  for (uint64_t i = 0; i < h; ++i) {
+    reim_ctwiddle(&re[i], &im[i], &re[h + i], &im[h + i], om[0], om[1]);
   }
 }
 
 void reim_bitwiddle_fft_ref(uint64_t h, double* re, double* im, double om[4]) {
   double* r0 = re;
   double* r1 = re + h;
-  double* r2 = re + 2*h;
-  double* r3 = re + 3*h;
+  double* r2 = re + 2 * h;
+  double* r3 = re + 3 * h;
   double* i0 = im;
   double* i1 = im + h;
-  double* i2 = im + 2*h;
-  double* i3 = im + 3*h;
-  for (uint64_t i=0; i<h; ++i) {
-    reim_ctwiddle(&r0[i],&i0[i],&r2[i],&i2[i], om[0], om[1]);
-    reim_ctwiddle(&r1[i],&i1[i],&r3[i],&i3[i], om[0], om[1]);
+  double* i2 = im + 2 * h;
+  double* i3 = im + 3 * h;
+  for (uint64_t i = 0; i < h; ++i) {
+    reim_ctwiddle(&r0[i], &i0[i], &r2[i], &i2[i], om[0], om[1]);
+    reim_ctwiddle(&r1[i], &i1[i], &r3[i], &i3[i], om[0], om[1]);
   }
-  for (uint64_t i=0; i<h; ++i) {
-    reim_ctwiddle(&r0[i],&i0[i],&r1[i],&i1[i], om[2], om[3]);
-    reim_citwiddle(&r2[i],&i2[i],&r3[i],&i3[i], om[2], om[3]);
+  for (uint64_t i = 0; i < h; ++i) {
+    reim_ctwiddle(&r0[i], &i0[i], &r1[i], &i1[i], om[2], om[3]);
+    reim_citwiddle(&r2[i], &i2[i], &r3[i], &i3[i], om[2], om[3]);
   }
 }
 
@@ -276,9 +276,9 @@ void reim_fft_bfs_16_ref(uint64_t m, double* re, double* im, double** omg) {
     }
     mm = h;
   }
-  if (mm!=16) abort(); // bug!
+  if (mm != 16) abort();  // bug!
   for (uint64_t off = 0; off < m; off += 16) {
-    reim_fft16_ref(re+off, im+off, *omg);
+    reim_fft16_ref(re + off, im + off, *omg);
     *omg += 16;
   }
 }
@@ -301,7 +301,7 @@ void fill_reim_fft_bfs_16_omegas(uint64_t m, double entry_pwr, double** omg) {
     uint64_t h = mm >> 2;
     double s = ss / 4.;
     for (uint64_t off = 0; off < m; off += mm) {
-      double rs0 = s + fracrevbits(off/mm) / 4.;
+      double rs0 = s + fracrevbits(off / mm) / 4.;
       double rs1 = 2. * rs0;
       (*omg)[0] = cos(2 * M_PI * rs1);
       (*omg)[1] = sin(2 * M_PI * rs1);
@@ -312,9 +312,9 @@ void fill_reim_fft_bfs_16_omegas(uint64_t m, double entry_pwr, double** omg) {
     mm = h;
     ss = s;
   }
-  if (mm!=16) abort(); // bug!
+  if (mm != 16) abort();  // bug!
   for (uint64_t off = 0; off < m; off += 16) {
-    double s = ss + fracrevbits(off/16);
+    double s = ss + fracrevbits(off / 16);
     fill_reim_fft16_omegas(s, omg);
   }
 }
@@ -343,7 +343,7 @@ void reim_fft_ref(const REIM_FFT_PRECOMP* precomp, double* dat) {
   const int32_t m = precomp->m;
   double* omg = precomp->powomegas;
   double* re = dat;
-  double* im = dat+m;
+  double* im = dat + m;
   if (m <= 16) {
     switch (m) {
       case 1:
@@ -357,7 +357,7 @@ void reim_fft_ref(const REIM_FFT_PRECOMP* precomp, double* dat) {
       case 16:
         return reim_fft16_ref(re, im, omg);
       default:
-        abort(); // m is not a power of 2
+        abort();  // m is not a power of 2
     }
   }
   if (m <= 2048) return reim_fft_bfs_16_ref(m, re, im, &omg);
@@ -367,10 +367,10 @@ void reim_fft_ref(const REIM_FFT_PRECOMP* precomp, double* dat) {
 EXPORT REIM_FFT_PRECOMP* new_reim_fft_precomp(uint32_t m, uint32_t num_buffers) {
   const uint64_t OMG_SPACE = ceilto64b(2 * m * sizeof(double));
   const uint64_t BUF_SIZE = ceilto64b(2 * m * sizeof(double));
-  void* reps = malloc(sizeof(REIM_FFT_PRECOMP)          // base
-                      + 63                              // padding
-                      + OMG_SPACE                       // tables //TODO 16?
-                      + num_buffers * BUF_SIZE          // buffers
+  void* reps = malloc(sizeof(REIM_FFT_PRECOMP)  // base
+                      + 63                      // padding
+                      + OMG_SPACE               // tables //TODO 16?
+                      + num_buffers * BUF_SIZE  // buffers
   );
   uint64_t aligned_addr = ceilto64b((uint64_t)(reps) + sizeof(REIM_FFT_PRECOMP));
   REIM_FFT_PRECOMP* r = (REIM_FFT_PRECOMP*)reps;
@@ -379,7 +379,7 @@ EXPORT REIM_FFT_PRECOMP* new_reim_fft_precomp(uint32_t m, uint32_t num_buffers) 
   r->powomegas = (double*)aligned_addr;
   r->aligned_buffers = (void*)(aligned_addr + OMG_SPACE);
   // fill in powomegas
-  double* omg = (double*) r->powomegas;
+  double* omg = (double*)r->powomegas;
   if (m <= 16) {
     switch (m) {
       case 1:
@@ -415,7 +415,6 @@ EXPORT REIM_FFT_PRECOMP* new_reim_fft_precomp(uint32_t m, uint32_t num_buffers) 
   }
   return reps;
 }
-
 
 void reim_naive_fft(uint64_t m, double entry_pwr, double* re, double* im) {
   if (m == 1) return;

@@ -1,7 +1,7 @@
 #include "coeffs_arithmetic.h"
 
-#include <memory.h>
 #include <assert.h>
+#include <memory.h>
 
 /** res = a + b */
 EXPORT void znx_add_i64_ref(uint64_t nn, int64_t* res, const int64_t* a, const int64_t* b) {

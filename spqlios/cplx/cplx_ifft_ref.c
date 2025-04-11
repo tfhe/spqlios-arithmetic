@@ -204,9 +204,9 @@ void fill_cplx_ifft_omegas_bfs_16(const double entry_pwr, CPLX** omg, uint32_t m
     h = 32;
   }
   for (; h < m; h <<= 2) {
-    for (uint32_t i = 0; i < m / (2 * h); i+=2) {
+    for (uint32_t i = 0; i < m / (2 * h); i += 2) {
       cplx_set_e2pimx(omg[0][0], pwr + fracrevbits(i) / 2.);
-      cplx_set_e2pimx(omg[0][1], 2.*pwr + fracrevbits(i));
+      cplx_set_e2pimx(omg[0][1], 2. * pwr + fracrevbits(i));
       *omg += 2;
     }
     pwr *= 4.;
@@ -270,11 +270,11 @@ EXPORT void cplx_ifft_ref(const CPLX_IFFT_PRECOMP* precomp, void* d) {
 EXPORT CPLX_IFFT_PRECOMP* new_cplx_ifft_precomp(uint32_t m, uint32_t num_buffers) {
   const uint64_t OMG_SPACE = ceilto64b(2 * m * sizeof(CPLX));
   const uint64_t BUF_SIZE = ceilto64b(m * sizeof(CPLX));
-  void* reps = malloc(sizeof(CPLX_IFFT_PRECOMP) + 63    // padding
-                      + OMG_SPACE                       // tables
-                      + num_buffers * BUF_SIZE  // buffers
+  void* reps = malloc(sizeof(CPLX_IFFT_PRECOMP) + 63  // padding
+                      + OMG_SPACE                     // tables
+                      + num_buffers * BUF_SIZE        // buffers
   );
-  uint64_t aligned_addr = ceilto64b((uint64_t) reps + sizeof(CPLX_IFFT_PRECOMP));
+  uint64_t aligned_addr = ceilto64b((uint64_t)reps + sizeof(CPLX_IFFT_PRECOMP));
   CPLX_IFFT_PRECOMP* r = (CPLX_IFFT_PRECOMP*)reps;
   r->m = m;
   r->buf_size = BUF_SIZE;
@@ -299,12 +299,10 @@ EXPORT CPLX_IFFT_PRECOMP* new_cplx_ifft_precomp(uint32_t m, uint32_t num_buffers
 }
 
 EXPORT void* cplx_ifft_precomp_get_buffer(const CPLX_IFFT_PRECOMP* itables, uint32_t buffer_index) {
-  return (uint8_t*) itables->aligned_buffers + buffer_index * itables->buf_size;
+  return (uint8_t*)itables->aligned_buffers + buffer_index * itables->buf_size;
 }
 
-EXPORT void cplx_ifft(const CPLX_IFFT_PRECOMP* itables, void* data) {
-  itables->function(itables, data);
-}
+EXPORT void cplx_ifft(const CPLX_IFFT_PRECOMP* itables, void* data) { itables->function(itables, data); }
 
 EXPORT void cplx_ifft_simple(uint32_t m, void* data) {
   static CPLX_IFFT_PRECOMP* p[31] = {0};
@@ -312,4 +310,3 @@ EXPORT void cplx_ifft_simple(uint32_t m, void* data) {
   if (!*f) *f = new_cplx_ifft_precomp(m, 0);
   (*f)->function(*f, data);
 }
-

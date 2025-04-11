@@ -90,9 +90,9 @@ typedef struct cplx_addmul_precomp {
 } CPLX_FFTVEC_ADDMUL_PRECOMP;
 
 struct cplx_twiddle_precomp {
-   FFTVEC_TWIDDLE_FUNCTION function;
-   int64_t m;
- };
+  FFTVEC_TWIDDLE_FUNCTION function;
+  int64_t m;
+};
 
 struct cplx_bitwiddle_precomp {
   FFTVEC_BITWIDDLE_FUNCTION function;

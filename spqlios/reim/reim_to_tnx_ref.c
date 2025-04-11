@@ -8,13 +8,16 @@
 EXPORT void reim_to_tnx_basic_ref(const REIM_TO_TNX_PRECOMP* tables, double* r, const double* x) {
   const uint64_t n = tables->m << 1;
   double divisor = tables->divisor;
-  for (uint64_t i=0; i<n; ++i) {
-    double ri = x[i]/divisor;
+  for (uint64_t i = 0; i < n; ++i) {
+    double ri = x[i] / divisor;
     r[i] = ri - rint(ri);
   }
 }
 
-typedef union {double d; uint64_t u;} dblui64_t;
+typedef union {
+  double d;
+  uint64_t u;
+} dblui64_t;
 
 EXPORT void reim_to_tnx_ref(const REIM_TO_TNX_PRECOMP* tables, double* r, const double* x) {
   const uint64_t n = tables->m << 1;
@@ -23,7 +26,7 @@ EXPORT void reim_to_tnx_ref(const REIM_TO_TNX_PRECOMP* tables, double* r, const 
   uint64_t mask_or = tables->mask_or;
   double sub_cst = tables->sub_cst;
   dblui64_t cur;
-  for (uint64_t i=0; i<n; ++i) {
+  for (uint64_t i = 0; i < n; ++i) {
     cur.d = x[i] + add_cst;
     cur.u &= mask_and;
     cur.u |= mask_or;
@@ -43,18 +46,18 @@ void* init_reim_to_tnx_precomp(REIM_TO_TNX_PRECOMP* const res, uint32_t m, doubl
   // .......=========(1)|expo|sign  msbbits = log2ovh + 2 + 11 + 1
   uint64_t nbits = 50 - log2overhead;
   dblui64_t ovh_cst;
-  ovh_cst.d = 0.5 + (6<<log2overhead);
+  ovh_cst.d = 0.5 + (6 << log2overhead);
   res->add_cst = ovh_cst.d * divisor;
   res->mask_and = ((UINT64_C(1) << nbits) - 1);
   res->mask_or = ovh_cst.u & ((UINT64_C(-1)) << nbits);
   res->sub_cst = ovh_cst.d;
   // TODO: check selection logic
   if (CPU_SUPPORTS("avx2")) {
-      if (m >= 8) {
-        res->function = reim_to_tnx_avx;
-      } else {
-        res->function = reim_to_tnx_ref;
-      }
+    if (m >= 8) {
+      res->function = reim_to_tnx_avx;
+    } else {
+      res->function = reim_to_tnx_ref;
+    }
   } else {
     res->function = reim_to_tnx_ref;
   }

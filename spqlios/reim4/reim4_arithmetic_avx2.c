@@ -97,31 +97,31 @@ void reim4_vec_mat1col_product_avx2(const uint64_t nrows,
 }
 
 EXPORT void reim4_vec_mat2cols_product_avx2(const uint64_t nrows,
-                                                double* const dst,      // 16 doubles
-                                                const double* const u,  // nrows * 16 doubles
-                                                const double* const v   // nrows * 16 doubles
+                                            double* const dst,      // 16 doubles
+                                            const double* const u,  // nrows * 16 doubles
+                                            const double* const v   // nrows * 16 doubles
 ) {
   __m256d re1 = _mm256_setzero_pd();
   __m256d im1 = _mm256_setzero_pd();
   __m256d re2 = _mm256_setzero_pd();
   __m256d im2 = _mm256_setzero_pd();
 
-  __m256d ur,ui,ar,ai,br,bi;
+  __m256d ur, ui, ar, ai, br, bi;
   for (uint64_t i = 0; i < nrows; ++i) {
-    ur = _mm256_loadu_pd(u+8*i);
-    ui = _mm256_loadu_pd(u+8*i+4);
-    ar = _mm256_loadu_pd(v+16*i);
-    ai = _mm256_loadu_pd(v+16*i+4);
-    br = _mm256_loadu_pd(v+16*i+8);
-    bi = _mm256_loadu_pd(v+16*i+12);
-    re1 = _mm256_fmsub_pd(ui,ai,re1);
-    re2 = _mm256_fmsub_pd(ui,bi,re2);
-    im1 = _mm256_fmadd_pd(ur,ai,im1);
-    im2 = _mm256_fmadd_pd(ur,bi,im2);
-    re1 = _mm256_fmsub_pd(ur,ar,re1);
-    re2 = _mm256_fmsub_pd(ur,br,re2);
-    im1 = _mm256_fmadd_pd(ui,ar,im1);
-    im2 = _mm256_fmadd_pd(ui,br,im2);
+    ur = _mm256_loadu_pd(u + 8 * i);
+    ui = _mm256_loadu_pd(u + 8 * i + 4);
+    ar = _mm256_loadu_pd(v + 16 * i);
+    ai = _mm256_loadu_pd(v + 16 * i + 4);
+    br = _mm256_loadu_pd(v + 16 * i + 8);
+    bi = _mm256_loadu_pd(v + 16 * i + 12);
+    re1 = _mm256_fmsub_pd(ui, ai, re1);
+    re2 = _mm256_fmsub_pd(ui, bi, re2);
+    im1 = _mm256_fmadd_pd(ur, ai, im1);
+    im2 = _mm256_fmadd_pd(ur, bi, im2);
+    re1 = _mm256_fmsub_pd(ur, ar, re1);
+    re2 = _mm256_fmsub_pd(ur, br, re2);
+    im1 = _mm256_fmadd_pd(ui, ar, im1);
+    im2 = _mm256_fmadd_pd(ui, br, im2);
   }
   _mm256_storeu_pd(dst, re1);
   _mm256_storeu_pd(dst + 4, im1);

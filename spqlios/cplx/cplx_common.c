@@ -54,15 +54,15 @@ EXPORT void cplx_split_fft_ref(int32_t h, CPLX* data, const CPLX powom) {
  */
 EXPORT void cplx_bisplit_fft_ref(int32_t h, CPLX* data, const CPLX powom[2]) {
   CPLX* d0 = data;
-  CPLX* d2 = data + 2*h;
+  CPLX* d2 = data + 2 * h;
   const CPLX* om0 = powom;
   CPLX iom0;
-  iom0[0]=powom[0][1];
-  iom0[1]=-powom[0][0];
-  const CPLX* om1 = powom+1;
+  iom0[0] = powom[0][1];
+  iom0[1] = -powom[0][0];
+  const CPLX* om1 = powom + 1;
   cplx_split_fft_ref(h, d0, *om0);
   cplx_split_fft_ref(h, d2, iom0);
-  cplx_split_fft_ref(2*h, d0, *om1);
+  cplx_split_fft_ref(2 * h, d0, *om1);
 }
 
 /**

@@ -307,4 +307,3 @@ EXPORT void cplx_fftvec_innerprod_avx2_fma(const CPLX_FFTVEC_INNERPROD_PRECOMP* 
   }
 }
 #endif
-

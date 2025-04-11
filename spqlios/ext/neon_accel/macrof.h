@@ -62,10 +62,10 @@
 // c = -a
 #define vfneg(c, a) c = vnegq_f64(a);
 
-#define transpose_f64(a, b, t, ia, ib, it)        \
-    t.val[it] = a.val[ia];                        \
-    a.val[ia] = vzip1q_f64(a.val[ia], b.val[ib]); \
-    b.val[ib] = vzip2q_f64(t.val[it], b.val[ib]);
+#define transpose_f64(a, b, t, ia, ib, it)      \
+  t.val[it] = a.val[ia];                        \
+  a.val[ia] = vzip1q_f64(a.val[ia], b.val[ib]); \
+  b.val[ib] = vzip2q_f64(t.val[it], b.val[ib]);
 
 /*
  * c = a + jb
@@ -98,18 +98,18 @@
  * c[0] = a[0]*b[0] - a[1]*b[1]
  * c[1] = a[0]*b[1] + a[1]*b[0]
  */
-#define FPC_CMUL(c, a, b)         \
-    c = vmulq_laneq_f64(b, a, 0); \
-    c = vcmlaq_rot90_f64(c, a, b);
+#define FPC_CMUL(c, a, b)       \
+  c = vmulq_laneq_f64(b, a, 0); \
+  c = vcmlaq_rot90_f64(c, a, b);
 
 /*
  * Complex MUL: c = a * conjugate(b) = a * (b[0], -b[1])
  * c[0] =   b[0]*a[0] + b[1]*a[1]
  * c[1] = + b[0]*a[1] - b[1]*a[0]
  */
-#define FPC_CMUL_CONJ(c, a, b)    \
-    c = vmulq_laneq_f64(a, b, 0); \
-    c = vcmlaq_rot270_f64(c, b, a);
+#define FPC_CMUL_CONJ(c, a, b)  \
+  c = vmulq_laneq_f64(a, b, 0); \
+  c = vcmlaq_rot270_f64(c, b, a);
 
 #if FMA == 1
 // d = c + a *b
@@ -122,16 +122,14 @@
 #define vfmls_lane(d, c, a, b, i) d = vfmsq_laneq_f64(c, a, b, i);
 
 #else
-    // d = c + a *b
-    #define vfmla(d, c, a, b) d = vaddq_f64(c, vmulq_f64(a, b));
-    // d = c - a *b
-    #define vfmls(d, c, a, b) d = vsubq_f64(c, vmulq_f64(a, b));
-    // d = c + a * b[i]
-    #define vfmla_lane(d, c, a, b, i) \
-        d = vaddq_f64(c, vmulq_laneq_f64(a, b, i));
+// d = c + a *b
+#define vfmla(d, c, a, b) d = vaddq_f64(c, vmulq_f64(a, b));
+// d = c - a *b
+#define vfmls(d, c, a, b) d = vsubq_f64(c, vmulq_f64(a, b));
+// d = c + a * b[i]
+#define vfmla_lane(d, c, a, b, i) d = vaddq_f64(c, vmulq_laneq_f64(a, b, i));
 
-    #define vfmls_lane(d, c, a, b, i) \
-        d = vsubq_f64(c, vmulq_laneq_f64(a, b, i));
+#define vfmls_lane(d, c, a, b, i) d = vsubq_f64(c, vmulq_laneq_f64(a, b, i));
 
 #endif
 

@@ -70,8 +70,6 @@ END_TEMPLATE
   } while (aa < aend);
 }
 
-
-
 EXPORT void cplx_fftvec_addmul_fma(const CPLX_FFTVEC_ADDMUL_PRECOMP* precomp, void* r, const void* a, const void* b) {
   const uint32_t m = precomp->m;
   const double(*aa)[4] = (double(*)[4])a;

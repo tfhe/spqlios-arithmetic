@@ -15,7 +15,6 @@ EXPORT void reim_fftvec_addmul_ref(const REIM_FFTVEC_ADDMUL_PRECOMP* precomp, do
 EXPORT void reim_fftvec_mul_fma(const REIM_FFTVEC_MUL_PRECOMP* tables, double* r, const double* a, const double* b);
 EXPORT void reim_fftvec_mul_ref(const REIM_FFTVEC_MUL_PRECOMP* tables, double* r, const double* a, const double* b);
 
-
 /** @brief r = x from ZnX (coeffs as signed int32_t's ) to double */
 EXPORT void reim_from_znx32_ref(const REIM_FROM_ZNX32_PRECOMP* precomp, void* r, const int32_t* x);
 EXPORT void reim_from_znx32_avx2_fma(const REIM_FROM_ZNX32_PRECOMP* precomp, void* r, const int32_t* x);
@@ -90,7 +89,7 @@ EXPORT void reim_fft4_ref(double* dre, double* dim, const void* omega);
 EXPORT void fill_reim_fft4_omegas(const double entry_pwr, double** omg);
 
 /** @brief 2-dimensional FFT with precomputed omegas */
-//EXPORT void reim_fft4_avx_fma(double* dre, double* dim, const void* omega);
+// EXPORT void reim_fft4_avx_fma(double* dre, double* dim, const void* omega);
 EXPORT void reim_fft2_ref(double* dre, double* dim, const void* omega);
 
 /** @brief precompute omegas so that reim_fft8 functions */
@@ -101,7 +100,6 @@ EXPORT void fill_reim_fft_bfs_16_omegas(uint64_t m, double entry_pwr, double** o
 
 EXPORT void reim_fft_rec_16_ref(uint64_t m, double* re, double* im, double** omg);
 EXPORT void fill_reim_fft_rec_16_omegas(uint64_t m, double entry_pwr, double** omg);
-
 
 /** @brief naive FFT code mod X^m-exp(2i.pi.entry_pwr) */
 EXPORT void reim_naive_ifft(uint64_t m, double entry_pwr, double* re, double* im);
@@ -128,7 +126,7 @@ EXPORT void reim_ifft4_ref(double* dre, double* dim, const void* omega);
 EXPORT void fill_reim_ifft4_omegas(const double entry_pwr, double** omg);
 
 /** @brief 2-dimensional FFT with precomputed omegas */
-//EXPORT void reim_ifft2_avx_fma(double* dre, double* dim, const void* omega);
+// EXPORT void reim_ifft2_avx_fma(double* dre, double* dim, const void* omega);
 EXPORT void reim_ifft2_ref(double* dre, double* dim, const void* omega);
 
 /** @brief precompute omegas so that reim_fft8 functions */

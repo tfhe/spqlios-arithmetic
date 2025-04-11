@@ -115,8 +115,8 @@ void cplx_twiddle_fft_ref(int32_t h, CPLX* data, const CPLX powom) {
 void cplx_bitwiddle_fft_ref(int32_t h, CPLX* data, const CPLX powom[2]) {
   CPLX* d0 = data;
   CPLX* d1 = data + h;
-  CPLX* d2 = data + 2*h;
-  CPLX* d3 = data + 3*h;
+  CPLX* d2 = data + 2 * h;
+  CPLX* d3 = data + 3 * h;
   for (uint64_t i = 0; i < h; ++i) {
     ctwiddle(d0[i], d2[i], powom[0]);
     ctwiddle(d1[i], d3[i], powom[0]);
@@ -180,17 +180,17 @@ void cplx_fft_ref_bfs_16(CPLX* dat, const CPLX** omg, uint32_t m) {
   uint32_t mm = m;
   uint32_t log2m = log2(m);
   if (log2m % 2 == 1) {
-    cplx_twiddle_fft_ref(mm/2, data, **omg);
+    cplx_twiddle_fft_ref(mm / 2, data, **omg);
     *omg += 2;
     mm >>= 1;
   }
-  while(mm>16) {
-    uint32_t h = mm/4;
+  while (mm > 16) {
+    uint32_t h = mm / 4;
     for (CPLX* d = data; d < dend; d += mm) {
       cplx_bitwiddle_fft_ref(h, d, *omg);
       *omg += 2;
     }
-    mm=h;
+    mm = h;
   }
   for (CPLX* d = data; d < dend; d += 16) {
     cplx_fft16_ref(d, *omg);
@@ -237,7 +237,7 @@ void fill_cplx_fft_omegas_bfs_16(const double entry_pwr, CPLX** omg, uint32_t m)
     mm = h;
     ss = pom;
   }
-  while (mm>16) {
+  while (mm > 16) {
     double pom = ss / 4.;
     uint32_t h = mm / 4;
     for (uint32_t i = 0; i < m / mm; i++) {
@@ -316,11 +316,11 @@ void cplx_fft_ref(const CPLX_FFT_PRECOMP* precomp, void* d) {
 }
 
 EXPORT CPLX_FFT_PRECOMP* new_cplx_fft_precomp(uint32_t m, uint32_t num_buffers) {
-  const uint64_t OMG_SPACE = ceilto64b((2 * m)* sizeof(CPLX));
+  const uint64_t OMG_SPACE = ceilto64b((2 * m) * sizeof(CPLX));
   const uint64_t BUF_SIZE = ceilto64b(m * sizeof(CPLX));
-  void* reps = malloc(sizeof(CPLX_FFT_PRECOMP) + 63     // padding
-                      + OMG_SPACE                       // tables //TODO 16?
-                      + num_buffers * BUF_SIZE          // buffers
+  void* reps = malloc(sizeof(CPLX_FFT_PRECOMP) + 63  // padding
+                      + OMG_SPACE                    // tables //TODO 16?
+                      + num_buffers * BUF_SIZE       // buffers
   );
   uint64_t aligned_addr = ceilto64b((uint64_t)(reps) + sizeof(CPLX_FFT_PRECOMP));
   CPLX_FFT_PRECOMP* r = (CPLX_FFT_PRECOMP*)reps;
@@ -354,7 +354,7 @@ EXPORT CPLX_FFT_PRECOMP* new_cplx_fft_precomp(uint32_t m, uint32_t num_buffers) 
 }
 
 EXPORT void* cplx_fft_precomp_get_buffer(const CPLX_FFT_PRECOMP* tables, uint32_t buffer_index) {
-  return (uint8_t *)tables->aligned_buffers + buffer_index * tables->buf_size;
+  return (uint8_t*)tables->aligned_buffers + buffer_index * tables->buf_size;
 }
 
 EXPORT void cplx_fft_simple(uint32_t m, void* data) {

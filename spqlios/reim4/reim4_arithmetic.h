@@ -76,6 +76,18 @@ EXPORT void reim4_extract_1blk_from_reim_avx(uint64_t m, uint64_t blk,
 );
 
 /**
+ * @brief extract 1 reim vectors from one reim4 block of m complexes
+ * @param m the size of each reim
+ * @param blk the block id to extract (<m/4)
+ * @param dst the output: nrows reim4's  dst[i](blk) = src[i]
+ * @param src the input: nrows reim's
+ */
+EXPORT void reim4_extract_reim_from_1blk_ref(uint64_t m, uint64_t blk,
+                                             double* const dst,       // 8 doubles
+                                             const double* const src  // a reim vector
+);
+
+/**
  * @brief extract 1 reim4 block from nrows reim vectors of m complexes
  * @param nrows the number of reim (fft) vectors
  * @param m the size of each reim

@@ -302,6 +302,10 @@ EXPORT uint64_t znx_small_single_product_tmp_bytes(const MODULE* module);
 EXPORT uint64_t vmp_prepare_tmp_bytes(const MODULE* module,  // N
                                       uint64_t nrows, uint64_t ncols);
 
+/** @brief minimal scratch space byte-size required for the vmp_extract function */
+EXPORT uint64_t vmp_extract_tmp_bytes(const MODULE* module,  // N
+                                      uint64_t nrows, uint64_t ncols);
+
 /** @brief prepares a vmp matrix (contiguous row-major version) */
 EXPORT void vmp_prepare_contiguous(const MODULE* module,                                // N
                                    VMP_PMAT* pmat,                                      // output
@@ -321,6 +325,26 @@ EXPORT void vmp_prepare_row(const MODULE* module,                               
                             VMP_PMAT* pmat,                                                      // output
                             const int64_t* row, uint64_t row_i, uint64_t nrows, uint64_t ncols,  // a
                             uint8_t* tmp_space                                                   // scratch space
+);
+
+/** @brief extracts the ith-row of a vmp matrix with nrows and ncols */
+EXPORT void vmp_extract_row(const MODULE* module, VEC_ZNX_BIG* res, const VMP_PMAT* pmat, uint64_t row_i,
+                            uint64_t nrows, uint64_t ncols);
+
+/** @brief extracts the ith-row of a vmp matrix with nrows and ncols */
+EXPORT void vmp_extract_row_dft(const MODULE* module, VEC_ZNX_DFT* res, const VMP_PMAT* pmat, uint64_t row_i,
+                                uint64_t nrows, uint64_t ncols);
+
+/** @brief prepares the ith-row of a vmp matrix with nrows and ncols */
+EXPORT void vmp_prepare_row_dft(const MODULE* module,                                                   // N
+                                VMP_PMAT* pmat,                                                         // output
+                                const VEC_ZNX_DFT* row, uint64_t row_i, uint64_t nrows, uint64_t ncols  // a
+);
+
+/** @brief prepares the ith-row of a vmp matrix with nrows and ncols from a vec_znx_dft */
+EXPORT void fft64_vmp_prepare_row(const MODULE* module,                                                   // N
+                                  VMP_PMAT* pmat,                                                         // output
+                                  const VEC_ZNX_DFT* row, uint64_t row_i, uint64_t nrows, uint64_t ncols  // a
 );
 
 /** @brief applies a vmp product (result in DFT space) */

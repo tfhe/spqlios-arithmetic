@@ -69,7 +69,7 @@ __always_inline void cplx_twiddle_fft_avx2(int32_t h, D4MEM* data, const void* o
   const __m256d omim = _mm256_unpackhi_pd(om, om);
   const __m256d omre = _mm256_unpacklo_pd(om, om);
   D4MEM* d0 = data;
-  D4MEM* const ddend = d0 + (h>>1);
+  D4MEM* const ddend = d0 + (h >> 1);
   D4MEM* d1 = ddend;
   do {
     const __m256d b = _mm256_loadu_pd(d1[0]);
@@ -94,12 +94,12 @@ __always_inline void cplx_bitwiddle_fft_avx2(int32_t h, void* data, const void* 
   const __m256d omare = _mm256_unpacklo_pd(oma, oma);
   const __m256d ombim = _mm256_unpackhi_pd(omb, omb);
   const __m256d ombre = _mm256_unpacklo_pd(omb, omb);
-  D4MEM* d0 = (D4MEM*) data;
-  D4MEM* const ddend = d0 + (h>>1);
+  D4MEM* d0 = (D4MEM*)data;
+  D4MEM* const ddend = d0 + (h >> 1);
   D4MEM* d1 = ddend;
-  D4MEM* d2 = d0+h;
-  D4MEM* d3 = d1+h;
-  __m256d reg0,reg1,reg2,reg3,tmp0,tmp1;
+  D4MEM* d2 = d0 + h;
+  D4MEM* d3 = d1 + h;
+  __m256d reg0, reg1, reg2, reg3, tmp0, tmp1;
   do {
     reg0 = _mm256_loadu_pd(d0[0]);
     reg1 = _mm256_loadu_pd(d1[0]);
@@ -148,20 +148,20 @@ void cplx_fft_avx2_fma_bfs_16(D4MEM* dat, const D4MEM** omg, uint32_t m) {
   double* data = (double*)dat;
   D4MEM* const finaldd = (D4MEM*)(data + 2 * m);
   uint32_t mm = m;
-  uint32_t log2m = _mm_popcnt_u32(m-1); // log2(m)
+  uint32_t log2m = _mm_popcnt_u32(m - 1);  // log2(m)
   if (log2m % 2 == 1) {
-    uint32_t h = mm>>1;
+    uint32_t h = mm >> 1;
     cplx_twiddle_fft_avx2(h, dat, **omg);
     *omg += 1;
     mm >>= 1;
   }
-  while(mm>16) {
-    uint32_t h = mm/4;
-    for (CPLX* d = (CPLX*) data; d < (CPLX*) finaldd; d += mm) {
-      cplx_bitwiddle_fft_avx2(h, d, (CPLX*) *omg);
+  while (mm > 16) {
+    uint32_t h = mm / 4;
+    for (CPLX* d = (CPLX*)data; d < (CPLX*)finaldd; d += mm) {
+      cplx_bitwiddle_fft_avx2(h, d, (CPLX*)*omg);
       *omg += 1;
     }
-    mm=h;
+    mm = h;
   }
   {
     D4MEM* dd = (D4MEM*)data;

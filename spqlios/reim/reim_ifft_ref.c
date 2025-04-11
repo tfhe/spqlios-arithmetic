@@ -18,7 +18,7 @@ void reim_invcitwiddle(double* ra, double* ia, double* rb, double* ib, double om
   *ra = *ra + *rb;
   *ia = *ia + *ib;
   *rb = rdiff * omim + idiff * omre;
-  *ib = - rdiff * omre + idiff * omim;
+  *ib = -rdiff * omre + idiff * omim;
 }
 
 void reim_ifft16_ref(double* dre, double* dim, const void* pom) {
@@ -93,21 +93,21 @@ void fill_reim_ifft16_omegas(const double entry_pwr, double** omg) {
   (*omg)[1] = cos(2. * M_PI * (pin_8 + j_pow));
   (*omg)[2] = cos(2. * M_PI * (pin_8 + k_pow));
   (*omg)[3] = cos(2. * M_PI * (pin_8 + j_pow + k_pow));
-  (*omg)[4] = - sin(2. * M_PI * (pin_8));
-  (*omg)[5] = - sin(2. * M_PI * (pin_8 + j_pow));
-  (*omg)[6] = - sin(2. * M_PI * (pin_8 + k_pow));
-  (*omg)[7] = - sin(2. * M_PI * (pin_8 + j_pow + k_pow));
+  (*omg)[4] = -sin(2. * M_PI * (pin_8));
+  (*omg)[5] = -sin(2. * M_PI * (pin_8 + j_pow));
+  (*omg)[6] = -sin(2. * M_PI * (pin_8 + k_pow));
+  (*omg)[7] = -sin(2. * M_PI * (pin_8 + j_pow + k_pow));
   // (4,5) and (6,7) are real and imag of om^1/4 and j.om^1/4
   (*omg)[8] = cos(2. * M_PI * (pin_4));
-  (*omg)[9] = - sin(2. * M_PI * (pin_4));
+  (*omg)[9] = -sin(2. * M_PI * (pin_4));
   (*omg)[10] = cos(2. * M_PI * (pin_4 + j_pow));
-  (*omg)[11] = - sin(2. * M_PI * (pin_4 + j_pow));
+  (*omg)[11] = -sin(2. * M_PI * (pin_4 + j_pow));
   // 2 and 3 are real and imag of om^1/2
   (*omg)[12] = cos(2. * M_PI * (pin_2));
-  (*omg)[13] = - sin(2. * M_PI * (pin_2));
+  (*omg)[13] = -sin(2. * M_PI * (pin_2));
   // 0 and 1 are real and imag of om
   (*omg)[14] = cos(2. * M_PI * pin);
-  (*omg)[15] = - sin(2. * M_PI * pin);
+  (*omg)[15] = -sin(2. * M_PI * pin);
   *omg += 16;
 }
 
@@ -149,14 +149,14 @@ void fill_reim_ifft8_omegas(const double entry_pwr, double** omg) {
   // (4,5) and (6,7) are real and imag of om^1/4 and j.om^1/4
   (*omg)[0] = cos(2. * M_PI * (pin_4));
   (*omg)[1] = cos(2. * M_PI * (pin_4 + j_pow));
-  (*omg)[2] = - sin(2. * M_PI * (pin_4));
-  (*omg)[3] = - sin(2. * M_PI * (pin_4 + j_pow));
+  (*omg)[2] = -sin(2. * M_PI * (pin_4));
+  (*omg)[3] = -sin(2. * M_PI * (pin_4 + j_pow));
   // 2 and 3 are real and imag of om^1/2
   (*omg)[4] = cos(2. * M_PI * (pin_2));
-  (*omg)[5] = - sin(2. * M_PI * (pin_2));
+  (*omg)[5] = -sin(2. * M_PI * (pin_2));
   // 0 and 1 are real and imag of om
   (*omg)[6] = cos(2. * M_PI * pin);
-  (*omg)[7] = - sin(2. * M_PI * pin);
+  (*omg)[7] = -sin(2. * M_PI * pin);
   *omg += 8;
 }
 
@@ -181,10 +181,10 @@ void fill_reim_ifft4_omegas(const double entry_pwr, double** omg) {
   const double pin_2 = entry_pwr / 4.;
   // 2 and 3 are real and imag of om^1/2
   (*omg)[0] = cos(2. * M_PI * (pin_2));
-  (*omg)[1] = - sin(2. * M_PI * (pin_2));
+  (*omg)[1] = -sin(2. * M_PI * (pin_2));
   // 0 and 1 are real and imag of om
   (*omg)[2] = cos(2. * M_PI * pin);
-  (*omg)[3] = - sin(2. * M_PI * pin);
+  (*omg)[3] = -sin(2. * M_PI * pin);
   *omg += 4;
 }
 
@@ -201,43 +201,43 @@ void fill_reim_ifft2_omegas(const double entry_pwr, double** omg) {
   const double pin = entry_pwr / 2.;
   // 0 and 1 are real and imag of om
   (*omg)[0] = cos(2. * M_PI * pin);
-  (*omg)[1] = - sin(2. * M_PI * pin);
+  (*omg)[1] = -sin(2. * M_PI * pin);
   *omg += 2;
 }
 
 void reim_invtwiddle_ifft_ref(uint64_t h, double* re, double* im, double om[2]) {
-  for (uint64_t i=0; i<h; ++i) {
-    reim_invctwiddle(&re[i],&im[i],&re[h+i],&im[h+i], om[0], om[1]);
+  for (uint64_t i = 0; i < h; ++i) {
+    reim_invctwiddle(&re[i], &im[i], &re[h + i], &im[h + i], om[0], om[1]);
   }
 }
 
 void reim_invbitwiddle_ifft_ref(uint64_t h, double* re, double* im, double om[4]) {
   double* r0 = re;
   double* r1 = re + h;
-  double* r2 = re + 2*h;
-  double* r3 = re + 3*h;
+  double* r2 = re + 2 * h;
+  double* r3 = re + 3 * h;
   double* i0 = im;
   double* i1 = im + h;
-  double* i2 = im + 2*h;
-  double* i3 = im + 3*h;
-  for (uint64_t i=0; i<h; ++i) {
-    reim_invctwiddle(&r0[i],&i0[i],&r1[i],&i1[i], om[0], om[1]);
-    reim_invcitwiddle(&r2[i],&i2[i],&r3[i],&i3[i], om[0], om[1]);
+  double* i2 = im + 2 * h;
+  double* i3 = im + 3 * h;
+  for (uint64_t i = 0; i < h; ++i) {
+    reim_invctwiddle(&r0[i], &i0[i], &r1[i], &i1[i], om[0], om[1]);
+    reim_invcitwiddle(&r2[i], &i2[i], &r3[i], &i3[i], om[0], om[1]);
   }
-  for (uint64_t i=0; i<h; ++i) {
-    reim_invctwiddle(&r0[i],&i0[i],&r2[i],&i2[i], om[2], om[3]);
-    reim_invctwiddle(&r1[i],&i1[i],&r3[i],&i3[i], om[2], om[3]);
+  for (uint64_t i = 0; i < h; ++i) {
+    reim_invctwiddle(&r0[i], &i0[i], &r2[i], &i2[i], om[2], om[3]);
+    reim_invctwiddle(&r1[i], &i1[i], &r3[i], &i3[i], om[2], om[3]);
   }
 }
 
 void reim_ifft_bfs_16_ref(uint64_t m, double* re, double* im, double** omg) {
   uint64_t log2m = log2(m);
   for (uint64_t off = 0; off < m; off += 16) {
-    reim_ifft16_ref(re+off, im+off, *omg);
+    reim_ifft16_ref(re + off, im + off, *omg);
     *omg += 16;
   }
   uint64_t h = 16;
-  uint64_t ms2 = m/2;
+  uint64_t ms2 = m / 2;
   while (h < ms2) {
     uint64_t mm = h << 2;
     for (uint64_t off = 0; off < m; off += mm) {
@@ -247,7 +247,7 @@ void reim_ifft_bfs_16_ref(uint64_t m, double* re, double* im, double** omg) {
     h = mm;
   }
   if (log2m % 2 != 0) {
-    if (h!=ms2) abort(); // bug
+    if (h != ms2) abort();  // bug
     // do the first twiddle iteration normally
     reim_invtwiddle_ifft_ref(h, re, im, *omg);
     *omg += 2;
@@ -257,14 +257,14 @@ void reim_ifft_bfs_16_ref(uint64_t m, double* re, double* im, double** omg) {
 
 void fill_reim_ifft_bfs_16_omegas(uint64_t m, double entry_pwr, double** omg) {
   uint64_t log2m = log2(m);
-  //uint64_t mm = 16;
+  // uint64_t mm = 16;
   double ss = entry_pwr * 16. / m;
   for (uint64_t off = 0; off < m; off += 16) {
-    double s = ss + fracrevbits(off/16);
+    double s = ss + fracrevbits(off / 16);
     fill_reim_ifft16_omegas(s, omg);
   }
   uint64_t h = 16;
-  uint64_t ms2 = m/2;
+  uint64_t ms2 = m / 2;
   while (h < ms2) {
     uint64_t mm = h << 2;
     for (uint64_t off = 0; off < m; off += mm) {
@@ -280,15 +280,15 @@ void fill_reim_ifft_bfs_16_omegas(uint64_t m, double entry_pwr, double** omg) {
     h = mm;
   }
   if (log2m % 2 != 0) {
-    if (h!=ms2) abort(); // bug
+    if (h != ms2) abort();  // bug
     // do the first twiddle iteration normally
     (*omg)[0] = cos(2 * M_PI * ss);
-    (*omg)[1] = - sin(2 * M_PI * ss);
+    (*omg)[1] = -sin(2 * M_PI * ss);
     *omg += 2;
     h = m;
     ss *= 2.;
   }
-  if (ss!=entry_pwr) abort();
+  if (ss != entry_pwr) abort();
 }
 
 void reim_ifft_rec_16_ref(uint64_t m, double* re, double* im, double** omg) {
@@ -307,7 +307,7 @@ void fill_reim_ifft_rec_16_omegas(uint64_t m, double entry_pwr, double** omg) {
   fill_reim_ifft_rec_16_omegas(h, s, omg);
   fill_reim_ifft_rec_16_omegas(h, s + 0.5, omg);
   (*omg)[0] = cos(2 * M_PI * s);
-  (*omg)[1] = - sin(2 * M_PI * s);
+  (*omg)[1] = -sin(2 * M_PI * s);
   *omg += 2;
 }
 
@@ -315,7 +315,7 @@ void reim_ifft_ref(const REIM_IFFT_PRECOMP* precomp, double* dat) {
   const int32_t m = precomp->m;
   double* omg = precomp->powomegas;
   double* re = dat;
-  double* im = dat+m;
+  double* im = dat + m;
   if (m <= 16) {
     switch (m) {
       case 1:
@@ -329,7 +329,7 @@ void reim_ifft_ref(const REIM_IFFT_PRECOMP* precomp, double* dat) {
       case 16:
         return reim_ifft16_ref(re, im, omg);
       default:
-        abort(); // m is not a power of 2
+        abort();  // m is not a power of 2
     }
   }
   if (m <= 2048) return reim_ifft_bfs_16_ref(m, re, im, &omg);
@@ -339,10 +339,10 @@ void reim_ifft_ref(const REIM_IFFT_PRECOMP* precomp, double* dat) {
 EXPORT REIM_IFFT_PRECOMP* new_reim_ifft_precomp(uint32_t m, uint32_t num_buffers) {
   const uint64_t OMG_SPACE = ceilto64b(2 * m * sizeof(double));
   const uint64_t BUF_SIZE = ceilto64b(2 * m * sizeof(double));
-  void* reps = malloc(sizeof(REIM_IFFT_PRECOMP)          // base
-                      + 63                              // padding
-                      + OMG_SPACE                       // tables //TODO 16?
-                      + num_buffers * BUF_SIZE  // buffers
+  void* reps = malloc(sizeof(REIM_IFFT_PRECOMP)  // base
+                      + 63                       // padding
+                      + OMG_SPACE                // tables //TODO 16?
+                      + num_buffers * BUF_SIZE   // buffers
   );
   uint64_t aligned_addr = ceilto64b((uint64_t)(reps) + sizeof(REIM_IFFT_PRECOMP));
   REIM_IFFT_PRECOMP* r = (REIM_IFFT_PRECOMP*)reps;
@@ -351,7 +351,7 @@ EXPORT REIM_IFFT_PRECOMP* new_reim_ifft_precomp(uint32_t m, uint32_t num_buffers
   r->powomegas = (double*)aligned_addr;
   r->aligned_buffers = (void*)(aligned_addr + OMG_SPACE);
   // fill in powomegas
-  double* omg = (double*) r->powomegas;
+  double* omg = (double*)r->powomegas;
   if (m <= 16) {
     switch (m) {
       case 1:
@@ -388,7 +388,6 @@ EXPORT REIM_IFFT_PRECOMP* new_reim_ifft_precomp(uint32_t m, uint32_t num_buffers
   return reps;
 }
 
-
 void reim_naive_ifft(uint64_t m, double entry_pwr, double* re, double* im) {
   if (m == 1) return;
   // twiddle
@@ -397,13 +396,13 @@ void reim_naive_ifft(uint64_t m, double entry_pwr, double* re, double* im) {
   reim_naive_ifft(h, s, re, im);
   reim_naive_ifft(h, s + 0.5, re + h, im + h);
   const double sre = cos(2 * M_PI * s);
-  const double sim = - sin(2 * M_PI * s);
+  const double sim = -sin(2 * M_PI * s);
   for (uint64_t j = 0; j < h; ++j) {
-    double rdiff = re[j] - re[h+j];
-    double idiff = im[j] - im[h+j];
-    re[j] = re[j] + re[h+j];
-    im[j] = im[j] + im[h+j];
-    re[h+j] = rdiff * sre - idiff * sim;
+    double rdiff = re[j] - re[h + j];
+    double idiff = im[j] - im[h + j];
+    re[j] = re[j] + re[h + j];
+    im[j] = im[j] + im[h + j];
+    re[h + j] = rdiff * sre - idiff * sim;
     im[h + j] = idiff * sre + rdiff * sim;
   }
 }

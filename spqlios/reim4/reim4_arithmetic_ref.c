@@ -3,9 +3,11 @@
 
 #include "reim4_arithmetic.h"
 
+// Stores the first 4 values (RE) of src + blk*4 and he first 4 values (IM) of src + blk*4 + m
+// contiguously into dst
 void reim4_extract_1blk_from_reim_ref(uint64_t m, uint64_t blk,
                                       double* const dst,       // 8 doubles
-                                      const double* const src  // one reim vector
+                                      const double* const src  // one reim4 vector
 ) {
   assert(blk < (m >> 2));
   const double* src_ptr = src + (blk << 2);
@@ -20,6 +22,25 @@ void reim4_extract_1blk_from_reim_ref(uint64_t m, uint64_t blk,
   dst[5] = src_ptr[1];
   dst[6] = src_ptr[2];
   dst[7] = src_ptr[3];
+}
+
+void reim4_extract_reim_from_1blk_ref(uint64_t m, uint64_t blk,
+                                      double* const dst,       // 8 doubles
+                                      const double* const src  // one reim4 vector
+) {
+  assert(blk < (m >> 2));
+  double* dst_ptr = dst + (blk << 2);
+  // copy the real parts
+  dst_ptr[0] = src[0];
+  dst_ptr[1] = src[1];
+  dst_ptr[2] = src[2];
+  dst_ptr[3] = src[3];
+  dst_ptr += m;
+  // copy the imaginary parts
+  dst_ptr[0] = src[4];
+  dst_ptr[1] = src[5];
+  dst_ptr[2] = src[6];
+  dst_ptr[3] = src[7];
 }
 
 EXPORT void reim4_extract_1blk_from_contiguous_reim_ref(uint64_t m, uint64_t nrows, uint64_t blk, double* const dst,

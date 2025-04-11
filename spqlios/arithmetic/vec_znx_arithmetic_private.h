@@ -86,7 +86,11 @@ typedef typeof(znx_small_single_product_tmp_bytes) ZNX_SMALL_SINGLE_PRODUCT_TMP_
 typedef typeof(vmp_prepare_contiguous) VMP_PREPARE_CONTIGUOUS_F;
 typedef typeof(vmp_prepare_dblptr) VMP_PREPARE_DBLPTR_F;
 typedef typeof(vmp_prepare_row) VMP_PREPARE_ROW_F;
+typedef typeof(vmp_prepare_row_dft) VMP_PREPARE_ROW_DFT_F;
+typedef typeof(vmp_extract_row_dft) VMP_EXTRACT_ROW_DFT_F;
+typedef typeof(vmp_extract_row) VMP_EXTRACT_ROW_F;
 typedef typeof(vmp_prepare_tmp_bytes) VMP_PREPARE_TMP_BYTES_F;
+typedef typeof(vmp_extract_tmp_bytes) VMP_EXTRACT_TMP_BYTES_F;
 typedef typeof(vmp_apply_dft) VMP_APPLY_DFT_F;
 typedef typeof(vmp_apply_dft_tmp_bytes) VMP_APPLY_DFT_TMP_BYTES_F;
 typedef typeof(vmp_apply_dft_to_dft) VMP_APPLY_DFT_TO_DFT_F;
@@ -131,7 +135,11 @@ struct module_virtual_functions_t {
   VMP_PREPARE_CONTIGUOUS_F* vmp_prepare_contiguous;
   VMP_PREPARE_DBLPTR_F* vmp_prepare_dblptr;
   VMP_PREPARE_ROW_F* vmp_prepare_row;
+  VMP_PREPARE_ROW_DFT_F* vmp_prepare_row_dft;
+  VMP_EXTRACT_ROW_DFT_F* vmp_extract_row_dft;
+  VMP_EXTRACT_ROW_F* vmp_extract_row;
   VMP_PREPARE_TMP_BYTES_F* vmp_prepare_tmp_bytes;
+  VMP_EXTRACT_TMP_BYTES_F* vmp_extract_tmp_bytes;
   VMP_APPLY_DFT_F* vmp_apply_dft;
   VMP_APPLY_DFT_TMP_BYTES_F* vmp_apply_dft_tmp_bytes;
   VMP_APPLY_DFT_TO_DFT_F* vmp_apply_dft_to_dft;
@@ -438,6 +446,20 @@ EXPORT void fft64_vmp_prepare_row_ref(const MODULE* module,                     
                                       uint8_t* tmp_space  // scratch space
 );
 
+/** @brief extracts the ith-row of a vmp matrix with nrows and ncols */
+EXPORT void fft64_vmp_extract_row_dft_ref(const MODULE* module, VEC_ZNX_DFT* res, const VMP_PMAT* pmat, uint64_t row_i,
+                                          uint64_t nrows, uint64_t ncols);
+
+/** @brief extracts the ith-row of a vmp matrix with nrows and ncols */
+EXPORT void fft64_vmp_extract_row_ref(const MODULE* module, VEC_ZNX_BIG* res, const VMP_PMAT* pmat, uint64_t row_i,
+                                      uint64_t nrows, uint64_t ncols);
+
+/** @brief prepares the ith-row of a vmp matrix with nrows and ncols */
+EXPORT void fft64_vmp_prepare_row_dft_ref(const MODULE* module,  // N
+                                          VMP_PMAT* pmat,        // output
+                                          const VEC_ZNX_DFT* row, uint64_t row_i, uint64_t nrows, uint64_t ncols  // a
+);
+
 /** @brief prepares a vmp matrix (contiguous row-major version) */
 EXPORT void fft64_vmp_prepare_contiguous_avx(const MODULE* module,                                // N
                                              VMP_PMAT* pmat,                                      // output
@@ -461,6 +483,9 @@ EXPORT void fft64_vmp_prepare_row_avx(const MODULE* module,                     
 
 /** @brief minimal scratch space byte-size required for the vmp_prepare function */
 EXPORT uint64_t fft64_vmp_prepare_tmp_bytes(const MODULE* module,  // N
+                                            uint64_t nrows, uint64_t ncols);
+/** @brief minimal scratch space byte-size required for the vmp_extract function */
+EXPORT uint64_t fft64_vmp_extract_tmp_bytes(const MODULE* module,  // N
                                             uint64_t nrows, uint64_t ncols);
 
 /** @brief applies a vmp product (result in DFT space) */

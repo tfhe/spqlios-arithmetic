@@ -32,10 +32,12 @@ EXPORT void cplx_fft_avx2_fma(const CPLX_FFT_PRECOMP* tables, void* data){UNDEFI
 // DEPRECATED?
 EXPORT void cplx_fftvec_add_fma(uint32_t m, void* r, const void* a, const void* b){UNDEFINED()} EXPORT
     void cplx_fftvec_sub2_to_fma(uint32_t m, void* r, const void* a, const void* b){UNDEFINED()} EXPORT
-    void cplx_fftvec_copy_fma(uint32_t m, void* r, const void* a){UNDEFINED()}
+    void cplx_fftvec_copy_fma(uint32_t m, void* r, const void* a) {
+  UNDEFINED()
+}
 
 // executors
-//EXPORT void cplx_ifft(const CPLX_IFFT_PRECOMP* itables, void* data) {
+// EXPORT void cplx_ifft(const CPLX_IFFT_PRECOMP* itables, void* data) {
 //  itables->function(itables, data);
 //}
-//EXPORT void cplx_fft(const CPLX_FFT_PRECOMP* tables, void* data) { tables->function(tables, data); }
+// EXPORT void cplx_fft(const CPLX_FFT_PRECOMP* tables, void* data) { tables->function(tables, data); }

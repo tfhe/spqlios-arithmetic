@@ -23,15 +23,13 @@ double accurate_sin(int32_t i, int32_t n) {  // sin(2pi*i/n)
   return sin(2. * M_PI * (i) / (double)(n));
 }
 
-
 EXPORT double* reim_ifft_precomp_get_buffer(const REIM_IFFT_PRECOMP* tables, uint32_t buffer_index) {
-  return (double*)((uint8_t*) tables->aligned_buffers + buffer_index * tables->buf_size);
+  return (double*)((uint8_t*)tables->aligned_buffers + buffer_index * tables->buf_size);
 }
 
 EXPORT double* reim_fft_precomp_get_buffer(const REIM_FFT_PRECOMP* tables, uint32_t buffer_index) {
-  return (double*)((uint8_t*) tables->aligned_buffers + buffer_index * tables->buf_size);
+  return (double*)((uint8_t*)tables->aligned_buffers + buffer_index * tables->buf_size);
 }
-
 
 EXPORT void reim_fft(const REIM_FFT_PRECOMP* tables, double* data) { tables->function(tables, data); }
 EXPORT void reim_ifft(const REIM_IFFT_PRECOMP* tables, double* data) { tables->function(tables, data); }

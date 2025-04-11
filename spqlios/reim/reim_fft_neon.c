@@ -50,290 +50,288 @@ void fill_reim_fft16_omegas_neon(const double entry_pwr, double** omg) {
   *omg += 16;
 }
 
-
 EXPORT void reim_fft16_neon(double* dre, double* dim, const void* omega) {
   const double* pom = omega;
- // Total SIMD register: 28 = 24 + 4
- float64x2x2_t s_re_im;                                        // 2
- float64x2x4_t x_re, x_im, y_re, y_im, t_re, t_im, v_re, v_im; // 32
+  // Total SIMD register: 28 = 24 + 4
+  float64x2x2_t s_re_im;                                         // 2
+  float64x2x4_t x_re, x_im, y_re, y_im, t_re, t_im, v_re, v_im;  // 32
 
- {
-   /*
-   Level 2
-   (   8,   24) * (   0,    1)
-   (   9,   25) * (   0,    1)
-   (  10,   26) * (   0,    1)
-   (  11,   27) * (   0,    1)
-   (  12,   28) * (   0,    1)
-   (  13,   29) * (   0,    1)
-   (  14,   30) * (   0,    1)
-   (  15,   31) * (   0,    1)
+  {
+    /*
+    Level 2
+    (   8,   24) * (   0,    1)
+    (   9,   25) * (   0,    1)
+    (  10,   26) * (   0,    1)
+    (  11,   27) * (   0,    1)
+    (  12,   28) * (   0,    1)
+    (  13,   29) * (   0,    1)
+    (  14,   30) * (   0,    1)
+    (  15,   31) * (   0,    1)
 
-   (   8,   24) = (   0,   16) - @
-   (   9,   25) = (   1,   17) - @
-   (  10,   26) = (   2,   18) - @
-   (  11,   27) = (   3,   19) - @
-   (  12,   28) = (   4,   20) - @
-   (  13,   29) = (   5,   21) - @
-   (  14,   30) = (   6,   22) - @
-   (  15,   31) = (   7,   23) - @
+    (   8,   24) = (   0,   16) - @
+    (   9,   25) = (   1,   17) - @
+    (  10,   26) = (   2,   18) - @
+    (  11,   27) = (   3,   19) - @
+    (  12,   28) = (   4,   20) - @
+    (  13,   29) = (   5,   21) - @
+    (  14,   30) = (   6,   22) - @
+    (  15,   31) = (   7,   23) - @
 
-   (   0,   16) = (   0,   16) + @
-   (   1,   17) = (   1,   17) + @
-   (   2,   18) = (   2,   18) + @
-   (   3,   19) = (   3,   19) + @
-   (   4,   20) = (   4,   20) + @
-   (   5,   21) = (   5,   21) + @
-   (   6,   22) = (   6,   22) + @
-   (   7,   23) = (   7,   23) + @
-   */
-   vload(s_re_im.val[0], pom);
+    (   0,   16) = (   0,   16) + @
+    (   1,   17) = (   1,   17) + @
+    (   2,   18) = (   2,   18) + @
+    (   3,   19) = (   3,   19) + @
+    (   4,   20) = (   4,   20) + @
+    (   5,   21) = (   5,   21) + @
+    (   6,   22) = (   6,   22) + @
+    (   7,   23) = (   7,   23) + @
+    */
+    vload(s_re_im.val[0], pom);
 
-   vloadx4(y_re, dre + 8);
-   vloadx4(y_im, dim + 8);
+    vloadx4(y_re, dre + 8);
+    vloadx4(y_im, dim + 8);
 
-   FWD_TOP_LANEx4(v_re, v_im, y_re, y_im, s_re_im.val[0]);
+    FWD_TOP_LANEx4(v_re, v_im, y_re, y_im, s_re_im.val[0]);
 
-   vloadx4(x_re, dre);
-   vloadx4(x_im, dim);
+    vloadx4(x_re, dre);
+    vloadx4(x_im, dim);
 
-   FWD_BOTx4(x_re, x_im, y_re, y_im, v_re, v_im);
+    FWD_BOTx4(x_re, x_im, y_re, y_im, v_re, v_im);
 
-   //vstorex4(dre, x_re);
-   //vstorex4(dim, x_im);
-   //vstorex4(dre + 8, y_re);
-   //vstorex4(dim + 8, y_im);
-   //return;
- }
- {
-   /*
-   Level 3
+    // vstorex4(dre, x_re);
+    // vstorex4(dim, x_im);
+    // vstorex4(dre + 8, y_re);
+    // vstorex4(dim + 8, y_im);
+    // return;
+  }
+  {
+    /*
+    Level 3
 
-   (   4,   20) * (   0,    1)
-   (   5,   21) * (   0,    1)
-   (   6,   22) * (   0,    1)
-   (   7,   23) * (   0,    1)
+    (   4,   20) * (   0,    1)
+    (   5,   21) * (   0,    1)
+    (   6,   22) * (   0,    1)
+    (   7,   23) * (   0,    1)
 
-   (   4,   20) = (   0,   16) - @
-   (   5,   21) = (   1,   17) - @
-   (   6,   22) = (   2,   18) - @
-   (   7,   23) = (   3,   19) - @
+    (   4,   20) = (   0,   16) - @
+    (   5,   21) = (   1,   17) - @
+    (   6,   22) = (   2,   18) - @
+    (   7,   23) = (   3,   19) - @
 
-   (   0,   16) = (   0,   16) + @
-   (   1,   17) = (   1,   17) + @
-   (   2,   18) = (   2,   18) + @
-   (   3,   19) = (   3,   19) + @
+    (   0,   16) = (   0,   16) + @
+    (   1,   17) = (   1,   17) + @
+    (   2,   18) = (   2,   18) + @
+    (   3,   19) = (   3,   19) + @
 
-   (  12,   28) * (   0,    1)
-   (  13,   29) * (   0,    1)
-   (  14,   30) * (   0,    1)
-   (  15,   31) * (   0,    1)
+    (  12,   28) * (   0,    1)
+    (  13,   29) * (   0,    1)
+    (  14,   30) * (   0,    1)
+    (  15,   31) * (   0,    1)
 
-   (  12,   28) = (   8,   24) - j@
-   (  13,   29) = (   9,   25) - j@
-   (  14,   30) = (  10,   26) - j@
-   (  15,   31) = (  11,   27) - j@
+    (  12,   28) = (   8,   24) - j@
+    (  13,   29) = (   9,   25) - j@
+    (  14,   30) = (  10,   26) - j@
+    (  15,   31) = (  11,   27) - j@
 
-   (   8,   24) = (   8,   24) + j@
-   (   9,   25) = (   9,   25) + j@
-   (  10,   26) = (  10,   26) + j@
-   (  11,   27) = (  11,   27) + j@
-   */
+    (   8,   24) = (   8,   24) + j@
+    (   9,   25) = (   9,   25) + j@
+    (  10,   26) = (  10,   26) + j@
+    (  11,   27) = (  11,   27) + j@
+    */
 
-   //vloadx4(y_re, dre + 8);
-   //vloadx4(y_im, dim + 8);
-   //vloadx4(x_re, dre);
-   //vloadx4(x_im, dim);
+    // vloadx4(y_re, dre + 8);
+    // vloadx4(y_im, dim + 8);
+    // vloadx4(x_re, dre);
+    // vloadx4(x_im, dim);
 
-   vload(s_re_im.val[0], pom + 2);
+    vload(s_re_im.val[0], pom + 2);
 
-   FWD_TOP_LANE(t_re.val[0], t_im.val[0], x_re.val[2], x_im.val[2], s_re_im.val[0]);
-   FWD_TOP_LANE(t_re.val[1], t_im.val[1], x_re.val[3], x_im.val[3], s_re_im.val[0]);
-   FWD_TOP_LANE(t_re.val[2], t_im.val[2], y_re.val[2], y_im.val[2], s_re_im.val[0]);
-   FWD_TOP_LANE(t_re.val[3], t_im.val[3], y_re.val[3], y_im.val[3], s_re_im.val[0]);
+    FWD_TOP_LANE(t_re.val[0], t_im.val[0], x_re.val[2], x_im.val[2], s_re_im.val[0]);
+    FWD_TOP_LANE(t_re.val[1], t_im.val[1], x_re.val[3], x_im.val[3], s_re_im.val[0]);
+    FWD_TOP_LANE(t_re.val[2], t_im.val[2], y_re.val[2], y_im.val[2], s_re_im.val[0]);
+    FWD_TOP_LANE(t_re.val[3], t_im.val[3], y_re.val[3], y_im.val[3], s_re_im.val[0]);
 
-   FWD_BOT(x_re.val[0], x_im.val[0], x_re.val[2], x_im.val[2], t_re.val[0], t_im.val[0]);
-   FWD_BOT(x_re.val[1], x_im.val[1], x_re.val[3], x_im.val[3], t_re.val[1], t_im.val[1]);
-   FWD_BOTJ(y_re.val[0], y_im.val[0], y_re.val[2], y_im.val[2], t_re.val[2], t_im.val[2]);
-   FWD_BOTJ(y_re.val[1], y_im.val[1], y_re.val[3], y_im.val[3], t_re.val[3], t_im.val[3]);
+    FWD_BOT(x_re.val[0], x_im.val[0], x_re.val[2], x_im.val[2], t_re.val[0], t_im.val[0]);
+    FWD_BOT(x_re.val[1], x_im.val[1], x_re.val[3], x_im.val[3], t_re.val[1], t_im.val[1]);
+    FWD_BOTJ(y_re.val[0], y_im.val[0], y_re.val[2], y_im.val[2], t_re.val[2], t_im.val[2]);
+    FWD_BOTJ(y_re.val[1], y_im.val[1], y_re.val[3], y_im.val[3], t_re.val[3], t_im.val[3]);
 
-   //vstorex4(dre, x_re);
-   //vstorex4(dim, x_im);
-   //vstorex4(dre + 8, y_re);
-   //vstorex4(dim + 8, y_im);
-   //return;
- }
- {
-   /*
-   Level 4
+    // vstorex4(dre, x_re);
+    // vstorex4(dim, x_im);
+    // vstorex4(dre + 8, y_re);
+    // vstorex4(dim + 8, y_im);
+    // return;
+  }
+  {
+    /*
+    Level 4
 
-   (   2,   18) * (   0,    1)
-   (   3,   19) * (   0,    1)
-   (   6,   22) * (   0,    1)
-   (   7,   23) * (   0,    1)
+    (   2,   18) * (   0,    1)
+    (   3,   19) * (   0,    1)
+    (   6,   22) * (   0,    1)
+    (   7,   23) * (   0,    1)
 
-   (   2,   18) = (   0,   16) - @
-   (   3,   19) = (   1,   17) - @
-   (   0,   16) = (   0,   16) + @
-   (   1,   17) = (   1,   17) + @
+    (   2,   18) = (   0,   16) - @
+    (   3,   19) = (   1,   17) - @
+    (   0,   16) = (   0,   16) + @
+    (   1,   17) = (   1,   17) + @
 
-   (   6,   22) = (   4,   20) - j@
-   (   7,   23) = (   5,   21) - j@
-   (   4,   20) = (   4,   20) + j@
-   (   5,   21) = (   5,   21) + j@
+    (   6,   22) = (   4,   20) - j@
+    (   7,   23) = (   5,   21) - j@
+    (   4,   20) = (   4,   20) + j@
+    (   5,   21) = (   5,   21) + j@
 
-   (  10,   26) * (   2,    3)
-   (  11,   27) * (   2,    3)
-   (  14,   30) * (   2,    3)
-   (  15,   31) * (   2,    3)
+    (  10,   26) * (   2,    3)
+    (  11,   27) * (   2,    3)
+    (  14,   30) * (   2,    3)
+    (  15,   31) * (   2,    3)
 
-   (  10,   26) = (   8,   24) - @
-   (  11,   27) = (   9,   25) - @
-   (   8,   24) = (   8,   24) + @
-   (   9,   25) = (   9,   25) + @
+    (  10,   26) = (   8,   24) - @
+    (  11,   27) = (   9,   25) - @
+    (   8,   24) = (   8,   24) + @
+    (   9,   25) = (   9,   25) + @
 
-   (  14,   30) = (  12,   28) - j@
-   (  15,   31) = (  13,   29) - j@
-   (  12,   28) = (  12,   28) + j@
-   (  13,   29) = (  13,   29) + j@
-   */
-   //vloadx4(y_re, dre + 8);
-   //vloadx4(y_im, dim + 8);
-   //vloadx4(x_re, dre);
-   //vloadx4(x_im, dim);
+    (  14,   30) = (  12,   28) - j@
+    (  15,   31) = (  13,   29) - j@
+    (  12,   28) = (  12,   28) + j@
+    (  13,   29) = (  13,   29) + j@
+    */
+    // vloadx4(y_re, dre + 8);
+    // vloadx4(y_im, dim + 8);
+    // vloadx4(x_re, dre);
+    // vloadx4(x_im, dim);
 
-   vloadx2(s_re_im, pom + 4);
+    vloadx2(s_re_im, pom + 4);
 
-   FWD_TOP_LANE(t_re.val[0], t_im.val[0], x_re.val[1], x_im.val[1], s_re_im.val[0]);
-   FWD_TOP_LANE(t_re.val[1], t_im.val[1], x_re.val[3], x_im.val[3], s_re_im.val[0]);
-   FWD_TOP_LANE(t_re.val[2], t_im.val[2], y_re.val[1], y_im.val[1], s_re_im.val[1]);
-   FWD_TOP_LANE(t_re.val[3], t_im.val[3], y_re.val[3], y_im.val[3], s_re_im.val[1]);
+    FWD_TOP_LANE(t_re.val[0], t_im.val[0], x_re.val[1], x_im.val[1], s_re_im.val[0]);
+    FWD_TOP_LANE(t_re.val[1], t_im.val[1], x_re.val[3], x_im.val[3], s_re_im.val[0]);
+    FWD_TOP_LANE(t_re.val[2], t_im.val[2], y_re.val[1], y_im.val[1], s_re_im.val[1]);
+    FWD_TOP_LANE(t_re.val[3], t_im.val[3], y_re.val[3], y_im.val[3], s_re_im.val[1]);
 
-   FWD_BOT(x_re.val[0], x_im.val[0], x_re.val[1], x_im.val[1], t_re.val[0], t_im.val[0]);
-   FWD_BOTJ(x_re.val[2], x_im.val[2], x_re.val[3], x_im.val[3], t_re.val[1], t_im.val[1]);
-   FWD_BOT(y_re.val[0], y_im.val[0], y_re.val[1], y_im.val[1], t_re.val[2], t_im.val[2]);
-   FWD_BOTJ(y_re.val[2], y_im.val[2], y_re.val[3], y_im.val[3], t_re.val[3], t_im.val[3]);
+    FWD_BOT(x_re.val[0], x_im.val[0], x_re.val[1], x_im.val[1], t_re.val[0], t_im.val[0]);
+    FWD_BOTJ(x_re.val[2], x_im.val[2], x_re.val[3], x_im.val[3], t_re.val[1], t_im.val[1]);
+    FWD_BOT(y_re.val[0], y_im.val[0], y_re.val[1], y_im.val[1], t_re.val[2], t_im.val[2]);
+    FWD_BOTJ(y_re.val[2], y_im.val[2], y_re.val[3], y_im.val[3], t_re.val[3], t_im.val[3]);
 
-   //vstorex4(dre, x_re);
-   //vstorex4(dim, x_im);
-   //vstorex4(dre + 8, y_re);
-   //vstorex4(dim + 8, y_im);
-   //return;
- }
- {
-   /*
-   Level 5
+    // vstorex4(dre, x_re);
+    // vstorex4(dim, x_im);
+    // vstorex4(dre + 8, y_re);
+    // vstorex4(dim + 8, y_im);
+    // return;
+  }
+  {
+    /*
+    Level 5
 
-   (   1,   17) * (   0,    1)
-   (   5,   21) * (   2,    3)
-   ------
-   (   1,   17) = (   0,   16) - @
-   (   5,   21) = (   4,   20) - @
-   (   0,   16) = (   0,   16) + @
-   (   4,   20) = (   4,   20) + @
+    (   1,   17) * (   0,    1)
+    (   5,   21) * (   2,    3)
+    ------
+    (   1,   17) = (   0,   16) - @
+    (   5,   21) = (   4,   20) - @
+    (   0,   16) = (   0,   16) + @
+    (   4,   20) = (   4,   20) + @
 
-   (   3,   19) * (   0,    1)
-   (   7,   23) * (   2,    3)
-   ------
-   (   3,   19) = (   2,   18) - j@
-   (   7,   23) = (   6,   22) - j@
-   (   2,   18) = (   2,   18) + j@
-   (   6,   22) = (   6,   22) + j@
+    (   3,   19) * (   0,    1)
+    (   7,   23) * (   2,    3)
+    ------
+    (   3,   19) = (   2,   18) - j@
+    (   7,   23) = (   6,   22) - j@
+    (   2,   18) = (   2,   18) + j@
+    (   6,   22) = (   6,   22) + j@
 
-   (   9,   25) * (   4,    5)
-   (  13,   29) * (   6,    7)
-   ------
-   (   9,   25) = (   8,   24) - @
-   (  13,   29) = (  12,   28) - @
-   (   8,   24) = (   8,   24) + @
-   (  12,   28) = (  12,   28) + @
+    (   9,   25) * (   4,    5)
+    (  13,   29) * (   6,    7)
+    ------
+    (   9,   25) = (   8,   24) - @
+    (  13,   29) = (  12,   28) - @
+    (   8,   24) = (   8,   24) + @
+    (  12,   28) = (  12,   28) + @
 
-   (  11,   27) * (   4,    5)
-   (  15,   31) * (   6,    7)
-   ------
-   (  11,   27) = (  10,   26) - j@
-   (  15,   31) = (  14,   30) - j@
-   (  10,   26) = (  10,   26) + j@
-   (  14,   30) = (  14,   30) + j@
+    (  11,   27) * (   4,    5)
+    (  15,   31) * (   6,    7)
+    ------
+    (  11,   27) = (  10,   26) - j@
+    (  15,   31) = (  14,   30) - j@
+    (  10,   26) = (  10,   26) + j@
+    (  14,   30) = (  14,   30) + j@
 
-   before transpose_f64
-   x_re: 0, 1 |  2,  3 |  4,  5 |  6,  7
-   y_re: 8, 9 | 10, 11 | 12, 13 | 14, 15
-   after transpose_f64
-   x_re: 0, 4 |  2,  6 |  1,  5 |  3,  7
-   y_re: 8, 12|  9,  13| 10, 14 | 11, 15
-   after swap
-   x_re: 0, 4 |  1,  5 | 2,  6 |  3,  7
-   y_re: 8, 12| 10, 14 | 9,  13| 11, 15
-   */
+    before transpose_f64
+    x_re: 0, 1 |  2,  3 |  4,  5 |  6,  7
+    y_re: 8, 9 | 10, 11 | 12, 13 | 14, 15
+    after transpose_f64
+    x_re: 0, 4 |  2,  6 |  1,  5 |  3,  7
+    y_re: 8, 12|  9,  13| 10, 14 | 11, 15
+    after swap
+    x_re: 0, 4 |  1,  5 | 2,  6 |  3,  7
+    y_re: 8, 12| 10, 14 | 9,  13| 11, 15
+    */
 
-   //vloadx4(y_re, dre + 8);
-   //vloadx4(y_im, dim + 8);
-   //vloadx4(x_re, dre);
-   //vloadx4(x_im, dim);
+    // vloadx4(y_re, dre + 8);
+    // vloadx4(y_im, dim + 8);
+    // vloadx4(x_re, dre);
+    // vloadx4(x_im, dim);
 
-   transpose_f64(x_re, x_re, v_re, 0, 2, 0);
-   transpose_f64(x_re, x_re, v_re, 1, 3, 1);
-   transpose_f64(x_im, x_im, v_im, 0, 2, 0);
-   transpose_f64(x_im, x_im, v_im, 1, 3, 1);
+    transpose_f64(x_re, x_re, v_re, 0, 2, 0);
+    transpose_f64(x_re, x_re, v_re, 1, 3, 1);
+    transpose_f64(x_im, x_im, v_im, 0, 2, 0);
+    transpose_f64(x_im, x_im, v_im, 1, 3, 1);
 
+    v_re.val[0] = x_re.val[2];
+    x_re.val[2] = x_re.val[1];
+    x_re.val[1] = v_re.val[0];
 
-   v_re.val[0] = x_re.val[2];
-   x_re.val[2] = x_re.val[1];
-   x_re.val[1] = v_re.val[0];
+    v_im.val[0] = x_im.val[2];
+    x_im.val[2] = x_im.val[1];
+    x_im.val[1] = v_im.val[0];
 
-   v_im.val[0] = x_im.val[2];
-   x_im.val[2] = x_im.val[1];
-   x_im.val[1] = v_im.val[0];
+    transpose_f64(y_re, y_re, v_re, 0, 2, 2);
+    transpose_f64(y_re, y_re, v_re, 1, 3, 3);
+    transpose_f64(y_im, y_im, v_im, 0, 2, 2);
+    transpose_f64(y_im, y_im, v_im, 1, 3, 3);
 
-   transpose_f64(y_re, y_re, v_re, 0, 2, 2);
-   transpose_f64(y_re, y_re, v_re, 1, 3, 3);
-   transpose_f64(y_im, y_im, v_im, 0, 2, 2);
-   transpose_f64(y_im, y_im, v_im, 1, 3, 3);
+    v_re.val[0] = y_re.val[2];
+    y_re.val[2] = y_re.val[1];
+    y_re.val[1] = v_re.val[0];
 
-   v_re.val[0] = y_re.val[2];
-   y_re.val[2] = y_re.val[1];
-   y_re.val[1] = v_re.val[0];
+    v_im.val[0] = y_im.val[2];
+    y_im.val[2] = y_im.val[1];
+    y_im.val[1] = v_im.val[0];
 
-   v_im.val[0] = y_im.val[2];
-   y_im.val[2] = y_im.val[1];
-   y_im.val[1] = v_im.val[0];
+    // double pom8[] = {pom[8], pom[12], pom[9], pom[13]};
+    vload2(s_re_im, pom + 8);
+    // vload2(s_re_im, pom8);
 
-   //double pom8[] = {pom[8], pom[12], pom[9], pom[13]};
-   vload2(s_re_im, pom+8);
-   //vload2(s_re_im, pom8);
+    FWD_TOP(t_re.val[0], t_im.val[0], x_re.val[1], x_im.val[1], s_re_im.val[0], s_re_im.val[1]);
+    FWD_TOP(t_re.val[1], t_im.val[1], x_re.val[3], x_im.val[3], s_re_im.val[0], s_re_im.val[1]);
 
-   FWD_TOP(t_re.val[0], t_im.val[0], x_re.val[1], x_im.val[1], s_re_im.val[0], s_re_im.val[1]);
-   FWD_TOP(t_re.val[1], t_im.val[1], x_re.val[3], x_im.val[3], s_re_im.val[0], s_re_im.val[1]);
+    // double pom12[] = {pom[10], pom[14], pom[11], pom[15]};
+    vload2(s_re_im, pom + 12);
+    // vload2(s_re_im, pom12);
 
-   //double pom12[] = {pom[10], pom[14], pom[11], pom[15]};
-   vload2(s_re_im, pom+12);
-   //vload2(s_re_im, pom12);
+    FWD_TOP(t_re.val[2], t_im.val[2], y_re.val[1], y_im.val[1], s_re_im.val[0], s_re_im.val[1]);
+    FWD_TOP(t_re.val[3], t_im.val[3], y_re.val[3], y_im.val[3], s_re_im.val[0], s_re_im.val[1]);
 
-   FWD_TOP(t_re.val[2], t_im.val[2], y_re.val[1], y_im.val[1], s_re_im.val[0], s_re_im.val[1]);
-   FWD_TOP(t_re.val[3], t_im.val[3], y_re.val[3], y_im.val[3], s_re_im.val[0], s_re_im.val[1]);
+    FWD_BOT(x_re.val[0], x_im.val[0], x_re.val[1], x_im.val[1], t_re.val[0], t_im.val[0]);
+    FWD_BOTJ(x_re.val[2], x_im.val[2], x_re.val[3], x_im.val[3], t_re.val[1], t_im.val[1]);
 
-   FWD_BOT (x_re.val[0], x_im.val[0], x_re.val[1], x_im.val[1], t_re.val[0], t_im.val[0]);
-   FWD_BOTJ(x_re.val[2], x_im.val[2], x_re.val[3], x_im.val[3], t_re.val[1], t_im.val[1]);
+    vstore4(dre, x_re);
+    vstore4(dim, x_im);
 
-   vstore4(dre, x_re);
-   vstore4(dim, x_im);
+    FWD_BOT(y_re.val[0], y_im.val[0], y_re.val[1], y_im.val[1], t_re.val[2], t_im.val[2]);
+    FWD_BOTJ(y_re.val[2], y_im.val[2], y_re.val[3], y_im.val[3], t_re.val[3], t_im.val[3]);
 
-   FWD_BOT (y_re.val[0], y_im.val[0], y_re.val[1], y_im.val[1], t_re.val[2], t_im.val[2]);
-   FWD_BOTJ(y_re.val[2], y_im.val[2], y_re.val[3], y_im.val[3], t_re.val[3], t_im.val[3]);
-
-   vstore4(dre+8, y_re);
-   vstore4(dim+8, y_im);
- }
+    vstore4(dre + 8, y_re);
+    vstore4(dim + 8, y_im);
+  }
 }
 
 void reim_twiddle_fft_neon(uint64_t h, double* re, double* im, double om[2]) {
   // Total SIMD register: 28 = 24 + 4
-  if (h<8) abort(); // bug
-  float64x2_t s_re_im;                                        // 2
-  float64x2x4_t x_re, x_im, y_re, y_im, v_re, v_im; // 32
+  if (h < 8) abort();                                // bug
+  float64x2_t s_re_im;                               // 2
+  float64x2x4_t x_re, x_im, y_re, y_im, v_re, v_im;  // 32
   vload(s_re_im, om);
-  for (uint64_t blk = 0; blk < h; blk+=8) {
+  for (uint64_t blk = 0; blk < h; blk += 8) {
     double* dre = re + blk;
     double* dim = im + blk;
     vloadx4(y_re, dre + h);
@@ -355,21 +353,21 @@ void reim_citwiddle(double* ra, double* ia, double* rb, double* ib, double omre,
 
 void reim_bitwiddle_fft_neon(uint64_t h, double* re, double* im, double om[4]) {
   // Total SIMD register: 28 = 24 + 4
-  if (h<4) abort(); // bug
+  if (h < 4) abort();  // bug
   double* r0 = re;
   double* r1 = re + h;
-  double* r2 = re + 2*h;
-  double* r3 = re + 3*h;
+  double* r2 = re + 2 * h;
+  double* r3 = re + 3 * h;
   double* i0 = im;
   double* i1 = im + h;
-  double* i2 = im + 2*h;
-  double* i3 = im + 3*h;
-  float64x2x2_t s_re_im;                                        // 2
-  float64x2x4_t v_re, v_im;                                        // 2
-  float64x2x2_t x0_re, x0_im, x1_re, x1_im; // 32
-  float64x2x2_t x2_re, x2_im, x3_re, x3_im; // 32
+  double* i2 = im + 2 * h;
+  double* i3 = im + 3 * h;
+  float64x2x2_t s_re_im;                     // 2
+  float64x2x4_t v_re, v_im;                  // 2
+  float64x2x2_t x0_re, x0_im, x1_re, x1_im;  // 32
+  float64x2x2_t x2_re, x2_im, x3_re, x3_im;  // 32
   vloadx2(s_re_im, om);
-  for (uint64_t blk=0; blk<h; blk+=4) {
+  for (uint64_t blk = 0; blk < h; blk += 4) {
     {
       vloadx2(x2_re, r2 + blk);
       vloadx2(x3_re, r3 + blk);
@@ -408,7 +406,6 @@ void reim_bitwiddle_fft_neon(uint64_t h, double* re, double* im, double om[4]) {
     }
   }
 }
-
 
 #if 0
 static void ZfN(iFFT_log2)(fpr *f)

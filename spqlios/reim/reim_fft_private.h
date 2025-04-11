@@ -25,16 +25,16 @@ typedef void (*FFTVEC_BITWIDDLE_FUNC)(const REIM_FFTVEC_BITWIDDLE_PRECOMP*, void
 
 typedef struct reim_fft_precomp {
   FFT_FUNC function;
-  int64_t m; ///< complex dimension warning: reim uses n=2N=4m
-  uint64_t buf_size; ///< size of aligned_buffers (multiple of 64B)
-  double* powomegas;  ///< 64B aligned
-  void* aligned_buffers; ///< 64B aligned
+  int64_t m;              ///< complex dimension warning: reim uses n=2N=4m
+  uint64_t buf_size;      ///< size of aligned_buffers (multiple of 64B)
+  double* powomegas;      ///< 64B aligned
+  void* aligned_buffers;  ///< 64B aligned
 } REIM_FFT_PRECOMP;
 
 typedef struct reim_ifft_precomp {
   IFFT_FUNC function;
-  int64_t m;  // warning: reim uses n=2N=4m
-  uint64_t buf_size; ///< size of aligned_buffers (multiple of 64B)
+  int64_t m;          // warning: reim uses n=2N=4m
+  uint64_t buf_size;  ///< size of aligned_buffers (multiple of 64B)
   double* powomegas;
   void* aligned_buffers;
 } REIM_IFFT_PRECOMP;
@@ -48,7 +48,6 @@ typedef struct reim_addmul_precomp {
   FFTVEC_ADDMUL_FUNC function;
   int64_t m;
 } REIM_FFTVEC_ADDMUL_PRECOMP;
-
 
 struct reim_from_znx32_precomp {
   FROM_ZNX32_FUNC function;
