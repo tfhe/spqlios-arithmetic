@@ -331,12 +331,11 @@ EXPORT uint64_t fft64_vec_znx_big_range_normalize_base2k_tmp_bytes(const MODULE*
 EXPORT uint64_t fft64_vec_znx_dft_automorphism_tmp_bytes(const MODULE* module, uint64_t size);
 
 /** @brief sets DFT(res) = DFT(a(X^p)) */
-EXPORT void fft64_vec_znx_dft_automorphism_ref(const MODULE* module,                  // N
-  int64_t p,                             // X-X^p
-  VEC_ZNX_DFT* res, uint64_t res_size,   // res
-  const VEC_ZNX_DFT* a, uint64_t a_size,  // a
-  uint8_t* tmp_bytes
-);
+EXPORT void fft64_vec_znx_dft_automorphism_ref(const MODULE* module,                   // N
+                                               int64_t p,                              // X-X^p
+                                               VEC_ZNX_DFT* res, uint64_t res_size,    // res
+                                               const VEC_ZNX_DFT* a, uint64_t a_size,  // a
+                                               uint8_t* tmp_bytes);
 
 EXPORT void fft64_vec_znx_dft(const MODULE* module,                             // N
                               VEC_ZNX_DFT* res, uint64_t res_size,              // res

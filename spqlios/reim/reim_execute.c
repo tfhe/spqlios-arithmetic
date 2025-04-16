@@ -21,14 +21,17 @@ EXPORT void reim_fftvec_addmul(const REIM_FFTVEC_ADDMUL_PRECOMP* tables, double*
   tables->function(tables, r, a, b);
 }
 
-EXPORT void reim_fftvec_automorphism(const REIM_FFTVEC_AUTOMORPHISM_PRECOMP* tables, int64_t p, double *r, const double *a, uint64_t a_size){
+EXPORT void reim_fftvec_automorphism(const REIM_FFTVEC_AUTOMORPHISM_PRECOMP* tables, int64_t p, double* r,
+                                     const double* a, uint64_t a_size) {
   tables->function.apply(tables, p, r, a, a_size);
 }
 
-EXPORT void reim_fftvec_automorphism_inplace(const REIM_FFTVEC_AUTOMORPHISM_PRECOMP* tables, int64_t p, double *a, uint64_t a_size, uint8_t* tmp_bytes){
+EXPORT void reim_fftvec_automorphism_inplace(const REIM_FFTVEC_AUTOMORPHISM_PRECOMP* tables, int64_t p, double* a,
+                                             uint64_t a_size, uint8_t* tmp_bytes) {
   tables->function.apply_inplace(tables, p, a, a_size, tmp_bytes);
 }
 
-EXPORT uint64_t reim_fftvec_automorphism_inplace_tmp_bytes(const REIM_FFTVEC_AUTOMORPHISM_PRECOMP* tables, uint64_t a_size){
+EXPORT uint64_t reim_fftvec_automorphism_inplace_tmp_bytes(const REIM_FFTVEC_AUTOMORPHISM_PRECOMP* tables,
+                                                           uint64_t a_size) {
   return tables->function.apply_inplace_tmp_bytes(tables, a_size);
 }

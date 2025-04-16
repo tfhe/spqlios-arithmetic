@@ -79,7 +79,7 @@ void reim_fftvec_automorphism_conj_with_lut_ref(const REIM_FFTVEC_AUTOMORPHISM_P
 
 // Returns the minimum number of temporary bytes used by reim_fftvec_automorphism_inplace_ref.
 EXPORT uint64_t reim_fftvec_automorphism_inplace_tmp_bytes_ref(const REIM_FFTVEC_AUTOMORPHISM_PRECOMP* tables,
-                                                           uint64_t a_size) {
+                                                               uint64_t a_size) {
   const uint64_t m = tables->m;
   return m * sizeof(double) + ((a_size > 1) ? m * sizeof(uint64_t) : 0);
 }
