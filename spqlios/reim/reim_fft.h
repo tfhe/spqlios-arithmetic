@@ -7,6 +7,7 @@ typedef struct reim_fft_precomp REIM_FFT_PRECOMP;
 typedef struct reim_ifft_precomp REIM_IFFT_PRECOMP;
 typedef struct reim_mul_precomp REIM_FFTVEC_MUL_PRECOMP;
 typedef struct reim_addmul_precomp REIM_FFTVEC_ADDMUL_PRECOMP;
+typedef struct reim_fftvec_automorphism_precomp REIM_FFTVEC_AUTOMORPHISM_PRECOMP;
 typedef struct reim_from_znx32_precomp REIM_FROM_ZNX32_PRECOMP;
 typedef struct reim_from_znx64_precomp REIM_FROM_ZNX64_PRECOMP;
 typedef struct reim_from_tnx32_precomp REIM_FROM_TNX32_PRECOMP;
@@ -68,6 +69,17 @@ EXPORT void reim_fftvec_mul(const REIM_FFTVEC_MUL_PRECOMP* tables, double* r, co
 EXPORT REIM_FFTVEC_ADDMUL_PRECOMP* new_reim_fftvec_addmul_precomp(uint32_t m);
 EXPORT void reim_fftvec_addmul(const REIM_FFTVEC_ADDMUL_PRECOMP* tables, double* r, const double* a, const double* b);
 #define delete_reim_fftvec_addmul_precomp free
+
+EXPORT REIM_FFTVEC_AUTOMORPHISM_PRECOMP* new_reim_fftvec_automorphism_precomp(uint32_t m);
+EXPORT void reim_fftvec_automorphism(const REIM_FFTVEC_AUTOMORPHISM_PRECOMP* tables, int64_t p,
+                                     double* r, const double* a, uint64_t a_size);
+
+EXPORT void reim_fftvec_automorphism_inplace(const REIM_FFTVEC_AUTOMORPHISM_PRECOMP* tables, int64_t p,
+double* a, uint64_t a_size, uint8_t* tmp_bytes);
+
+EXPORT uint64_t reim_fftvec_automorphism_inplace_tmp_bytes(const REIM_FFTVEC_AUTOMORPHISM_PRECOMP* tables, uint64_t a_size);
+
+#define delete_reim_fftvec_automorphism_precomp free
 
 /**
  * @brief prepares a conversion from ZnX to the cplx layout.
