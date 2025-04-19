@@ -16,6 +16,13 @@ EXPORT void reim_ifft_simple(uint32_t m, void* data) {
   (*f)->function(*f, data);
 }
 
+EXPORT void reim_fftvec_add_simple(uint32_t m, void* r, const void* a, const void* b) {
+  static REIM_FFTVEC_ADD_PRECOMP* p[31] = {0};
+  REIM_FFTVEC_ADD_PRECOMP** f = p + log2m(m);
+  if (!*f) *f = new_reim_fftvec_add_precomp(m);
+  (*f)->function(*f, r, a, b);
+}
+
 EXPORT void reim_fftvec_mul_simple(uint32_t m, void* r, const void* a, const void* b) {
   static REIM_FFTVEC_MUL_PRECOMP* p[31] = {0};
   REIM_FFTVEC_MUL_PRECOMP** f = p + log2m(m);

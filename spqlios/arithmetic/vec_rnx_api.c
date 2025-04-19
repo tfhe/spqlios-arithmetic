@@ -7,6 +7,7 @@ void fft64_init_rnx_module_precomp(MOD_RNX* module) {
   const uint64_t m = module->m;
   module->precomp.fft64.p_fft = new_reim_fft_precomp(m, 0);
   module->precomp.fft64.p_ifft = new_reim_ifft_precomp(m, 0);
+  module->precomp.fft64.p_fftvec_add = new_reim_fftvec_add_precomp(m);
   module->precomp.fft64.p_fftvec_mul = new_reim_fftvec_mul_precomp(m);
   module->precomp.fft64.p_fftvec_addmul = new_reim_fftvec_addmul_precomp(m);
 }
@@ -15,6 +16,7 @@ void fft64_finalize_rnx_module_precomp(MOD_RNX* module) {
   // Add here deleters for items that are in the precomp
   delete_reim_fft_precomp(module->precomp.fft64.p_fft);
   delete_reim_ifft_precomp(module->precomp.fft64.p_ifft);
+  delete_reim_fftvec_add_precomp(module->precomp.fft64.p_fftvec_add);
   delete_reim_fftvec_mul_precomp(module->precomp.fft64.p_fftvec_mul);
   delete_reim_fftvec_addmul_precomp(module->precomp.fft64.p_fftvec_addmul);
 }

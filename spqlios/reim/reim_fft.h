@@ -5,6 +5,7 @@
 
 typedef struct reim_fft_precomp REIM_FFT_PRECOMP;
 typedef struct reim_ifft_precomp REIM_IFFT_PRECOMP;
+typedef struct reim_add_precomp REIM_FFTVEC_ADD_PRECOMP;
 typedef struct reim_mul_precomp REIM_FFTVEC_MUL_PRECOMP;
 typedef struct reim_addmul_precomp REIM_FFTVEC_ADDMUL_PRECOMP;
 typedef struct reim_from_znx32_precomp REIM_FROM_ZNX32_PRECOMP;
@@ -60,6 +61,10 @@ EXPORT REIM_IFFT_PRECOMP* new_reim_ifft_precomp(uint32_t m, uint32_t num_buffers
 EXPORT double* reim_ifft_precomp_get_buffer(const REIM_IFFT_PRECOMP* tables, uint32_t buffer_index);
 EXPORT void reim_ifft(const REIM_IFFT_PRECOMP* tables, double* data);
 #define delete_reim_ifft_precomp free
+
+EXPORT REIM_FFTVEC_ADD_PRECOMP* new_reim_fftvec_add_precomp(uint32_t m);
+EXPORT void reim_fftvec_add(const REIM_FFTVEC_ADD_PRECOMP* tables, double* r, const double* a, const double* b);
+#define delete_reim_fftvec_add_precomp free
 
 EXPORT REIM_FFTVEC_MUL_PRECOMP* new_reim_fftvec_mul_precomp(uint32_t m);
 EXPORT void reim_fftvec_mul(const REIM_FFTVEC_MUL_PRECOMP* tables, double* r, const double* a, const double* b);
@@ -178,6 +183,11 @@ EXPORT void reim_fft_simple(uint32_t m, void* data);
  * It is advised to do one dry-run call per desired dimension in the main thread before using in a multithread
  * environment */
 EXPORT void reim_ifft_simple(uint32_t m, void* data);
+/**
+ * @brief Simpler API for the fftvec addition function.
+ * For each dimension, the precomputed tables for this dimension are generated automatically the first time.
+ * It is advised to do one dry-run call per desired dimension before using in a multithread environment */
+EXPORT void reim_fftvec_add_simple(uint32_t m, void* r, const void* a, const void* b);
 /**
  * @brief Simpler API for the fftvec multiplication function.
  * For each dimension, the precomputed tables for this dimension are generated automatically the first time.

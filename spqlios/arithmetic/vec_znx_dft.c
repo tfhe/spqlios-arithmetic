@@ -10,6 +10,16 @@ EXPORT void vec_znx_dft(const MODULE* module,                             // N
   return module->func.vec_znx_dft(module, res, res_size, a, a_size, a_sl);
 }
 
+EXPORT void vec_dft_add(const MODULE* module,                   // N
+                        VEC_ZNX_DFT* res, uint64_t res_size,    // res
+                        const VEC_ZNX_DFT* a, uint64_t a_size,  // a
+                        const VEC_ZNX_DFT* b, uint64_t b_size   // b
+) {
+  return module->func.vec_dft_add(module, res, res_size, a, a_size, b, b_size);
+}
+
+
+
 EXPORT void vec_znx_idft(const MODULE* module,                       // N
                          VEC_ZNX_BIG* res, uint64_t res_size,        // res
                          const VEC_ZNX_DFT* a_dft, uint64_t a_size,  // a
@@ -58,6 +68,23 @@ EXPORT void fft64_vec_znx_dft(const MODULE* module,                             
   }
 
   // fill up remaining part with 0's
+  double* const dres = (double*)res;
+  memset(dres + smin * nn, 0, (res_size - smin) * nn * sizeof(double));
+}
+
+EXPORT void fft64_vec_dft_add(const MODULE* module,                   // N
+                        VEC_ZNX_DFT* res, uint64_t res_size,    // res
+                        const VEC_ZNX_DFT* a, uint64_t a_size,  // a
+                        const VEC_ZNX_DFT* b, uint64_t b_size   // b
+) {
+  const uint64_t smin0 = a_size < b_size ? a_size : b_size;
+  const uint64_t smin = res_size < smin0 ? res_size : smin0;
+  const uint64_t nn = module->nn;
+  for (uint64_t i =0; i < smin; i++) {
+    reim_fftvec_add(module->mod.fft64.add_fft, ((double*)res) + i*nn, ((double*)a) + i*nn, ((double*)b) + i*nn);
+  }
+
+  // fill remain `res` part with 0's
   double* const dres = (double*)res;
   memset(dres + smin * nn, 0, (res_size - smin) * nn * sizeof(double));
 }

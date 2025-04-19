@@ -30,6 +30,7 @@ static void fill_fft64_virtual_table(MODULE* module) {
   module->func.vec_znx_big_range_normalize_base2k_tmp_bytes = fft64_vec_znx_big_range_normalize_base2k_tmp_bytes;
   module->func.vec_znx_dft = fft64_vec_znx_dft;
   module->func.vec_znx_idft = fft64_vec_znx_idft;
+  module->func.vec_dft_add = fft64_vec_dft_add;
   module->func.vec_znx_idft_tmp_bytes = fft64_vec_znx_idft_tmp_bytes;
   module->func.vec_znx_idft_tmp_a = fft64_vec_znx_idft_tmp_a;
   module->func.vec_znx_big_add = fft64_vec_znx_big_add;
