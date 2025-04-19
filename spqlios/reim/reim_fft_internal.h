@@ -16,6 +16,7 @@ EXPORT void reim_fftvec_mul_fma(const REIM_FFTVEC_MUL_PRECOMP* tables, double* r
 EXPORT void reim_fftvec_mul_ref(const REIM_FFTVEC_MUL_PRECOMP* tables, double* r, const double* a, const double* b);
 
 EXPORT void reim_fftvec_add_ref(const REIM_FFTVEC_ADD_PRECOMP* tables, double* r, const double* a, const double* b);
+EXPORT void reim_fftvec_add_fma(const REIM_FFTVEC_ADD_PRECOMP* tables, double* r, const double* a, const double* b);
 
 /** @brief r = x from ZnX (coeffs as signed int32_t's ) to double */
 EXPORT void reim_from_znx32_ref(const REIM_FROM_ZNX32_PRECOMP* precomp, void* r, const int32_t* x);

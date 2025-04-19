@@ -73,3 +73,34 @@ EXPORT void reim_fftvec_mul_fma(const REIM_FFTVEC_MUL_PRECOMP* precomp, double* 
     bi_ptr += 4;
   }
 }
+
+EXPORT void reim_fftvec_add_fma(const REIM_FFTVEC_ADD_PRECOMP* precomp, double* r, const double* a, const double* b) {
+  const uint64_t m = precomp->m;
+  double* rr_ptr = r;
+  double* ri_ptr = r + m;
+  const double* ar_ptr = a;
+  const double* ai_ptr = a + m;
+  const double* br_ptr = b;
+  const double* bi_ptr = b + m;
+
+  const double* const rend_ptr = ri_ptr;
+  while (rr_ptr != rend_ptr) {
+    const __m256d ar = _mm256_loadu_pd(ar_ptr);
+    const __m256d ai = _mm256_loadu_pd(ai_ptr);
+    const __m256d br = _mm256_loadu_pd(br_ptr);
+    const __m256d bi = _mm256_loadu_pd(bi_ptr);
+
+    __m256d rr = _mm256_add_pd(ar, br);
+    __m256d ri = _mm256_add_pd(ai, br);
+
+    _mm256_storeu_pd(rr_ptr, rr);
+    _mm256_storeu_pd(ri_ptr, ri);
+
+    rr_ptr += 4;
+    ri_ptr += 4;
+    ar_ptr += 4;
+    ai_ptr += 4;
+    br_ptr += 4;
+    bi_ptr += 4;
+  }
+}

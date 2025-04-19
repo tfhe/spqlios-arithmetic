@@ -50,16 +50,15 @@ EXPORT REIM_FFTVEC_ADDMUL_PRECOMP* new_reim_fftvec_addmul_precomp(uint32_t m) {
 EXPORT REIM_FFTVEC_ADD_PRECOMP* new_reim_fftvec_add_precomp(uint32_t m) {
   REIM_FFTVEC_ADD_PRECOMP* reps = malloc(sizeof(REIM_FFTVEC_ADD_PRECOMP));
   reps->m = m;
-  // if (CPU_SUPPORTS("fma")) {
-  //   if (m >= 4) {
-  //     reps->function = reim_fftvec_mul_fma;
-  //   } else {
-  //     reps->function = reim_fftvec_mul_ref;
-  //   }
-  // } else {
-  //   reps->function = reim_fftvec_mul_ref;
-  // }
-  reps->function = reim_fftvec_add_ref;
+  if (CPU_SUPPORTS("fma")) {
+    if (m >= 4) {
+      reps->function = reim_fftvec_add_fma;
+    } else {
+      reps->function = reim_fftvec_add_ref;
+    }
+  } else {
+    reps->function = reim_fftvec_add_ref;
+  }
   return reps;
 }
 

@@ -161,6 +161,46 @@ TEST(fft, reim_vecfft_mul_fma_vs_ref) {
 }
 #endif
 
+#ifdef __x86_64__
+TEST(fft, reim_vecfft_add_fma_vs_ref) {
+  for (uint64_t nn : {16, 32, 64, 1024, 8192, 65536}) {
+    uint64_t m = nn / 2;
+    REIM_FFTVEC_MUL_PRECOMP* tbl = new_reim_fftvec_add_precomp(m);
+    double* a1 = (double*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
+    double* a2 = (double*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
+    double* b1 = (double*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
+    double* b2 = (double*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
+    double* r1 = (double*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
+    double* r2 = (double*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
+    int64_t p = 1 << 16;
+    for (uint32_t i = 0; i < nn; i++) {
+      a1[i] = (rand() % p) - p / 2;  // between -p/2 and p/2
+      b1[i] = (rand() % p) - p / 2;
+      r1[i] = (rand() % p) - p / 2;
+    }
+    memcpy(a2, a1, nn / 2 * sizeof(CPLX));
+    memcpy(b2, b1, nn / 2 * sizeof(CPLX));
+    memcpy(r2, r1, nn / 2 * sizeof(CPLX));
+    reim_fftvec_add_ref(tbl, r1, a1, b1);
+    reim_fftvec_add_fma(tbl, r2, a2, b2);
+    double d = 0;
+    for (uint32_t i = 0; i < nn; i++) {
+      double di = fabs(r1[i] - r2[i]);
+      if (di > d) d = di;
+      ASSERT_LE(d, 1e-8);
+    }
+    ASSERT_LE(d, 1e-8);
+    spqlios_free(a1);
+    spqlios_free(a2);
+    spqlios_free(b1);
+    spqlios_free(b2);
+    spqlios_free(r1);
+    spqlios_free(r2);
+    delete_reim_fftvec_mul_precomp(tbl);
+  }
+}
+#endif
+
 typedef void (*FILL_REIM_FFT_OMG_F)(const double entry_pwr, double** omg);
 typedef void (*REIM_FFT_F)(double* dre, double* dim, const void* omega);
 
