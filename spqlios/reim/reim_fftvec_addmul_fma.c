@@ -91,7 +91,7 @@ EXPORT void reim_fftvec_add_fma(const REIM_FFTVEC_ADD_PRECOMP* precomp, double* 
     const __m256d bi = _mm256_loadu_pd(bi_ptr);
 
     __m256d rr = _mm256_add_pd(ar, br);
-    __m256d ri = _mm256_add_pd(ai, br);
+    __m256d ri = _mm256_add_pd(ai, bi);
 
     _mm256_storeu_pd(rr_ptr, rr);
     _mm256_storeu_pd(ri_ptr, ri);
