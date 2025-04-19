@@ -165,7 +165,7 @@ TEST(fft, reim_vecfft_mul_fma_vs_ref) {
 TEST(fft, reim_vecfft_add_fma_vs_ref) {
   for (uint64_t nn : {16, 32, 64, 1024, 8192, 65536}) {
     uint64_t m = nn / 2;
-    REIM_FFTVEC_MUL_PRECOMP* tbl = new_reim_fftvec_add_precomp(m);
+    REIM_FFTVEC_ADD_PRECOMP* tbl = new_reim_fftvec_add_precomp(m);
     double* a1 = (double*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
     double* a2 = (double*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
     double* b1 = (double*)spqlios_alloc_custom_align(32, nn / 2 * sizeof(CPLX));
@@ -196,7 +196,7 @@ TEST(fft, reim_vecfft_add_fma_vs_ref) {
     spqlios_free(b2);
     spqlios_free(r1);
     spqlios_free(r2);
-    delete_reim_fftvec_mul_precomp(tbl);
+    delete_reim_fftvec_add_precomp(tbl);
   }
 }
 #endif
