@@ -80,8 +80,9 @@ EXPORT void fft64_vec_dft_add(const MODULE* module,                   // N
   const uint64_t smin0 = a_size < b_size ? a_size : b_size;
   const uint64_t smin = res_size < smin0 ? res_size : smin0;
   const uint64_t nn = module->nn;
-  for (uint64_t i =0; i < smin; i++) {
-    reim_fftvec_add(module->mod.fft64.add_fft, ((double*)res) + i*nn, ((double*)a) + i*nn, ((double*)b) + i*nn);
+
+  for (uint64_t i=0; i < smin; i++) {
+    reim_fftvec_add(module->mod.fft64.add_fft, ((double*)res) + i * nn, ((double*)a) + i*nn, ((double*)b) + i*nn);
   }
 
   // fill remain `res` part with 0's

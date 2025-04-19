@@ -107,6 +107,7 @@ static void fill_fft64_precomp(MODULE* module) {
   module->mod.fft64.p_ifft = new_reim_ifft_precomp(module->m, 0);
   module->mod.fft64.p_addmul = new_reim_fftvec_addmul_precomp(module->m);
   module->mod.fft64.mul_fft = new_reim_fftvec_mul_precomp(module->m);
+  module->mod.fft64.add_fft = new_reim_fftvec_add_precomp(module->m);
 }
 static void fill_ntt120_precomp(MODULE* module) {
   // fill any necessary precomp stuff
