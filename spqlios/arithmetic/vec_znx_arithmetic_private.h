@@ -328,7 +328,7 @@ EXPORT uint64_t fft64_vec_znx_big_range_normalize_base2k_tmp_bytes(const MODULE*
 );
 
 /** @brief returns the minimum size of scratch space requires to apply automorphism in the fourier domain */
-EXPORT uint64_t fft64_vec_znx_dft_automorphism_tmp_bytes(const MODULE* module, uint64_t size);
+EXPORT uint64_t fft64_vec_znx_dft_automorphism_tmp_bytes(const MODULE* module);
 
 /** @brief sets DFT(res) = DFT(a(X^p)) */
 EXPORT void fft64_vec_znx_dft_automorphism_ref(const MODULE* module,                   // N

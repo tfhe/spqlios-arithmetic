@@ -14,6 +14,7 @@ EXPORT void reim_fftvec_automorphism_ref(const REIM_FFTVEC_AUTOMORPHISM_PRECOMP*
   const uint64_t mask = (4 * m - 1);
   const uint64_t conj = !((p & 3) == 1);
   p = p & mask;
+  p *= 1 - (conj << 1);
   if (a_size == 1) {
     for (uint64_t i = 0; i < m; ++i) {
       uint64_t i_rev = 2 * irev[i] + 1;
@@ -46,7 +47,9 @@ EXPORT void reim_fftvec_automorphism_lut_precomp_ref(const REIM_FFTVEC_AUTOMORPH
   const uint64_t m = tables->m;
   const uint64_t* irev = tables->irev;
   const uint64_t mask = (4 * m - 1);
+  const uint64_t conj = !((p & 3) == 1);
   p = p & mask;
+  p *= 1 - (conj << 1);
   for (uint64_t i = 0; i < m; ++i) {
     uint64_t i_rev = 2 * irev[i] + 1;
     i_rev = (((p * i_rev) & mask) - 1) >> 1;
@@ -97,9 +100,9 @@ EXPORT void reim_fftvec_automorphism_inplace_ref(const REIM_FFTVEC_AUTOMORPHISM_
   const uint64_t conj = !((p & 3) == 1);
 
   double* tmp = (double*)tmp_bytes;
-
   p = p & mask;
   if (a_size == 1) {
+    p *= 1 - (conj << 1);
     for (uint64_t i = 0; i < m; ++i) {
       uint64_t i_rev = 2 * irev[i] + 1;
       i_rev = (((p * i_rev) & mask) - 1) >> 1;
@@ -108,12 +111,12 @@ EXPORT void reim_fftvec_automorphism_inplace_ref(const REIM_FFTVEC_AUTOMORPHISM_
       double x = a[j + m];
       tmp[i + m] = conj ? -x : x;
     }
-    memcpy(a, tmp, m * sizeof(double));
+    memcpy(a, tmp, nn * sizeof(double));
   } else {
     uint64_t* lut = (uint64_t*)tmp_bytes + m * sizeof(double);
     reim_fftvec_automorphism_lut_precomp_ref(tables, p, lut);
     for (uint64_t i = 0; i < a_size; ++i) {
-      if (conj == 0) {
+      if (conj == 1) {
         reim_fftvec_automorphism_conj_with_lut_ref(tables, lut, tmp, a + i * nn);
       } else {
         reim_fftvec_automorphism_with_lut_ref(tables, lut, tmp, a + i * nn);
@@ -180,10 +183,11 @@ EXPORT REIM_FFTVEC_AUTOMORPHISM_PRECOMP* new_reim_fftvec_automorphism_precomp(ui
   reps->function.apply = reim_fftvec_automorphism_ref;
   reps->function.apply_inplace = reim_fftvec_automorphism_inplace_ref;
   reps->function.apply_inplace_tmp_bytes = reim_fftvec_automorphism_inplace_tmp_bytes_ref;
-  reps->irev = malloc(sizeof(uint64_t) * m);
-  uint32_t logm = log2m(m);
-  for (uint32_t i = 0; i < m; i++) {
-    reps->irev[i] = (uint64_t)revbits(i, logm);
+  const uint64_t nn = 2 * m;
+  reps->irev = malloc(sizeof(uint64_t) * nn);
+  uint32_t lognn = log2m(nn);
+  for (uint32_t i = 0; i < nn; i++) {
+    reps->irev[i] = (uint64_t)revbits(lognn, i);
   }
   return reps;
 }

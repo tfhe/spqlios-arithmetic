@@ -10,6 +10,74 @@
 #include "testlib/fft64_layouts.h"
 #include "testlib/polynomial_vector.h"
 
+static int64_t random_automorphism_param() { return uniform_i64() | 1; }
+
+static void test_fft64_vec_znx_dft_automorphism(VEC_ZNX_DFT_AUTOMORPHISM_F func){
+  const uint64_t nn = 32;
+  MODULE* module = new_module_info(nn, FFT64);
+
+  uint64_t tmp_space_size = fft64_vec_znx_big_normalize_base2k_tmp_bytes(module) | fft64_vec_znx_dft_automorphism_tmp_bytes(module) | fft64_vec_znx_idft_tmp_bytes(module);
+  uint8_t* tmp_space = (uint8_t*)spqlios_alloc(tmp_space_size);
+  const double scale = 32768.0;
+
+  for (uint64_t cols_a : {3, 5, 8}) {
+    for (uint64_t cols_b : {3, 5, 8}) {
+
+      std::cout << cols_a << " " << cols_b <<std::endl;
+
+      int64_t p = random_automorphism_param();
+
+      fft64_vec_znx_dft_layout a_dft(nn, cols_a);
+      fft64_vec_znx_dft_layout b0_dft_auto(nn, cols_b);
+      fft64_vec_znx_big_layout b1_big_auto(nn, cols_b);
+      fft64_vec_znx_dft_layout b1_dft_auto(nn, cols_b);
+
+      // Sets a_dft directly
+      double* a_dft_doubles = (double*)a_dft.data;
+      for (uint64_t i = 0; i < cols_a; ++i) {
+        for (uint64_t j = 0; j < nn; ++j){
+          a_dft_doubles[i*nn+j] = (i+j)*scale;
+        }
+      }
+
+      // Hash before apply function to test
+      thash hash_before = a_dft.content_hash();
+
+      // b0_dft_auto <- AUTO(a_dft)
+      func(module, p, b0_dft_auto.data, cols_b, a_dft.data, cols_a, tmp_space);
+
+      // Checks a_dft is unchanged
+      ASSERT_EQ(a_dft.content_hash(), hash_before);
+
+      // b1_dft_auto = DFT(AUTO(IDFT(a_dft)))
+      fft64_vec_znx_idft(module, b1_big_auto.data, cols_b, a_dft.data, cols_b, tmp_space);
+
+      fft64_vec_znx_big_automorphism(module, p, b1_big_auto.data, cols_b, b1_big_auto.data, cols_b);
+
+      //fft64_vec_znx_big_automorphism(module, p, b1_big_auto.data, cols_b, b1_big_auto.data, cols_b);
+      fft64_vec_znx_dft(module, b1_dft_auto.data, cols_b, (int64_t*)b1_big_auto.data, cols_b, nn);
+
+      double* b1_dft_auto_data = (double*)b1_dft_auto.data;
+      double* b0_dft_auto_data = (double*)b0_dft_auto.data;
+
+      for (uint64_t i = 0; i < cols_b; ++i) {
+        for (uint64_t j = 0; j < nn; ++j){
+          std::cout << b0_dft_auto_data[i*nn+j] << " " << b1_dft_auto_data[i*nn+j] << std::endl;
+        }
+        std::cout << ""<<std::endl;
+      }
+
+      // Checks b0_dft_auto = b1_dft_auto
+      for (uint64_t i = 0; i < cols_b; ++i) {
+        ASSERT_LE(infty_dist(b0_dft_auto.get_copy_zext(i), b1_dft_auto.get_copy_zext(i)), 10);
+      }
+    }
+  }
+  delete_module_info(module);
+}
+
+TEST(vec_znx_dft, fft64_vec_znx_dft_automorphism_ref) { test_fft64_vec_znx_dft_automorphism(fft64_vec_znx_dft_automorphism_ref); }
+
 static void test_fft64_vec_znx_dft(VEC_ZNX_DFT_F dft) {
   for (uint64_t n : {2, 4, 128}) {
     MODULE* module = new_module_info(n, FFT64);

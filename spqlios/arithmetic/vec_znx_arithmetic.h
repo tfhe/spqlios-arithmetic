@@ -144,7 +144,7 @@ EXPORT void vec_znx_automorphism(const MODULE* module,                          
 );
 
 /** @brief returns the minimum scratch space to apply an automorphism in DFT */
-EXPORT uint64_t vec_znx_dft_automorphism_tmp_bytes(const MODULE* module, uint64_t size);
+EXPORT uint64_t vec_znx_dft_automorphism_tmp_bytes(const MODULE* module);
 
 /** @brief sets DFT(res) = DFT(a(X^p)) */
 EXPORT void vec_znx_dft_automorphism(const MODULE* module,                   // N
