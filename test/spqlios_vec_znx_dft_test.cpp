@@ -51,21 +51,8 @@ static void test_fft64_vec_znx_dft_automorphism(VEC_ZNX_DFT_AUTOMORPHISM_F func)
 
       // b1_dft_auto = DFT(AUTO(IDFT(a_dft)))
       fft64_vec_znx_idft(module, b1_big_auto.data, cols_b, a_dft.data, cols_b, tmp_space);
-
       fft64_vec_znx_big_automorphism(module, p, b1_big_auto.data, cols_b, b1_big_auto.data, cols_b);
-
-      //fft64_vec_znx_big_automorphism(module, p, b1_big_auto.data, cols_b, b1_big_auto.data, cols_b);
       fft64_vec_znx_dft(module, b1_dft_auto.data, cols_b, (int64_t*)b1_big_auto.data, cols_b, nn);
-
-      double* b1_dft_auto_data = (double*)b1_dft_auto.data;
-      double* b0_dft_auto_data = (double*)b0_dft_auto.data;
-
-      for (uint64_t i = 0; i < cols_b; ++i) {
-        for (uint64_t j = 0; j < nn; ++j){
-          std::cout << b0_dft_auto_data[i*nn+j] << " " << b1_dft_auto_data[i*nn+j] << std::endl;
-        }
-        std::cout << ""<<std::endl;
-      }
 
       // Checks b0_dft_auto = b1_dft_auto
       for (uint64_t i = 0; i < cols_b; ++i) {
