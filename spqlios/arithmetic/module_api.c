@@ -28,6 +28,8 @@ static void fill_fft64_virtual_table(MODULE* module) {
   module->func.vec_znx_big_normalize_base2k_tmp_bytes = fft64_vec_znx_big_normalize_base2k_tmp_bytes;
   module->func.vec_znx_big_range_normalize_base2k = fft64_vec_znx_big_range_normalize_base2k;
   module->func.vec_znx_big_range_normalize_base2k_tmp_bytes = fft64_vec_znx_big_range_normalize_base2k_tmp_bytes;
+  module->func.vec_znx_dft_automorphism = fft64_vec_znx_dft_automorphism_ref;
+  module->func.vec_znx_dft_automorphism_tmp_bytes = fft64_vec_znx_dft_automorphism_tmp_bytes;
   module->func.vec_znx_dft = fft64_vec_znx_dft;
   module->func.vec_znx_idft = fft64_vec_znx_idft;
   module->func.vec_znx_idft_tmp_bytes = fft64_vec_znx_idft_tmp_bytes;
@@ -105,6 +107,7 @@ static void fill_fft64_precomp(MODULE* module) {
   module->mod.fft64.p_reim_to_znx = new_reim_to_znx64_precomp(module->m, module->m, 63);
   module->mod.fft64.p_ifft = new_reim_ifft_precomp(module->m, 0);
   module->mod.fft64.p_addmul = new_reim_fftvec_addmul_precomp(module->m);
+  module->mod.fft64.p_automorphism = new_reim_fftvec_automorphism_precomp(module->m);
   module->mod.fft64.mul_fft = new_reim_fftvec_mul_precomp(module->m);
 }
 static void fill_ntt120_precomp(MODULE* module) {
@@ -154,6 +157,7 @@ EXPORT void delete_module_info(MODULE* mod) {
       free(mod->mod.fft64.p_reim_to_znx);
       free(mod->mod.fft64.mul_fft);
       free(mod->mod.fft64.p_addmul);
+      free(mod->mod.fft64.p_automorphism);
       break;
     case NTT120:
       if (CPU_SUPPORTS("avx2")) {

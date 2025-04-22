@@ -3,6 +3,15 @@
 #include "../q120/q120_arithmetic.h"
 #include "vec_znx_arithmetic_private.h"
 
+EXPORT uint64_t vec_znx_dft_automorphism_tmp_bytes(const MODULE* module) {
+  return module->func.vec_znx_dft_automorphism_tmp_bytes(module);
+}
+
+EXPORT void vec_znx_dft_automorphism(const MODULE* module, int64_t p, VEC_ZNX_DFT* res_dft, uint64_t res_size,
+                                     const VEC_ZNX_DFT* a_dft, uint64_t a_size, uint8_t* tmp_bytes) {
+  return module->func.vec_znx_dft_automorphism(module, p, res_dft, res_size, a_dft, a_size, tmp_bytes);
+}
+
 EXPORT void vec_znx_dft(const MODULE* module,                             // N
                         VEC_ZNX_DFT* res, uint64_t res_size,              // res
                         const int64_t* a, uint64_t a_size, uint64_t a_sl  // a
@@ -45,6 +54,8 @@ EXPORT VEC_ZNX_DFT* new_vec_znx_dft(const MODULE* module,  // N
 
 EXPORT void delete_vec_znx_dft(VEC_ZNX_DFT* res) { spqlios_free(res); }
 
+EXPORT uint64_t fft64_vec_znx_dft_automorphism_tmp_bytes(const MODULE* module) { return module->nn; }
+
 EXPORT void fft64_vec_znx_dft(const MODULE* module,                             // N
                               VEC_ZNX_DFT* res, uint64_t res_size,              // res
                               const int64_t* a, uint64_t a_size, uint64_t a_sl  // a
@@ -60,6 +71,20 @@ EXPORT void fft64_vec_znx_dft(const MODULE* module,                             
   // fill up remaining part with 0's
   double* const dres = (double*)res;
   memset(dres + smin * nn, 0, (res_size - smin) * nn * sizeof(double));
+}
+
+EXPORT void fft64_vec_znx_dft_automorphism_ref(const MODULE* module, int64_t p, VEC_ZNX_DFT* res_dft, uint64_t res_size,
+                                               const VEC_ZNX_DFT* a_dft, uint64_t a_size, uint8_t* tmp_bytes) {
+  const uint64_t smin = res_size < a_size ? res_size : a_size;
+  if (res_dft == a_dft) {
+    reim_fftvec_automorphism_inplace(module->mod.fft64.p_automorphism, p, (double*)res_dft, smin, tmp_bytes);
+  } else {
+    reim_fftvec_automorphism(module->mod.fft64.p_automorphism, p, (double*)res_dft, (double*)a_dft, smin);
+  }
+
+  int64_t* const fres_dft = (int64_t*)res_dft;
+  uint64_t nn = module->nn;
+  memset(fres_dft + smin * nn, 0, (res_size - smin) * nn * sizeof(double));
 }
 
 EXPORT void fft64_vec_znx_idft(const MODULE* module,                       // N

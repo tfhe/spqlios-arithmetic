@@ -21,7 +21,7 @@ set(SRCS_GENERIC
         reim/reim_conversions.c
         reim/reim_fft_ifft.c
         reim/reim_fft_ref.c
-        reim/reim_fftvec_addmul_ref.c
+        reim/reim_fftvec_ref.c
         reim/reim_ifft_ref.c
         reim/reim_ifft_ref.c
         reim/reim_to_tnx_ref.c
@@ -80,7 +80,7 @@ set(SRCS_FMA_C
         reim/reim_fft_avx2.c
         reim/reim_ifft_avx2.c
         reim/reim_to_tnx_avx.c
-        reim/reim_fftvec_addmul_fma.c
+        reim/reim_fftvec_fma.c
 )
 set(SRCS_FMA_ASM
         cplx/cplx_fft16_avx_fma.s
