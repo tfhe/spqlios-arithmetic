@@ -13,12 +13,11 @@
 static int64_t random_automorphism_param() { return uniform_i64() | 1; }
 
 static void test_fft64_vec_znx_dft_automorphism(VEC_ZNX_DFT_AUTOMORPHISM_F func){
-  const uint64_t nn = 32;
+  const uint64_t nn = 128;
   MODULE* module = new_module_info(nn, FFT64);
 
   uint64_t tmp_space_size = fft64_vec_znx_big_normalize_base2k_tmp_bytes(module) | fft64_vec_znx_dft_automorphism_tmp_bytes(module) | fft64_vec_znx_idft_tmp_bytes(module);
   uint8_t* tmp_space = (uint8_t*)spqlios_alloc(tmp_space_size);
-  const double scale = 32768.0;
 
   for (uint64_t cols_a : {3, 5, 8}) {
     for (uint64_t cols_b : {3, 5, 8}) {
@@ -27,36 +26,35 @@ static void test_fft64_vec_znx_dft_automorphism(VEC_ZNX_DFT_AUTOMORPHISM_F func)
 
       int64_t p = random_automorphism_param();
 
+      // a
+      znx_vec_i64_layout a(nn, cols_a, nn);
+      a.fill_random(10);
+      
+      // a_dft <- AUTO(DFT(a))
       fft64_vec_znx_dft_layout a_dft(nn, cols_a);
-      fft64_vec_znx_dft_layout b0_dft_auto(nn, cols_b);
-      fft64_vec_znx_big_layout b1_big_auto(nn, cols_b);
-      fft64_vec_znx_dft_layout b1_dft_auto(nn, cols_b);
-
-      // Sets a_dft directly
-      double* a_dft_doubles = (double*)a_dft.data;
-      for (uint64_t i = 0; i < cols_a; ++i) {
-        for (uint64_t j = 0; j < nn; ++j){
-          a_dft_doubles[i*nn+j] = (i+j)*scale;
-        }
-      }
+      fft64_vec_znx_dft(module, a_dft.data, cols_a, a.data(), cols_a, nn);
 
       // Hash before apply function to test
       thash hash_before = a_dft.content_hash();
 
-      // b0_dft_auto <- AUTO(a_dft)
-      func(module, p, b0_dft_auto.data, cols_b, a_dft.data, cols_a, tmp_space);
+      // b_dft_auto_0 <- AUTO(a_dft)
+      fft64_vec_znx_dft_layout b_dft_auto_0(nn, cols_b);
+      func(module, p, b_dft_auto_0.data, cols_b, a_dft.data, cols_a, tmp_space);
 
       // Checks a_dft is unchanged
       ASSERT_EQ(a_dft.content_hash(), hash_before);
 
-      // b1_dft_auto = DFT(AUTO(IDFT(a_dft)))
-      fft64_vec_znx_idft(module, b1_big_auto.data, cols_b, a_dft.data, cols_b, tmp_space);
-      fft64_vec_znx_big_automorphism(module, p, b1_big_auto.data, cols_b, b1_big_auto.data, cols_b);
-      fft64_vec_znx_dft(module, b1_dft_auto.data, cols_b, (int64_t*)b1_big_auto.data, cols_b, nn);
+      // a_auto <- AUTO(a)
+      znx_vec_i64_layout a_auto(nn, cols_a, nn);
+      vec_znx_automorphism(module, p, a_auto.data(), cols_a, nn, a.data(), cols_a, nn);
 
-      // Checks b0_dft_auto = b1_dft_auto
+      // b_dft_auto_1 <- DFT(auto(a))
+      fft64_vec_znx_dft_layout b_dft_auto_1(nn, cols_b);
+      fft64_vec_znx_dft(module, b_dft_auto_1.data, cols_b, a_auto.data(), cols_a, nn);
+
+      // Checks b_dft_auto_1 = b_dft_auto_1
       for (uint64_t i = 0; i < cols_b; ++i) {
-        ASSERT_LE(infty_dist(b0_dft_auto.get_copy_zext(i), b1_dft_auto.get_copy_zext(i)), 10);
+        ASSERT_LE(infty_dist(b_dft_auto_0.get_copy_zext(i), b_dft_auto_1.get_copy_zext(i)), 1e-10);
       }
     }
   }

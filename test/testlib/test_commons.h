@@ -49,6 +49,7 @@ thash test_hash(const void* data, uint64_t size);
 /** @brief class to return a pseudorandom hash of a piecewise-defined content */
 class test_hasher {
   void* md;
+
  public:
   test_hasher();
   test_hasher(const test_hasher&) = delete;
