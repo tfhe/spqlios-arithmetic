@@ -528,7 +528,7 @@ EXPORT void fft64_vmp_apply_dft_to_dft_ref(const MODULE* module,                
 /** @brief same as `fft64_vmp_apply_dft_to_dft_ref` but with custom storeop 
  * function that stores reim4 block to reim vector
  */
-EXPORT void fft64_vmp_apply_dft_to_dft_custom_storeop_ref(const MODULE* module,                       // N
+void fft64_vmp_apply_dft_to_dft_custom_storeop_ref(const MODULE* module,                       // N
                                            VEC_ZNX_DFT* res, const uint64_t res_size,  // res
                                            const VEC_ZNX_DFT* a_dft, uint64_t a_size,  // a
                                            const VMP_PMAT* pmat, const uint64_t nrows,
@@ -544,6 +544,18 @@ EXPORT void fft64_vmp_apply_dft_to_dft_avx(const MODULE* module,                
                                            const VMP_PMAT* pmat, const uint64_t nrows,
                                            const uint64_t ncols,  // prep matrix
                                            uint8_t* tmp_space     // scratch space (a_size*sizeof(reim4) bytes)
+);
+
+/** @brief same as `fft64_vmp_apply_dft_to_dft_avx` but with custom storeop 
+ * function that stores reim4 block to reim vector
+ */
+void fft64_vmp_apply_dft_to_dft_custom_storeop_avx(const MODULE* module,                       // N
+                                           VEC_ZNX_DFT* res, const uint64_t res_size,  // res
+                                           const VEC_ZNX_DFT* a_dft, uint64_t a_size,  // a
+                                           const VMP_PMAT* pmat, const uint64_t nrows,
+                                           const uint64_t ncols,  // prep matrix
+                                           uint8_t* tmp_space,     // scratch space (a_size*sizeof(reim4) bytes)
+                                           void (*storeop)(uint64_t, uint64_t, double*, const double*)
 );
 
 /** @brief minimal size of the tmp_space */
