@@ -280,14 +280,18 @@ EXPORT void fft64_vmp_apply_dft_ref(const MODULE* module,                       
   fft64_vmp_apply_dft_to_dft_ref(module, res, res_size, a_dft, a_size, pmat, nrows, ncols, new_tmp_space);
 }
 
-/** @brief this inner function could be very handy */
-EXPORT void fft64_vmp_apply_dft_to_dft_ref(const MODULE* module,                       // N
-                                           VEC_ZNX_DFT* res, const uint64_t res_size,  // res
-                                           const VEC_ZNX_DFT* a_dft, uint64_t a_size,  // a
-                                           const VMP_PMAT* pmat, const uint64_t nrows,
-                                           const uint64_t ncols,  // prep matrix
-                                           uint8_t* tmp_space     // scratch space (a_size*sizeof(reim4) bytes)
-) {
+/** @brief same as `fft64_vmp_apply_dft_to_dft_ref` but with custom storeop 
+ * function that stores reim4 block to reim vector
+ */
+void fft64_vmp_apply_dft_to_dft_custom_storeop_ref( const MODULE* module,                       // N
+                                                    VEC_ZNX_DFT* res, const uint64_t res_size,  // res
+                                                    const VEC_ZNX_DFT* a_dft, uint64_t a_size,  // a
+                                                    const VMP_PMAT* pmat, const uint64_t nrows,
+                                                    const uint64_t ncols,  // prep matrix
+                                                    uint8_t* tmp_space,     // scratch space (a_size*sizeof(reim4) bytes)
+                                                    void (*storeop)(uint64_t, uint64_t, double*, const double*)
+                                                  )                                                   
+{ 
   const uint64_t m = module->m;
   const uint64_t nn = module->nn;
 
@@ -311,8 +315,8 @@ EXPORT void fft64_vmp_apply_dft_to_dft_ref(const MODULE* module,                
         uint64_t col_offset = col_i * (8 * nrows);
         reim4_vec_mat2cols_product_ref(row_max, mat2cols_output, extracted_blk, mat_blk_start + col_offset);
 
-        reim4_save_1blk_to_reim_ref(m, blk_i, vec_output + col_i * nn, mat2cols_output);
-        reim4_save_1blk_to_reim_ref(m, blk_i, vec_output + (col_i + 1) * nn, mat2cols_output + 8);
+        storeop(m, blk_i, vec_output + col_i * nn, mat2cols_output);
+        storeop(m, blk_i, vec_output + (col_i + 1) * nn, mat2cols_output + 8);
       }
 
       // check if col_max is odd, then special case
@@ -327,7 +331,7 @@ EXPORT void fft64_vmp_apply_dft_to_dft_ref(const MODULE* module,                
           // the last column is part of a colpair in the pmat: vec_mat2cols and ignore the second position
           reim4_vec_mat2cols_product_ref(row_max, mat2cols_output, extracted_blk, mat_blk_start + col_offset);
         }
-        reim4_save_1blk_to_reim_ref(m, blk_i, vec_output + last_col * nn, mat2cols_output);
+        storeop(m, blk_i, vec_output + last_col * nn, mat2cols_output);
       }
     }
   } else {
@@ -346,6 +350,19 @@ EXPORT void fft64_vmp_apply_dft_to_dft_ref(const MODULE* module,                
 
   // zero out remaining bytes
   memset(vec_output + col_max * nn, 0, (res_size - col_max) * nn * sizeof(double));
+}
+
+/** @brief this inner function could be very handy */
+EXPORT void fft64_vmp_apply_dft_to_dft_ref(const MODULE* module,                       // N
+                                           VEC_ZNX_DFT* res, const uint64_t res_size,  // res
+                                           const VEC_ZNX_DFT* a_dft, uint64_t a_size,  // a
+                                           const VMP_PMAT* pmat, const uint64_t nrows,
+                                           const uint64_t ncols,  // prep matrix
+                                           uint8_t* tmp_space     // scratch space (a_size*sizeof(reim4) bytes)
+) {
+  fft64_vmp_apply_dft_to_dft_custom_storeop_ref(
+    module, res, res_size, a_dft, a_size, pmat, nrows, ncols, tmp_space, reim4_save_1blk_to_reim_ref
+  );
 }
 
 /** @brief minimal size of the tmp_space */
