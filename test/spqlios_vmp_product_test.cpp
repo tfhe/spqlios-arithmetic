@@ -230,9 +230,17 @@ static void test_vmp_apply(VMP_APPLY_DFT_TO_DFT_F* apply, VMP_APPLY_DFT_TO_DFT_T
 }
 
 TEST(vec_znx, vmp_apply_to_dft) { test_vmp_apply(vmp_apply_dft_to_dft, vmp_apply_dft_to_dft_tmp_bytes); }
-TEST(vec_znx, vmp_apply_to_dft_add) { test_vmp_apply_add(vmp_apply_dft_to_dft_add, vmp_apply_dft_to_dft_tmp_bytes); }
+TEST(vec_znx, fft64_vmp_apply_dft_to_dft_ref) { test_vmp_apply(fft64_vmp_apply_dft_to_dft_ref, vmp_apply_dft_to_dft_tmp_bytes); }
 #ifdef __x86_64__
 TEST(vec_znx, fft64_vmp_apply_dft_to_dft_avx) {
   test_vmp_apply(fft64_vmp_apply_dft_to_dft_avx, fft64_vmp_apply_dft_to_dft_tmp_bytes);
+}
+#endif
+
+TEST(vec_znx, vmp_apply_to_dft_add) { test_vmp_apply_add(vmp_apply_dft_to_dft_add, vmp_apply_dft_to_dft_tmp_bytes); }
+TEST(vec_znx, fft64_vmp_apply_dft_to_dft_add_ref) { test_vmp_apply_add(fft64_vmp_apply_dft_to_dft_add_ref, vmp_apply_dft_to_dft_tmp_bytes); }
+#ifdef __x86_64__
+TEST(vec_znx, fft64_vmp_apply_dft_to_dft_add_avx) { 
+  test_vmp_apply_add(fft64_vmp_apply_dft_to_dft_add_avx, vmp_apply_dft_to_dft_tmp_bytes); 
 }
 #endif

@@ -71,8 +71,9 @@ static void fill_fft64_virtual_table(MODULE* module) {
     module->func.vmp_prepare_dblptr = fft64_vmp_prepare_dblptr_avx;
     module->func.vmp_prepare_row = fft64_vmp_prepare_row_avx;
     module->func.vmp_apply_dft = fft64_vmp_apply_dft_avx;
-    // module->func.vmp_apply_dft_add = fft64_vmp_apply_dft_add_avx;
+    module->func.vmp_apply_dft_add = fft64_vmp_apply_dft_add_avx;
     module->func.vmp_apply_dft_to_dft = fft64_vmp_apply_dft_to_dft_avx;
+    module->func.vmp_apply_dft_to_dft_add = fft64_vmp_apply_dft_to_dft_add_avx;
   }
 }
 
