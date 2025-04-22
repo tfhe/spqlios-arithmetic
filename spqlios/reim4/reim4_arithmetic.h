@@ -130,6 +130,18 @@ EXPORT void reim4_save_1blk_to_reim_avx(uint64_t m, uint64_t blk,
                                         const double* src  // 8 doubles
 );
 
+/**
+ * @brief Adds 1 single reim4 block in a reim vectors of m complexes
+ * @param m the size of each reim
+ * @param blk the block id to save (<m/4)
+ * @param dest the output reim: dst(blk) += src
+ * @param src the input reim4
+ */
+EXPORT void reim4_add_1blk_to_reim_ref(uint64_t m, uint64_t blk,
+                                        double* dest,      // 1 reim vector of length m
+                                        const double* src  // 8 doubles
+);
+
 // dest = sum u[i].v[i]
 // make ref and avx2 implem, needs to be fast
 // can accumulate the real and imaginary parts on 2 separate registers, and combine at the end
