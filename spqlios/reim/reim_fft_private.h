@@ -14,7 +14,6 @@ typedef void (*IFFT_FUNC)(const REIM_IFFT_PRECOMP*, double*);
 typedef void (*FFTVEC_ADD_FUNC)(const REIM_FFTVEC_ADD_PRECOMP*, double*, const double*, const double*);
 typedef void (*FFTVEC_MUL_FUNC)(const REIM_FFTVEC_MUL_PRECOMP*, double*, const double*, const double*);
 typedef void (*FFTVEC_ADDMUL_FUNC)(const REIM_FFTVEC_ADDMUL_PRECOMP*, double*, const double*, const double*);
-
 typedef void (*FROM_ZNX32_FUNC)(const REIM_FROM_ZNX32_PRECOMP*, void*, const int32_t*);
 typedef void (*FROM_ZNX64_FUNC)(const REIM_FROM_ZNX64_PRECOMP*, void*, const int64_t*);
 typedef void (*FROM_TNX32_FUNC)(const REIM_FROM_TNX32_PRECOMP*, void*, const int32_t*);
@@ -23,6 +22,17 @@ typedef void (*TO_TNX_FUNC)(const REIM_TO_TNX_PRECOMP*, double*, const double*);
 typedef void (*TO_ZNX64_FUNC)(const REIM_TO_ZNX64_PRECOMP*, int64_t*, const void*);
 typedef void (*FFTVEC_TWIDDLE_FUNC)(const REIM_FFTVEC_TWIDDLE_PRECOMP*, void*, const void*, const void*);
 typedef void (*FFTVEC_BITWIDDLE_FUNC)(const REIM_FFTVEC_BITWIDDLE_PRECOMP*, void*, uint64_t, const void*);
+
+typedef void (*FFTVEC_AUTOMORPHISM_APPLY)(const REIM_FFTVEC_AUTOMORPHISM_PRECOMP* precomp, int64_t p, double* r,
+                                          const double* a, uint64_t a_size);
+typedef uint64_t (*FFTVEC_AUTOMORPHISM_APPLY_INPLACE_TMP_BYTES)(const REIM_FFTVEC_AUTOMORPHISM_PRECOMP* precomp);
+typedef void (*FFTVEC_AUTOMORPHISM_APPLY_INPLACE)(const REIM_FFTVEC_AUTOMORPHISM_PRECOMP* precomp, int64_t p, double* a,
+                                                  uint64_t a_size, uint8_t* tmp_bytes);
+typedef struct reim_fftvec_automorphism_funcs {
+  FFTVEC_AUTOMORPHISM_APPLY apply;
+  FFTVEC_AUTOMORPHISM_APPLY_INPLACE apply_inplace;
+  FFTVEC_AUTOMORPHISM_APPLY_INPLACE_TMP_BYTES apply_inplace_tmp_bytes;
+} FFTVEC_AUTOMORPHISM_FUNCS;
 
 typedef struct reim_fft_precomp {
   FFT_FUNC function;
@@ -54,6 +64,12 @@ typedef struct reim_addmul_precomp {
   FFTVEC_ADDMUL_FUNC function;
   int64_t m;
 } REIM_FFTVEC_ADDMUL_PRECOMP;
+
+typedef struct reim_fftvec_automorphism_precomp {
+  FFTVEC_AUTOMORPHISM_FUNCS function;
+  int64_t m;
+  uint64_t* irev;
+} REIM_FFTVEC_AUTOMORPHISM_PRECOMP;
 
 struct reim_from_znx32_precomp {
   FROM_ZNX32_FUNC function;
