@@ -96,6 +96,9 @@ void test_reim4_add_1blk_to_reim(reim4_add_1blk_to_reim_f reim4_add_1blk_to_reim
 }
 
 TEST(reim4_arithmetic, reim4_add_1blk_to_reim_ref) { test_reim4_add_1blk_to_reim(reim4_add_1blk_to_reim_ref); }
+#ifdef __x86_64__
+TEST(reim4_arithmetic, reim4_add_1blk_to_reim_avx) { test_reim4_add_1blk_to_reim(reim4_add_1blk_to_reim_ref); }
+#endif
 
 typedef typeof(reim4_extract_1blk_from_contiguous_reim_ref) reim4_extract_1blk_from_contiguous_reim_f;
 void test_reim4_extract_1blk_from_contiguous_reim(
