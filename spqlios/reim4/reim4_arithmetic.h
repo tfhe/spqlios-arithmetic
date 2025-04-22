@@ -138,12 +138,12 @@ EXPORT void reim4_save_1blk_to_reim_avx(uint64_t m, uint64_t blk,
  * @param src the input reim4
  */
 EXPORT void reim4_add_1blk_to_reim_ref(uint64_t m, uint64_t blk,
-                                        double* dest,      // 1 reim vector of length m
-                                        const double* src  // 8 doubles
+                                       double* dest,      // 1 reim vector of length m
+                                       const double* src  // 8 doubles
 );
 EXPORT void reim4_add_1blk_to_reim_avx(uint64_t m, uint64_t blk,
-                                        double* dest,      // 1 reim vector of length m
-                                        const double* src  // 8 doubles
+                                       double* dest,      // 1 reim vector of length m
+                                       const double* src  // 8 doubles
 );
 
 // dest = sum u[i].v[i]

@@ -83,7 +83,7 @@ void reim_fftvec_automorphism_conj_with_lut_ref(const REIM_FFTVEC_AUTOMORPHISM_P
 // Returns the minimum number of temporary bytes used by reim_fftvec_automorphism_inplace_ref.
 EXPORT uint64_t reim_fftvec_automorphism_inplace_tmp_bytes_ref(const REIM_FFTVEC_AUTOMORPHISM_PRECOMP* tables) {
   const uint64_t m = tables->m;
-  return m * (2*sizeof(double)+sizeof(uint64_t));
+  return m * (2 * sizeof(double) + sizeof(uint64_t));
 }
 
 // Computes X^i -> X^(p*i) in the fourier domain for a reim vector is size 2 * m * a_size

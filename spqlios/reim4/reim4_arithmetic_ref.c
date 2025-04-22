@@ -105,8 +105,8 @@ void reim4_save_1blk_to_reim_ref(uint64_t m, uint64_t blk,
 }
 
 void reim4_add_1blk_to_reim_ref(uint64_t m, uint64_t blk,
-                                 double* dst,       // 1 reim vector of length m
-                                 const double* src  // 8 doubles
+                                double* dst,       // 1 reim vector of length m
+                                const double* src  // 8 doubles
 ) {
   assert(blk < (m >> 2));
   double* dst_ptr = dst + (blk << 2);

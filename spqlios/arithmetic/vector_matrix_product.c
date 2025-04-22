@@ -1,5 +1,6 @@
-#include <string.h>
 #include <assert.h>
+#include <string.h>
+
 #include "../reim4/reim4_arithmetic.h"
 #include "vec_znx_arithmetic_private.h"
 
@@ -265,10 +266,10 @@ EXPORT uint64_t fft64_vmp_extract_tmp_bytes(const MODULE* module,  // N
 
 /** @brief applies a vmp product (result in DFT space) and adds to res inplace */
 EXPORT void fft64_vmp_apply_dft_add_ref(const MODULE* module,                                  // N
-                                    VEC_ZNX_DFT* res, uint64_t res_size,                   // res
-                                    const int64_t* a, uint64_t a_size, uint64_t a_sl,      // a
-                                    const VMP_PMAT* pmat, uint64_t nrows, uint64_t ncols,  // prep matrix
-                                    uint8_t* tmp_space                                     // scratch space
+                                        VEC_ZNX_DFT* res, uint64_t res_size,                   // res
+                                        const int64_t* a, uint64_t a_size, uint64_t a_sl,      // a
+                                        const VMP_PMAT* pmat, uint64_t nrows, uint64_t ncols,  // prep matrix
+                                        uint8_t* tmp_space                                     // scratch space
 ) {
   const uint64_t nn = module->nn;
   const uint64_t rows = nrows < a_size ? nrows : a_size;
@@ -299,57 +300,57 @@ EXPORT void fft64_vmp_apply_dft_ref(const MODULE* module,                       
 
 /** @brief like fft64_vmp_apply_dft_to_dft_ref but adds in place */
 EXPORT void fft64_vmp_apply_dft_to_dft_add_ref(const MODULE* module,                       // N
-                                           VEC_ZNX_DFT* res, const uint64_t res_size,  // res
-                                           const VEC_ZNX_DFT* a_dft, uint64_t a_size,  // a
-                                           const VMP_PMAT* pmat, const uint64_t nrows,
-                                           const uint64_t ncols,  // prep matrix
-                                           uint8_t* tmp_space     // scratch space (a_size*sizeof(reim4) bytes)
+                                               VEC_ZNX_DFT* res, const uint64_t res_size,  // res
+                                               const VEC_ZNX_DFT* a_dft, uint64_t a_size,  // a
+                                               const VMP_PMAT* pmat, const uint64_t nrows,
+                                               const uint64_t ncols,  // prep matrix
+                                               uint8_t* tmp_space     // scratch space (a_size*sizeof(reim4) bytes)
 ) {
-    const uint64_t m = module->m;
-    const uint64_t nn = module->nn;
-    assert(nn >= 8);
+  const uint64_t m = module->m;
+  const uint64_t nn = module->nn;
+  assert(nn >= 8);
 
-    double* mat2cols_output = (double*)tmp_space;     // 128 bytes
-    double* extracted_blk = (double*)tmp_space + 16;  // 64*min(nrows,a_size) bytes
+  double* mat2cols_output = (double*)tmp_space;     // 128 bytes
+  double* extracted_blk = (double*)tmp_space + 16;  // 64*min(nrows,a_size) bytes
 
-    double* mat_input = (double*)pmat;
-    double* vec_input = (double*)a_dft;
-    double* vec_output = (double*)res;
+  double* mat_input = (double*)pmat;
+  double* vec_input = (double*)a_dft;
+  double* vec_output = (double*)res;
 
-    // const uint64_t row_max0 = res_size < a_size ? res_size: a_size;
-    const uint64_t row_max = nrows < a_size ? nrows : a_size;
-    const uint64_t col_max = ncols < res_size ? ncols : res_size;
+  // const uint64_t row_max0 = res_size < a_size ? res_size: a_size;
+  const uint64_t row_max = nrows < a_size ? nrows : a_size;
+  const uint64_t col_max = ncols < res_size ? ncols : res_size;
 
-    if (nn >= 8) { 
-      for (uint64_t blk_i = 0; blk_i < m / 4; blk_i++) {
-        double* mat_blk_start = mat_input + blk_i * (8 * nrows * ncols);
+  if (nn >= 8) {
+    for (uint64_t blk_i = 0; blk_i < m / 4; blk_i++) {
+      double* mat_blk_start = mat_input + blk_i * (8 * nrows * ncols);
 
-        reim4_extract_1blk_from_contiguous_reim_ref(m, row_max, blk_i, (double*)extracted_blk, (double*)a_dft);
-        // apply mat2cols
-        for (uint64_t col_i = 0; col_i < col_max - 1; col_i += 2) {
-          uint64_t col_offset = col_i * (8 * nrows);
-          reim4_vec_mat2cols_product_ref(row_max, mat2cols_output, extracted_blk, mat_blk_start + col_offset);
+      reim4_extract_1blk_from_contiguous_reim_ref(m, row_max, blk_i, (double*)extracted_blk, (double*)a_dft);
+      // apply mat2cols
+      for (uint64_t col_i = 0; col_i < col_max - 1; col_i += 2) {
+        uint64_t col_offset = col_i * (8 * nrows);
+        reim4_vec_mat2cols_product_ref(row_max, mat2cols_output, extracted_blk, mat_blk_start + col_offset);
 
-          reim4_add_1blk_to_reim_ref(m, blk_i, vec_output + col_i * nn, mat2cols_output);
-          reim4_add_1blk_to_reim_ref(m, blk_i, vec_output + (col_i + 1) * nn, mat2cols_output + 8);
-        }
-
-        // check if col_max is odd, then special case
-        if (col_max % 2 == 1) {
-          uint64_t last_col = col_max - 1;
-          uint64_t col_offset = last_col * (8 * nrows);
-
-          // the last column is alone in the pmat: vec_mat1col
-          if (ncols == col_max) {
-            reim4_vec_mat1col_product_ref(row_max, mat2cols_output, extracted_blk, mat_blk_start + col_offset);
-          } else {
-            // the last column is part of a colpair in the pmat: vec_mat2cols and ignore the second position
-            reim4_vec_mat2cols_product_ref(row_max, mat2cols_output, extracted_blk, mat_blk_start + col_offset);
-          }
-          reim4_add_1blk_to_reim_ref(m, blk_i, vec_output + last_col * nn, mat2cols_output);
-        }
+        reim4_add_1blk_to_reim_ref(m, blk_i, vec_output + col_i * nn, mat2cols_output);
+        reim4_add_1blk_to_reim_ref(m, blk_i, vec_output + (col_i + 1) * nn, mat2cols_output + 8);
       }
-  }else { 
+
+      // check if col_max is odd, then special case
+      if (col_max % 2 == 1) {
+        uint64_t last_col = col_max - 1;
+        uint64_t col_offset = last_col * (8 * nrows);
+
+        // the last column is alone in the pmat: vec_mat1col
+        if (ncols == col_max) {
+          reim4_vec_mat1col_product_ref(row_max, mat2cols_output, extracted_blk, mat_blk_start + col_offset);
+        } else {
+          // the last column is part of a colpair in the pmat: vec_mat2cols and ignore the second position
+          reim4_vec_mat2cols_product_ref(row_max, mat2cols_output, extracted_blk, mat_blk_start + col_offset);
+        }
+        reim4_add_1blk_to_reim_ref(m, blk_i, vec_output + last_col * nn, mat2cols_output);
+      }
+    }
+  } else {
     for (uint64_t col_i = 0; col_i < col_max; col_i++) {
       double* pmat_col = mat_input + col_i * nrows * nn;
       for (uint64_t row_i = 0; row_i < row_max; row_i++) {
@@ -386,7 +387,7 @@ EXPORT void fft64_vmp_apply_dft_to_dft_ref(const MODULE* module,                
   const uint64_t row_max = nrows < a_size ? nrows : a_size;
   const uint64_t col_max = ncols < res_size ? ncols : res_size;
 
-  if (nn >= 8) { 
+  if (nn >= 8) {
     for (uint64_t blk_i = 0; blk_i < m / 4; blk_i++) {
       double* mat_blk_start = mat_input + blk_i * (8 * nrows * ncols);
 
@@ -415,7 +416,7 @@ EXPORT void fft64_vmp_apply_dft_to_dft_ref(const MODULE* module,                
         reim4_save_1blk_to_reim_ref(m, blk_i, vec_output + last_col * nn, mat2cols_output);
       }
     }
-  }else {
+  } else {
     for (uint64_t col_i = 0; col_i < col_max; col_i++) {
       double* pmat_col = mat_input + col_i * nrows * nn;
       for (uint64_t row_i = 0; row_i < 1; row_i++) {
@@ -467,11 +468,11 @@ EXPORT void vmp_apply_dft_to_dft(const MODULE* module,                       // 
 }
 
 EXPORT void vmp_apply_dft_to_dft_add(const MODULE* module,                       // N
-                                 VEC_ZNX_DFT* res, const uint64_t res_size,  // res
-                                 const VEC_ZNX_DFT* a_dft, uint64_t a_size,  // a
-                                 const VMP_PMAT* pmat, const uint64_t nrows,
-                                 const uint64_t ncols,  // prep matrix
-                                 uint8_t* tmp_space     // scratch space (a_size*sizeof(reim4) bytes)
+                                     VEC_ZNX_DFT* res, const uint64_t res_size,  // res
+                                     const VEC_ZNX_DFT* a_dft, uint64_t a_size,  // a
+                                     const VMP_PMAT* pmat, const uint64_t nrows,
+                                     const uint64_t ncols,  // prep matrix
+                                     uint8_t* tmp_space     // scratch space (a_size*sizeof(reim4) bytes)
 ) {
   module->func.vmp_apply_dft_to_dft_add(module, res, res_size, a_dft, a_size, pmat, nrows, ncols, tmp_space);
 }
@@ -486,10 +487,10 @@ EXPORT uint64_t vmp_apply_dft_to_dft_tmp_bytes(const MODULE* module,           /
 
 /** @brief applies a vmp product (result in DFT space) adds to res inplace */
 EXPORT void vmp_apply_dft_add(const MODULE* module,                                  // N
-                          VEC_ZNX_DFT* res, uint64_t res_size,                   // res
-                          const int64_t* a, uint64_t a_size, uint64_t a_sl,      // a
-                          const VMP_PMAT* pmat, uint64_t nrows, uint64_t ncols,  // prep matrix
-                          uint8_t* tmp_space                                     // scratch space
+                              VEC_ZNX_DFT* res, uint64_t res_size,                   // res
+                              const int64_t* a, uint64_t a_size, uint64_t a_sl,      // a
+                              const VMP_PMAT* pmat, uint64_t nrows, uint64_t ncols,  // prep matrix
+                              uint8_t* tmp_space                                     // scratch space
 ) {
   module->func.vmp_apply_dft_add(module, res, res_size, a, a_size, a_sl, pmat, nrows, ncols, tmp_space);
 }
