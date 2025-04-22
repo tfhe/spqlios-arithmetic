@@ -147,7 +147,7 @@ TEST(vec_znx, fft64_vmp_prepare_dblptr_avx) {
 #endif
 
 static void test_vmp_apply_add(VMP_APPLY_DFT_TO_DFT_F* apply, VMP_APPLY_DFT_TO_DFT_TMP_BYTES_F* tmp_bytes) {
-  for (uint64_t nn : {8, 64}) {
+  for (uint64_t nn : {2, 4, 8, 64}) {
     MODULE* module = new_module_info(nn, FFT64);
     for (uint64_t mat_nrows : {1, 4, 7}) {
       for (uint64_t mat_ncols : {1, 2, 5}) {
@@ -191,7 +191,7 @@ static void test_vmp_apply_add(VMP_APPLY_DFT_TO_DFT_F* apply, VMP_APPLY_DFT_TO_D
 }
 
 static void test_vmp_apply(VMP_APPLY_DFT_TO_DFT_F* apply, VMP_APPLY_DFT_TO_DFT_TMP_BYTES_F* tmp_bytes) {
-  for (uint64_t nn : {8, 64}) {
+  for (uint64_t nn : {2, 4, 8, 64}) {
     MODULE* module = new_module_info(nn, FFT64);
     for (uint64_t mat_nrows : {1, 4, 7}) {
       for (uint64_t mat_ncols : {1, 2, 5}) {

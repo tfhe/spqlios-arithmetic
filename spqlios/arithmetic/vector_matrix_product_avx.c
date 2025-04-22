@@ -191,10 +191,6 @@ EXPORT void fft64_vmp_apply_dft_to_dft_add_avx(const MODULE* module,            
   } else {
     for (uint64_t col_i = 0; col_i < col_max; col_i++) {
       double* pmat_col = mat_input + col_i * nrows * nn;
-      // for (uint64_t row_i = 0; row_i < 1; row_i++) {
-      //   reim_fftvec_mul(module->mod.fft64.mul_fft, vec_output + col_i * nn, vec_input + row_i * nn,
-      //                   pmat_col + row_i * nn);
-      // }
       for (uint64_t row_i = 0; row_i < row_max; row_i++) {
         reim_fftvec_addmul(module->mod.fft64.p_addmul, vec_output + col_i * nn, vec_input + row_i * nn,
                            pmat_col + row_i * nn);
