@@ -32,6 +32,7 @@ static void fill_fft64_virtual_table(MODULE* module) {
   module->func.vec_znx_dft_automorphism_tmp_bytes = fft64_vec_znx_dft_automorphism_tmp_bytes;
   module->func.vec_znx_dft = fft64_vec_znx_dft;
   module->func.vec_znx_idft = fft64_vec_znx_idft;
+  module->func.vec_dft_add = fft64_vec_dft_add;
   module->func.vec_znx_idft_tmp_bytes = fft64_vec_znx_idft_tmp_bytes;
   module->func.vec_znx_idft_tmp_a = fft64_vec_znx_idft_tmp_a;
   module->func.vec_znx_big_add = fft64_vec_znx_big_add;
@@ -56,8 +57,10 @@ static void fill_fft64_virtual_table(MODULE* module) {
   module->func.vmp_prepare_tmp_bytes = fft64_vmp_prepare_tmp_bytes;
   module->func.vmp_extract_tmp_bytes = fft64_vmp_extract_tmp_bytes;
   module->func.vmp_apply_dft = fft64_vmp_apply_dft_ref;
+  module->func.vmp_apply_dft_add = fft64_vmp_apply_dft_add_ref;
   module->func.vmp_apply_dft_tmp_bytes = fft64_vmp_apply_dft_tmp_bytes;
   module->func.vmp_apply_dft_to_dft = fft64_vmp_apply_dft_to_dft_ref;
+  module->func.vmp_apply_dft_to_dft_add = fft64_vmp_apply_dft_to_dft_add_ref;
   module->func.vmp_apply_dft_to_dft_tmp_bytes = fft64_vmp_apply_dft_to_dft_tmp_bytes;
   module->func.bytes_of_vec_znx_dft = fft64_bytes_of_vec_znx_dft;
   module->func.bytes_of_vec_znx_big = fft64_bytes_of_vec_znx_big;
@@ -70,7 +73,9 @@ static void fill_fft64_virtual_table(MODULE* module) {
     module->func.vmp_prepare_dblptr = fft64_vmp_prepare_dblptr_avx;
     module->func.vmp_prepare_row = fft64_vmp_prepare_row_avx;
     module->func.vmp_apply_dft = fft64_vmp_apply_dft_avx;
+    module->func.vmp_apply_dft_add = fft64_vmp_apply_dft_add_avx;
     module->func.vmp_apply_dft_to_dft = fft64_vmp_apply_dft_to_dft_avx;
+    module->func.vmp_apply_dft_to_dft_add = fft64_vmp_apply_dft_to_dft_add_avx;
   }
 }
 
@@ -109,6 +114,7 @@ static void fill_fft64_precomp(MODULE* module) {
   module->mod.fft64.p_addmul = new_reim_fftvec_addmul_precomp(module->m);
   module->mod.fft64.p_automorphism = new_reim_fftvec_automorphism_precomp(module->m);
   module->mod.fft64.mul_fft = new_reim_fftvec_mul_precomp(module->m);
+  module->mod.fft64.add_fft = new_reim_fftvec_add_precomp(module->m);
 }
 static void fill_ntt120_precomp(MODULE* module) {
   // fill any necessary precomp stuff

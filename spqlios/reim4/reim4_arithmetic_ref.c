@@ -104,6 +104,25 @@ void reim4_save_1blk_to_reim_ref(uint64_t m, uint64_t blk,
   dst_ptr[3] = src[7];
 }
 
+void reim4_add_1blk_to_reim_ref(uint64_t m, uint64_t blk,
+                                double* dst,       // 1 reim vector of length m
+                                const double* src  // 8 doubles
+) {
+  assert(blk < (m >> 2));
+  double* dst_ptr = dst + (blk << 2);
+  // add the real part
+  dst_ptr[0] += src[0];
+  dst_ptr[1] += src[1];
+  dst_ptr[2] += src[2];
+  dst_ptr[3] += src[3];
+  dst_ptr += m;
+  // add the imag part
+  dst_ptr[0] += src[4];
+  dst_ptr[1] += src[5];
+  dst_ptr[2] += src[6];
+  dst_ptr[3] += src[7];
+}
+
 // dest = 0
 void reim4_zero(double* const dst  // 8 doubles
 ) {

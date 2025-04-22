@@ -88,6 +88,42 @@ static void test_fft64_vec_znx_dft(VEC_ZNX_DFT_F dft) {
   }
 }
 
+static void test_fft64_vec_dft_add(VEC_DFT_ADD_F dft_add) {
+  for (uint64_t n : {2, 4, 128}) {
+    MODULE* module = new_module_info(n, FFT64);
+    for (uint64_t sa : {3, 5, 8}) {
+      for (uint64_t sr : {3, 5, 8}) {
+        fft64_vec_znx_dft_layout a(n, sa);
+        fft64_vec_znx_dft_layout b(n, sa);
+        fft64_vec_znx_dft_layout res(n, sr);
+        a.fill_dft_random_log2bound(42);
+        b.fill_dft_random_log2bound(42);
+        std::vector<reim_fft64vec> expect(sr);
+        for (uint64_t i = 0; i < sr; ++i) {
+          std::vector<double>v(n);
+          if (i < sa) { 
+            reim_fftvec_add(module->mod.fft64.add_fft, v.data(), ((double*)a.data) + i*n, ((double*)b.data) + i*n);
+          }else { 
+            std::fill(v.begin(), v.end(), 0.0);
+          }
+          expect[i] = reim_fft64vec(n, v.data());
+        }
+        // test the function
+        thash a_hash_before = a.content_hash();
+        thash b_hash_before = b.content_hash();
+        dft_add(module, res.data, sr, a.data, sa, b.data, sa);
+        ASSERT_EQ(a.content_hash(), a_hash_before);
+        ASSERT_EQ(b.content_hash(), b_hash_before);
+        for (uint64_t i = 0; i < sr; ++i) {
+          reim_fft64vec actual = res.get_copy_zext(i);
+          ASSERT_LE(infty_dist(actual, expect[i]), 1e-10);
+        }
+      }
+    }
+    delete_module_info(module);
+  }
+}
+
 #ifdef __x86_64__
 // FIXME: currently, it only works on avx
 static void test_ntt120_vec_znx_dft(VEC_ZNX_DFT_F dft) {
@@ -135,6 +171,8 @@ TEST(vec_znx_dft, vec_znx_dft) {
   test_ntt120_vec_znx_dft(ntt120_vec_znx_dft_avx);
 #endif
 }
+
+TEST(vec_dft_add, fft64_vec_dft_add) { test_fft64_vec_dft_add(fft64_vec_dft_add); }
 
 static void test_fft64_vec_znx_idft(VEC_ZNX_IDFT_F idft, VEC_ZNX_IDFT_TMP_A_F idft_tmp_a,
                                     VEC_ZNX_IDFT_TMP_BYTES_F idft_tmp_bytes) {

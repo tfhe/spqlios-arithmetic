@@ -83,7 +83,7 @@ void reim_fftvec_automorphism_conj_with_lut_ref(const REIM_FFTVEC_AUTOMORPHISM_P
 // Returns the minimum number of temporary bytes used by reim_fftvec_automorphism_inplace_ref.
 EXPORT uint64_t reim_fftvec_automorphism_inplace_tmp_bytes_ref(const REIM_FFTVEC_AUTOMORPHISM_PRECOMP* tables) {
   const uint64_t m = tables->m;
-  return m * (2*sizeof(double)+sizeof(uint64_t));
+  return m * (2 * sizeof(double) + sizeof(uint64_t));
 }
 
 // Computes X^i -> X^(p*i) in the fourier domain for a reim vector is size 2 * m * a_size
@@ -136,6 +136,16 @@ EXPORT void reim_fftvec_addmul_ref(const REIM_FFTVEC_ADDMUL_PRECOMP* tables, dou
   }
 }
 
+EXPORT void reim_fftvec_add_ref(const REIM_FFTVEC_ADD_PRECOMP* precomp, double* r, const double* a, const double* b) {
+  const uint64_t m = precomp->m;
+  for (uint64_t i = 0; i < m; ++i) {
+    double re = a[i] + b[i];
+    double im = a[i + m] + b[i + m];
+    r[i] = re;
+    r[i + m] = im;
+  }
+}
+
 EXPORT void reim_fftvec_mul_ref(const REIM_FFTVEC_MUL_PRECOMP* tables, double* r, const double* a, const double* b) {
   const uint64_t m = tables->m;
   for (uint64_t i = 0; i < m; ++i) {
@@ -157,6 +167,21 @@ EXPORT REIM_FFTVEC_ADDMUL_PRECOMP* new_reim_fftvec_addmul_precomp(uint32_t m) {
     }
   } else {
     reps->function = reim_fftvec_addmul_ref;
+  }
+  return reps;
+}
+
+EXPORT REIM_FFTVEC_ADD_PRECOMP* new_reim_fftvec_add_precomp(uint32_t m) {
+  REIM_FFTVEC_ADD_PRECOMP* reps = malloc(sizeof(REIM_FFTVEC_ADD_PRECOMP));
+  reps->m = m;
+  if (CPU_SUPPORTS("fma")) {
+    if (m >= 4) {
+      reps->function = reim_fftvec_add_fma;
+    } else {
+      reps->function = reim_fftvec_add_ref;
+    }
+  } else {
+    reps->function = reim_fftvec_add_ref;
   }
   return reps;
 }

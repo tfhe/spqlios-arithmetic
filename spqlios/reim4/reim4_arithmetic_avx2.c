@@ -50,6 +50,23 @@ void reim4_save_1blk_to_reim_avx(uint64_t m, uint64_t blk,
   _mm256_storeu_pd(dst_ptr + m, _mm256_loadu_pd(src_ptr + 4));
 }
 
+void reim4_add_1blk_to_reim_avx(uint64_t m, uint64_t blk,
+                                double* dst,       // 1 reim vector of length m
+                                const double* src  // 8 doubles
+) {
+  assert(blk < (m >> 2));
+  const double* src_ptr = src;
+  double* dst_ptr = dst + (blk << 2);
+
+  __m256d s0 = _mm256_loadu_pd(src_ptr);
+  __m256d d0 = _mm256_loadu_pd(dst_ptr);
+  _mm256_storeu_pd(dst_ptr, _mm256_add_pd(s0, d0));
+
+  __m256d s1 = _mm256_loadu_pd(src_ptr + 4);
+  __m256d d1 = _mm256_loadu_pd(dst_ptr + m);
+  _mm256_storeu_pd(dst_ptr + m, _mm256_add_pd(s1, d1));
+}
+
 __always_inline void cplx_prod(__m256d* re1, __m256d* re2, __m256d* im, const double* const u_ptr,
                                const double* const v_ptr) {
   const __m256d a = _mm256_loadu_pd(u_ptr);

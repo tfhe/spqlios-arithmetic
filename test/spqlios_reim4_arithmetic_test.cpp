@@ -62,6 +62,44 @@ TEST(reim4_arithmetic, reim4_save_1blk_to_reim_ref) { test_reim4_save_1blk_to_re
 TEST(reim4_arithmetic, reim4_save_1blk_to_reim_avx) { test_reim4_save_1blk_to_reim(reim4_save_1blk_to_reim_avx); }
 #endif
 
+typedef typeof(reim4_add_1blk_to_reim_ref) reim4_add_1blk_to_reim_f;
+void test_reim4_add_1blk_to_reim(reim4_add_1blk_to_reim_f reim4_add_1blk_to_reim) {
+  static const uint64_t numtrials = 100;
+  for (uint64_t m : {4, 8, 16, 1024, 4096, 32768}) {
+    double* v = (double*)malloc(2 * m * sizeof(double));
+    double* w1 = (double*)malloc(8 * sizeof(double));
+    double* w2 = (double*)malloc(8 * sizeof(double));
+    // double* tmp = (double*)malloc(8 * sizeof(double));
+    reim_view vv(m, v);
+    for (uint64_t i = 0; i < numtrials; ++i) {
+      reim4_elem el1 = gaussian_reim4();
+      reim4_elem el2 = gaussian_reim4();
+
+      // v[blk] = w1
+      uint64_t blk = rand() % (m / 4);
+      el1.save_as(w1);
+      reim4_save_1blk_to_reim_ref(m, blk, v, w1);
+      el2.save_as(w2);
+
+      // v[blk] += w2
+      reim4_add_1blk_to_reim_ref(m, blk, v, w2);
+
+      reim4_elem w1w2sum = vv.get_blk(blk);
+      reim4_elem expected_sum = reim4_elem::zero();
+      reim4_add(expected_sum.value, w1, w2);
+      ASSERT_EQ(expected_sum, w1w2sum);
+    }
+    free(v);
+    free(w1);
+    free(w2);
+  }
+}
+
+TEST(reim4_arithmetic, reim4_add_1blk_to_reim_ref) { test_reim4_add_1blk_to_reim(reim4_add_1blk_to_reim_ref); }
+#ifdef __x86_64__
+TEST(reim4_arithmetic, reim4_add_1blk_to_reim_avx) { test_reim4_add_1blk_to_reim(reim4_add_1blk_to_reim_ref); }
+#endif
+
 typedef typeof(reim4_extract_1blk_from_contiguous_reim_ref) reim4_extract_1blk_from_contiguous_reim_f;
 void test_reim4_extract_1blk_from_contiguous_reim(
     reim4_extract_1blk_from_contiguous_reim_f reim4_extract_1blk_from_contiguous_reim) {

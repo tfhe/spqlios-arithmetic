@@ -10,6 +10,7 @@ typedef struct fft64_rnx_module_precomp_t FFT64_RNX_MODULE_PRECOMP;
 struct fft64_rnx_module_precomp_t {
   REIM_FFT_PRECOMP* p_fft;
   REIM_IFFT_PRECOMP* p_ifft;
+  REIM_FFTVEC_ADD_PRECOMP* p_fftvec_add;
   REIM_FFTVEC_MUL_PRECOMP* p_fftvec_mul;
   REIM_FFTVEC_ADDMUL_PRECOMP* p_fftvec_addmul;
 };

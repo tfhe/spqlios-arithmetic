@@ -13,6 +13,10 @@ EXPORT void reim_to_tnx32(const REIM_TO_TNX32_PRECOMP* tables, int32_t* r, const
   tables->function(tables, r, a);
 }
 
+EXPORT void reim_fftvec_add(const REIM_FFTVEC_ADD_PRECOMP* tables, double* r, const double* a, const double* b) {
+  tables->function(tables, r, a, b);
+}
+
 EXPORT void reim_fftvec_mul(const REIM_FFTVEC_MUL_PRECOMP* tables, double* r, const double* a, const double* b) {
   tables->function(tables, r, a, b);
 }
