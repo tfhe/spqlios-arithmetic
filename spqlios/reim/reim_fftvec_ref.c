@@ -83,14 +83,14 @@ void reim_fftvec_automorphism_conj_with_lut_ref(const REIM_FFTVEC_AUTOMORPHISM_P
 // Returns the minimum number of temporary bytes used by reim_fftvec_automorphism_inplace_ref.
 EXPORT uint64_t reim_fftvec_automorphism_inplace_tmp_bytes_ref(const REIM_FFTVEC_AUTOMORPHISM_PRECOMP* tables) {
   const uint64_t m = tables->m;
-  return m * (sizeof(double)+sizeof(uint64_t));
+  return m * (2*sizeof(double)+sizeof(uint64_t));
 }
 
 // Computes X^i -> X^(p*i) in the fourier domain for a reim vector is size 2 * m * a_size
 // This function cannot be evaluated in place.
 EXPORT void reim_fftvec_automorphism_inplace_ref(const REIM_FFTVEC_AUTOMORPHISM_PRECOMP* tables, int64_t p, double* a,
                                                  uint64_t a_size,
-                                                 uint8_t* tmp_bytes  // m * (sizeof(double) + sizeof(uint64_t))
+                                                 uint8_t* tmp_bytes  // m * (2*sizeof(double) + sizeof(uint64_t))
 ) {
   const uint64_t m = tables->m;
   const uint64_t nn = 2 * m;
@@ -112,7 +112,7 @@ EXPORT void reim_fftvec_automorphism_inplace_ref(const REIM_FFTVEC_AUTOMORPHISM_
     }
     memcpy(a, tmp, nn * sizeof(double));
   } else {
-    uint64_t* lut = (uint64_t*)tmp_bytes + m * sizeof(double);
+    uint64_t* lut = (uint64_t*)(tmp_bytes + nn * sizeof(double));
     reim_fftvec_automorphism_lut_precomp_ref(tables, p, lut);
     for (uint64_t i = 0; i < a_size; ++i) {
       if (conj == 1) {
