@@ -77,8 +77,7 @@ EXPORT void reim_fftvec_automorphism(const REIM_FFTVEC_AUTOMORPHISM_PRECOMP* tab
 EXPORT void reim_fftvec_automorphism_inplace(const REIM_FFTVEC_AUTOMORPHISM_PRECOMP* tables, int64_t p, double* a,
                                              uint64_t a_size, uint8_t* tmp_bytes);
 
-EXPORT uint64_t reim_fftvec_automorphism_inplace_tmp_bytes(const REIM_FFTVEC_AUTOMORPHISM_PRECOMP* tables,
-                                                           uint64_t a_size);
+EXPORT uint64_t reim_fftvec_automorphism_inplace_tmp_bytes(const REIM_FFTVEC_AUTOMORPHISM_PRECOMP* tables);
 
 #define delete_reim_fftvec_automorphism_precomp free
 

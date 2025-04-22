@@ -54,7 +54,7 @@ EXPORT VEC_ZNX_DFT* new_vec_znx_dft(const MODULE* module,  // N
 
 EXPORT void delete_vec_znx_dft(VEC_ZNX_DFT* res) { spqlios_free(res); }
 
-EXPORT uint64_t fft64_vec_znx_dft_automorphism_tmp_bytes(const MODULE* module) { return module->nn; }
+EXPORT uint64_t fft64_vec_znx_dft_automorphism_tmp_bytes(const MODULE* module) { return reim_fftvec_automorphism_inplace_tmp_bytes(module->mod.fft64.p_automorphism); }
 
 EXPORT void fft64_vec_znx_dft(const MODULE* module,                             // N
                               VEC_ZNX_DFT* res, uint64_t res_size,              // res

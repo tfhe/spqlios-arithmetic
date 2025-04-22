@@ -24,8 +24,7 @@ typedef void (*FFTVEC_BITWIDDLE_FUNC)(const REIM_FFTVEC_BITWIDDLE_PRECOMP*, void
 
 typedef void (*FFTVEC_AUTOMORPHISM_APPLY)(const REIM_FFTVEC_AUTOMORPHISM_PRECOMP* precomp, int64_t p, double* r,
                                           const double* a, uint64_t a_size);
-typedef uint64_t (*FFTVEC_AUTOMORPHISM_APPLY_INPLACE_TMP_BYTES)(const REIM_FFTVEC_AUTOMORPHISM_PRECOMP* precomp,
-                                                                uint64_t a_size);
+typedef uint64_t (*FFTVEC_AUTOMORPHISM_APPLY_INPLACE_TMP_BYTES)(const REIM_FFTVEC_AUTOMORPHISM_PRECOMP* precomp);
 typedef void (*FFTVEC_AUTOMORPHISM_APPLY_INPLACE)(const REIM_FFTVEC_AUTOMORPHISM_PRECOMP* precomp, int64_t p, double* a,
                                                   uint64_t a_size, uint8_t* tmp_bytes);
 typedef struct reim_fftvec_automorphism_funcs {

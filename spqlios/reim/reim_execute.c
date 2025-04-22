@@ -31,7 +31,6 @@ EXPORT void reim_fftvec_automorphism_inplace(const REIM_FFTVEC_AUTOMORPHISM_PREC
   tables->function.apply_inplace(tables, p, a, a_size, tmp_bytes);
 }
 
-EXPORT uint64_t reim_fftvec_automorphism_inplace_tmp_bytes(const REIM_FFTVEC_AUTOMORPHISM_PRECOMP* tables,
-                                                           uint64_t a_size) {
-  return tables->function.apply_inplace_tmp_bytes(tables, a_size);
+EXPORT uint64_t reim_fftvec_automorphism_inplace_tmp_bytes(const REIM_FFTVEC_AUTOMORPHISM_PRECOMP* tables) {
+  return tables->function.apply_inplace_tmp_bytes(tables);
 }
