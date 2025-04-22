@@ -22,8 +22,6 @@ static void test_fft64_vec_znx_dft_automorphism(VEC_ZNX_DFT_AUTOMORPHISM_F func)
   for (uint64_t cols_a : {3, 5, 8}) {
     for (uint64_t cols_b : {3, 5, 8}) {
 
-      std::cout << cols_a << " " << cols_b <<std::endl;
-
       int64_t p = random_automorphism_param();
 
       // a
