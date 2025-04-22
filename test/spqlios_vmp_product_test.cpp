@@ -146,13 +146,7 @@ TEST(vec_znx, fft64_vmp_prepare_dblptr_avx) {
 }
 #endif
 
-enum VMP_APPLY_STOREOP { 
-  STORE,
-  INPLACE_ADD,
-};
-
-
-static void test_vmp_apply(VMP_APPLY_DFT_TO_DFT_F* apply, VMP_APPLY_DFT_TO_DFT_TMP_BYTES_F* tmp_bytes, VMP_APPLY_STOREOP storeop) {
+static void test_vmp_apply_add(VMP_APPLY_DFT_TO_DFT_F* apply, VMP_APPLY_DFT_TO_DFT_TMP_BYTES_F* tmp_bytes) {
   for (uint64_t nn : {8, 64}) {
     MODULE* module = new_module_info(nn, FFT64);
     for (uint64_t mat_nrows : {1, 4, 7}) {
@@ -164,13 +158,7 @@ static void test_vmp_apply(VMP_APPLY_DFT_TO_DFT_F* apply, VMP_APPLY_DFT_TO_DFT_T
             fft64_vec_znx_dft_layout out(nn, out_size);
             in.fill_dft_random(0);
             pmat.fill_dft_random(0);
-            switch (storeop) { 
-              case INPLACE_ADD:
-                out.fill_dft_random(0);
-                break;
-              case STORE: 
-                break;
-            }
+            out.fill_dft_random(0);
 
             // naive computation of the product
             std::vector<reim_fft64vec> expect(out_size, reim_fft64vec(nn));
@@ -182,14 +170,8 @@ static void test_vmp_apply(VMP_APPLY_DFT_TO_DFT_F* apply, VMP_APPLY_DFT_TO_DFT_T
               expect[col] = ex;
             }
 
-            switch (storeop) { 
-                case INPLACE_ADD:
-                  for (uint64_t col = 0; col < out_size; ++col) {
-                    expect[col] += out.get_copy_zext(col);
-                  }
-                  break;
-                case STORE:       
-                  break;
+            for (uint64_t col = 0; col < out_size; ++col) {
+              expect[col] += out.get_copy_zext(col);
             }
 
             // apply the product
@@ -208,10 +190,49 @@ static void test_vmp_apply(VMP_APPLY_DFT_TO_DFT_F* apply, VMP_APPLY_DFT_TO_DFT_T
   }
 }
 
-TEST(vec_znx, vmp_apply_to_dft) { test_vmp_apply(vmp_apply_dft_to_dft, vmp_apply_dft_to_dft_tmp_bytes, STORE); }
-TEST(vec_znx, vmp_apply_to_dft_add) { test_vmp_apply(vmp_apply_dft_to_dft_add, vmp_apply_dft_to_dft_tmp_bytes, INPLACE_ADD); }
+static void test_vmp_apply(VMP_APPLY_DFT_TO_DFT_F* apply, VMP_APPLY_DFT_TO_DFT_TMP_BYTES_F* tmp_bytes) {
+  for (uint64_t nn : {8, 64}) {
+    MODULE* module = new_module_info(nn, FFT64);
+    for (uint64_t mat_nrows : {1, 4, 7}) {
+      for (uint64_t mat_ncols : {1, 2, 5}) {
+        for (uint64_t in_size : {1, 4, 7}) {
+          for (uint64_t out_size : {1, 2, 5}) {
+            fft64_vec_znx_dft_layout in(nn, in_size);
+            fft64_vmp_pmat_layout pmat(nn, mat_nrows, mat_ncols);
+            fft64_vec_znx_dft_layout out(nn, out_size);
+            in.fill_dft_random(0);
+            pmat.fill_dft_random(0);
+
+            // naive computation of the product
+            std::vector<reim_fft64vec> expect(out_size, reim_fft64vec(nn));
+            for (uint64_t col = 0; col < out_size; ++col) {
+              reim_fft64vec ex = reim_fft64vec::zero(nn);
+              for (uint64_t row = 0; row < std::min(mat_nrows, in_size); ++row) {
+                ex += pmat.get_zext(row, col) * in.get_copy_zext(row);
+              }
+              expect[col] = ex;
+            }
+
+            // apply the product
+            std::vector<uint8_t> tmp(tmp_bytes(module, out_size, in_size, mat_nrows, mat_ncols));
+            apply(module, out.data, out_size, in.data, in_size, pmat.data, mat_nrows, mat_ncols, tmp.data());
+            // check that the output is close from the expectation
+            for (uint64_t col = 0; col < std::min(mat_ncols, out_size); ++col) {
+              reim_fft64vec actual = out.get_copy_zext(col);
+              ASSERT_LE(infty_dist(actual, expect[col]), 1e-10);
+            }
+          }
+        }
+      }
+    }
+    delete_module_info(module);
+  }
+}
+
+TEST(vec_znx, vmp_apply_to_dft) { test_vmp_apply(vmp_apply_dft_to_dft, vmp_apply_dft_to_dft_tmp_bytes); }
+TEST(vec_znx, vmp_apply_to_dft_add) { test_vmp_apply_add(vmp_apply_dft_to_dft_add, vmp_apply_dft_to_dft_tmp_bytes); }
 #ifdef __x86_64__
 TEST(vec_znx, fft64_vmp_apply_dft_to_dft_avx) {
-  test_vmp_apply(fft64_vmp_apply_dft_to_dft_avx, fft64_vmp_apply_dft_to_dft_tmp_bytes, STORE);
+  test_vmp_apply(fft64_vmp_apply_dft_to_dft_avx, fft64_vmp_apply_dft_to_dft_tmp_bytes);
 }
 #endif
