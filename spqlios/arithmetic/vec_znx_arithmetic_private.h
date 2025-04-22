@@ -95,8 +95,10 @@ typedef typeof(vmp_extract_row) VMP_EXTRACT_ROW_F;
 typedef typeof(vmp_prepare_tmp_bytes) VMP_PREPARE_TMP_BYTES_F;
 typedef typeof(vmp_extract_tmp_bytes) VMP_EXTRACT_TMP_BYTES_F;
 typedef typeof(vmp_apply_dft) VMP_APPLY_DFT_F;
+typedef typeof(vmp_apply_dft_add) VMP_APPLY_DFT_ADD_F;
 typedef typeof(vmp_apply_dft_tmp_bytes) VMP_APPLY_DFT_TMP_BYTES_F;
 typedef typeof(vmp_apply_dft_to_dft) VMP_APPLY_DFT_TO_DFT_F;
+typedef typeof(vmp_apply_dft_to_dft_add) VMP_APPLY_DFT_TO_DFT_ADD_F;
 typedef typeof(vmp_apply_dft_to_dft_tmp_bytes) VMP_APPLY_DFT_TO_DFT_TMP_BYTES_F;
 typedef typeof(bytes_of_vec_znx_dft) BYTES_OF_VEC_ZNX_DFT_F;
 typedef typeof(bytes_of_vec_znx_big) BYTES_OF_VEC_ZNX_BIG_F;
@@ -145,8 +147,10 @@ struct module_virtual_functions_t {
   VMP_PREPARE_TMP_BYTES_F* vmp_prepare_tmp_bytes;
   VMP_EXTRACT_TMP_BYTES_F* vmp_extract_tmp_bytes;
   VMP_APPLY_DFT_F* vmp_apply_dft;
+  VMP_APPLY_DFT_ADD_F* vmp_apply_dft_add;
   VMP_APPLY_DFT_TMP_BYTES_F* vmp_apply_dft_tmp_bytes;
   VMP_APPLY_DFT_TO_DFT_F* vmp_apply_dft_to_dft;
+  VMP_APPLY_DFT_TO_DFT_ADD_F* vmp_apply_dft_to_dft_add;
   VMP_APPLY_DFT_TO_DFT_TMP_BYTES_F* vmp_apply_dft_to_dft_tmp_bytes;
   BYTES_OF_VEC_ZNX_DFT_F* bytes_of_vec_znx_dft;
   BYTES_OF_VEC_ZNX_BIG_F* bytes_of_vec_znx_big;
@@ -499,6 +503,14 @@ EXPORT uint64_t fft64_vmp_prepare_tmp_bytes(const MODULE* module,  // N
 EXPORT uint64_t fft64_vmp_extract_tmp_bytes(const MODULE* module,  // N
                                             uint64_t nrows, uint64_t ncols);
 
+/** @brief applies a vmp product (result in DFT space) and adds to res inplace */
+EXPORT void fft64_vmp_apply_dft_add_ref(const MODULE* module,                                  // N
+                                    VEC_ZNX_DFT* res, uint64_t res_size,                   // res
+                                    const int64_t* a, uint64_t a_size, uint64_t a_sl,      // a
+                                    const VMP_PMAT* pmat, uint64_t nrows, uint64_t ncols,  // prep matrix
+                                    uint8_t* tmp_space                                     // scratch space
+);
+
 /** @brief applies a vmp product (result in DFT space) */
 EXPORT void fft64_vmp_apply_dft_ref(const MODULE* module,                                  // N
                                     VEC_ZNX_DFT* res, uint64_t res_size,                   // res
@@ -524,6 +536,16 @@ EXPORT void fft64_vmp_apply_dft_to_dft_ref(const MODULE* module,                
                                            uint8_t* tmp_space     // scratch space (a_size*sizeof(reim4) bytes)
 );
 
+/** @brief applies rmp product and adds to res inplace */
+EXPORT void fft64_vmp_apply_dft_to_dft_add_ref(const MODULE* module,                       // N
+                                           VEC_ZNX_DFT* res, const uint64_t res_size,  // res
+                                           const VEC_ZNX_DFT* a_dft, uint64_t a_size,  // a
+                                           const VMP_PMAT* pmat, const uint64_t nrows,
+                                           const uint64_t ncols,  // prep matrix
+                                           uint8_t* tmp_space     // scratch space (a_size*sizeof(reim4) bytes)
+);
+
+
 
 /** @brief same as `fft64_vmp_apply_dft_to_dft_ref` but with custom storeop 
  * function that stores reim4 block to reim vector
@@ -539,6 +561,15 @@ void fft64_vmp_apply_dft_to_dft_custom_storeop_ref(const MODULE* module,        
 
 /** @brief this inner function could be very handy */
 EXPORT void fft64_vmp_apply_dft_to_dft_avx(const MODULE* module,                       // N
+                                           VEC_ZNX_DFT* res, const uint64_t res_size,  // res
+                                           const VEC_ZNX_DFT* a_dft, uint64_t a_size,  // a
+                                           const VMP_PMAT* pmat, const uint64_t nrows,
+                                           const uint64_t ncols,  // prep matrix
+                                           uint8_t* tmp_space     // scratch space (a_size*sizeof(reim4) bytes)
+);
+
+/** @brief applies rmp product and adds to res inplace */
+EXPORT void fft64_vmp_apply_dft_to_dft_add_avx(const MODULE* module,                       // N
                                            VEC_ZNX_DFT* res, const uint64_t res_size,  // res
                                            const VEC_ZNX_DFT* a_dft, uint64_t a_size,  // a
                                            const VMP_PMAT* pmat, const uint64_t nrows,

@@ -55,8 +55,10 @@ static void fill_fft64_virtual_table(MODULE* module) {
   module->func.vmp_prepare_tmp_bytes = fft64_vmp_prepare_tmp_bytes;
   module->func.vmp_extract_tmp_bytes = fft64_vmp_extract_tmp_bytes;
   module->func.vmp_apply_dft = fft64_vmp_apply_dft_ref;
+  module->func.vmp_apply_dft_add = fft64_vmp_apply_dft_add_ref;
   module->func.vmp_apply_dft_tmp_bytes = fft64_vmp_apply_dft_tmp_bytes;
   module->func.vmp_apply_dft_to_dft = fft64_vmp_apply_dft_to_dft_ref;
+  module->func.vmp_apply_dft_to_dft_add = fft64_vmp_apply_dft_to_dft_add_ref;
   module->func.vmp_apply_dft_to_dft_tmp_bytes = fft64_vmp_apply_dft_to_dft_tmp_bytes;
   module->func.bytes_of_vec_znx_dft = fft64_bytes_of_vec_znx_dft;
   module->func.bytes_of_vec_znx_big = fft64_bytes_of_vec_znx_big;
@@ -69,6 +71,7 @@ static void fill_fft64_virtual_table(MODULE* module) {
     module->func.vmp_prepare_dblptr = fft64_vmp_prepare_dblptr_avx;
     module->func.vmp_prepare_row = fft64_vmp_prepare_row_avx;
     module->func.vmp_apply_dft = fft64_vmp_apply_dft_avx;
+    // module->func.vmp_apply_dft_add = fft64_vmp_apply_dft_add_avx;
     module->func.vmp_apply_dft_to_dft = fft64_vmp_apply_dft_to_dft_avx;
   }
 }

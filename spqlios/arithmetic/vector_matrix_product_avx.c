@@ -194,6 +194,16 @@ void fft64_vmp_apply_dft_to_dft_custom_storeop_avx( const MODULE* module,       
   memset(vec_output + col_max * nn, 0, (res_size - col_max) * nn * sizeof(double));
 }
 
+// EXPORT void fft64_vmp_apply_dft_to_dft_add_avx(const MODULE* module,                       // N
+//                                            VEC_ZNX_DFT* res, const uint64_t res_size,  // res
+//                                            const VEC_ZNX_DFT* a_dft, uint64_t a_size,  // a
+//                                            const VMP_PMAT* pmat, const uint64_t nrows,
+//                                            const uint64_t ncols,  // prep matrix
+//                                            uint8_t* tmp_space     // scratch space (a_size*sizeof(reim4) bytes)
+// ) {
+//   fft64_vmp_apply_dft_to_dft_custom_storeop_avx(module, res, res_size, a_dft, a_size, pmat, nrows, ncols, tmp_space, reim4_add_1blk_to_reim_avx);
+// }
+
 /** @brief this inner function could be very handy */
 EXPORT void fft64_vmp_apply_dft_to_dft_avx(const MODULE* module,                       // N
                                            VEC_ZNX_DFT* res, const uint64_t res_size,  // res
