@@ -62,6 +62,38 @@ EXPORT void fft64_vmp_prepare_dblptr_avx(const MODULE* module,                  
   }
 }
 
+double* get_blk_addr(int row, int col, int nrows, int ncols, VMP_PMAT* pmat);
+
+void fft64_store_svp_ppol_into_vmp_pmat_row_blk_avx(uint64_t nn, uint64_t m, const SVP_PPOL* svp_ppol, uint64_t row_i,
+                                                    uint64_t col_i, uint64_t nrows, uint64_t ncols, VMP_PMAT* pmat) {
+  double* start_addr = get_blk_addr(row_i, col_i, nrows, ncols, pmat);
+  uint64_t offset = nrows * ncols * 8;
+  for (uint64_t blk_i = 0; blk_i < m / 4; blk_i++) {
+    reim4_extract_1blk_from_reim_avx(m, blk_i, start_addr + blk_i * offset, (double*)svp_ppol);
+  }
+}
+
+EXPORT void fft64_vmp_prepare_row_dft_avx(const MODULE* module,  // N
+                                          VMP_PMAT* pmat,        // output
+                                          const VEC_ZNX_DFT* row, uint64_t row_i, uint64_t nrows, uint64_t ncols  // a
+) {
+  // there is an edge case if nn < 8
+  const uint64_t nn = module->nn;
+  const uint64_t m = module->m;
+  double* row_addr = (double*)row;
+
+  if (nn >= 8) {
+    for (uint64_t col_i = 0; col_i < ncols; col_i++) {
+      fft64_store_svp_ppol_into_vmp_pmat_row_blk_avx(nn, m, (SVP_PPOL*)(row_addr + col_i * nn), row_i, col_i, nrows,
+                                                     ncols, pmat);
+    }
+  } else {
+    for (uint64_t col_i = 0; col_i < ncols; col_i++) {
+      memcpy((double*)pmat + (col_i * nrows + row_i) * nn, (double*)row + col_i * nn, nn * sizeof(double));
+    }
+  }
+}
+
 /** @brief prepares the ith-row of a vmp matrix with nrows and ncols */
 EXPORT void fft64_vmp_prepare_row_avx(const MODULE* module,                                                // N
                                       VMP_PMAT* pmat,                                                      // output
@@ -71,30 +103,14 @@ EXPORT void fft64_vmp_prepare_row_avx(const MODULE* module,                     
   // there is an edge case if nn < 8
   const uint64_t nn = module->nn;
   const uint64_t m = module->m;
-  double* output_mat = (double*)pmat;
-  double* start_addr = (double*)pmat;
-  uint64_t offset = nrows * ncols * 8;
+  double* row_addr = (double*)row;
 
   if (nn >= 8) {
     for (uint64_t col_i = 0; col_i < ncols; col_i++) {
       reim_from_znx64(module->mod.fft64.p_conv, (SVP_PPOL*)tmp_space, row + col_i * nn);
       reim_fft(module->mod.fft64.p_fft, (double*)tmp_space);
-
-      if (col_i == (ncols - 1) && (ncols % 2 == 1)) {
-        // special case: last column out of an odd column number
-        start_addr = output_mat + col_i * nrows * 8  // col == ncols-1
-                     + row_i * 8;
-      } else {
-        // general case: columns go by pair
-        start_addr = output_mat + (col_i / 2) * (2 * nrows) * 8  // second: col pair index
-                     + row_i * 2 * 8                             // third: row index
-                     + (col_i % 2) * 8;
-      }
-
-      for (uint64_t blk_i = 0; blk_i < m / 4; blk_i++) {
-        // extract blk from tmp and save it
-        reim4_extract_1blk_from_reim_avx(m, blk_i, start_addr + blk_i * offset, (double*)tmp_space);
-      }
+      fft64_store_svp_ppol_into_vmp_pmat_row_blk_avx(nn, m, (SVP_PPOL*)(row_addr + col_i * nn), row_i, col_i, nrows,
+                                                     ncols, pmat);
     }
   } else {
     for (uint64_t col_i = 0; col_i < ncols; col_i++) {

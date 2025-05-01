@@ -88,7 +88,7 @@ EXPORT uint64_t vmp_extract_tmp_bytes(const MODULE* module,  // N
   return module->func.vmp_extract_tmp_bytes(module, nrows, ncols);
 }
 
-double* get_blk_addr(uint64_t row_i, uint64_t col_i, uint64_t nrows, uint64_t ncols, const VMP_PMAT* pmat) {
+EXPORT double* get_blk_addr(uint64_t row_i, uint64_t col_i, uint64_t nrows, uint64_t ncols, const VMP_PMAT* pmat) {
   double* output_mat = (double*)pmat;
 
   if (col_i == (ncols - 1) && (ncols % 2 == 1)) {

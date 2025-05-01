@@ -250,13 +250,6 @@ EXPORT void vec_znx_big_normalize_base2k(const MODULE* module,                  
 EXPORT uint64_t vec_znx_big_normalize_base2k_tmp_bytes(const MODULE* module  // N
 );
 
-/** @brief apply a svp product, result = ppol * a, presented in DFT space */
-EXPORT void fft64_svp_apply_dft(const MODULE* module,                             // N
-                                const VEC_ZNX_DFT* res, uint64_t res_size,        // output
-                                const SVP_PPOL* ppol,                             // prepared pol
-                                const int64_t* a, uint64_t a_size, uint64_t a_sl  // a
-);
-
 /** @brief sets res = k-normalize(a.subrange) -- output in int64 coeffs space */
 EXPORT void vec_znx_big_range_normalize_base2k(                                                  //
     const MODULE* module,                                                                        // N

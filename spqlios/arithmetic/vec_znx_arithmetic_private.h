@@ -516,6 +516,12 @@ EXPORT void fft64_vmp_prepare_row_avx(const MODULE* module,                     
                                       uint8_t* tmp_space  // scratch space
 );
 
+/** @brief prepares the ith-row of a vmp matrix with nrows and ncols */
+EXPORT void fft64_vmp_prepare_row_dft_avx(const MODULE* module,  // N
+                                          VMP_PMAT* pmat,        // output
+                                          const VEC_ZNX_DFT* row, uint64_t row_i, uint64_t nrows, uint64_t ncols  // a
+);
+
 /** @brief minimal scratch space byte-size required for the vmp_prepare function */
 EXPORT uint64_t fft64_vmp_prepare_tmp_bytes(const MODULE* module,  // N
                                             uint64_t nrows, uint64_t ncols);
