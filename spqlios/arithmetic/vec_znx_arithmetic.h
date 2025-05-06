@@ -285,6 +285,13 @@ EXPORT void svp_apply_dft(const MODULE* module,                             // N
                           const int64_t* a, uint64_t a_size, uint64_t a_sl  // a
 );
 
+/** @brief apply a svp product, result = ppol * a, presented in DFT space */
+EXPORT void svp_apply_dft_to_dft(const MODULE* module,                       // N
+                                 const VEC_ZNX_DFT* res, uint64_t res_size,  // output
+                                 const SVP_PPOL* ppol,                       // prepared pol
+                                 const VEC_ZNX_DFT* a, uint64_t a_size       // a
+);
+
 /** @brief prepares a svp polynomial  */
 EXPORT void svp_prepare(const MODULE* module,  // N
                         SVP_PPOL* ppol,        // output

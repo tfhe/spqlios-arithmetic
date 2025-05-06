@@ -46,6 +46,7 @@ static void fill_fft64_virtual_table(MODULE* module) {
   module->func.vec_znx_big_automorphism = fft64_vec_znx_big_automorphism;
   module->func.svp_prepare = fft64_svp_prepare_ref;
   module->func.svp_apply_dft = fft64_svp_apply_dft_ref;
+  module->func.svp_apply_dft_to_dft = fft64_svp_apply_dft_to_dft_ref;
   module->func.znx_small_single_product = fft64_znx_small_single_product;
   module->func.znx_small_single_product_tmp_bytes = fft64_znx_small_single_product_tmp_bytes;
   module->func.vmp_prepare_contiguous = fft64_vmp_prepare_contiguous_ref;

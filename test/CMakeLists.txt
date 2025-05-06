@@ -85,8 +85,8 @@ set(UNITTEST_FILES
         spqlios_znx_small_test.cpp
         spqlios_vmp_product_test.cpp
         spqlios_vec_znx_dft_test.cpp
-        spqlios_svp_test.cpp
-        spqlios_svp_product_test.cpp
+        spqlios_svp_apply_test.cpp
+        spqlios_svp_prepare_test.cpp
         spqlios_vec_znx_test.cpp
         spqlios_vec_rnx_test.cpp
         spqlios_vec_rnx_vmp_test.cpp

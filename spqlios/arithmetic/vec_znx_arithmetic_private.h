@@ -88,6 +88,7 @@ typedef typeof(vec_znx_big_rotate) VEC_ZNX_BIG_ROTATE_F;
 typedef typeof(vec_znx_big_automorphism) VEC_ZNX_BIG_AUTOMORPHISM_F;
 typedef typeof(svp_prepare) SVP_PREPARE;
 typedef typeof(svp_apply_dft) SVP_APPLY_DFT_F;
+typedef typeof(svp_apply_dft_to_dft) SVP_APPLY_DFT_TO_DFT_F;
 typedef typeof(znx_small_single_product) ZNX_SMALL_SINGLE_PRODUCT_F;
 typedef typeof(znx_small_single_product_tmp_bytes) ZNX_SMALL_SINGLE_PRODUCT_TMP_BYTES_F;
 typedef typeof(vmp_prepare_contiguous) VMP_PREPARE_CONTIGUOUS_F;
@@ -142,6 +143,7 @@ struct module_virtual_functions_t {
   VEC_ZNX_BIG_AUTOMORPHISM_F* vec_znx_big_automorphism;
   SVP_PREPARE* svp_prepare;
   SVP_APPLY_DFT_F* svp_apply_dft;
+  SVP_APPLY_DFT_TO_DFT_F* svp_apply_dft_to_dft;
   ZNX_SMALL_SINGLE_PRODUCT_F* znx_small_single_product;
   ZNX_SMALL_SINGLE_PRODUCT_TMP_BYTES_F* znx_small_single_product_tmp_bytes;
   VMP_PREPARE_CONTIGUOUS_F* vmp_prepare_contiguous;
@@ -307,6 +309,13 @@ EXPORT void fft64_svp_apply_dft_ref(const MODULE* module,                       
                                     const VEC_ZNX_DFT* res, uint64_t res_size,        // output
                                     const SVP_PPOL* ppol,                             // prepared pol
                                     const int64_t* a, uint64_t a_size, uint64_t a_sl  // a
+);
+
+/** @brief apply a svp product, result = ppol * a, presented in DFT space  */
+EXPORT void fft64_svp_apply_dft_to_dft_ref(const MODULE* module,                       // N
+                                           const VEC_ZNX_DFT* res, uint64_t res_size,  // output
+                                           const SVP_PPOL* ppol,                       // prepared pol
+                                           const VEC_ZNX_DFT* a, uint64_t a_size       // a
 );
 
 /** @brief sets res = k-normalize(a) -- output in int64 coeffs space */
