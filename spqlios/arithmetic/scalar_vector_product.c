@@ -38,15 +38,15 @@ EXPORT void svp_apply_dft(const MODULE* module,                       // N
                              a, a_size, a_sl);
 }
 
-EXPORT void svp_apply_dft_to_dft(const MODULE* module,                       // N
-                                 const VEC_ZNX_DFT* res, uint64_t res_size,  // output
-                                 const SVP_PPOL* ppol,                       // prepared pol
-                                 const VEC_ZNX_DFT* a, uint64_t a_size) {
-  module->func.svp_apply_dft_to_dft(module,  // N
-                                    res,
-                                    res_size,  // output
-                                    ppol,      // prepared pol
-                                    a, a_size);
+EXPORT void svp_apply_dft_to_dft(const MODULE* module,  // N
+                                 const VEC_ZNX_DFT* res, uint64_t res_size,
+                                 uint64_t res_cols,     // output
+                                 const SVP_PPOL* ppol,  // prepared pol
+                                 const VEC_ZNX_DFT* a, uint64_t a_size, uint64_t a_cols) {
+  module->func.svp_apply_dft_to_dft(module,                   // N
+                                    res, res_size, res_cols,  // output
+                                    ppol, a, a_size, a_cols   // prepared pol
+  );
 }
 
 // result = ppol * a
@@ -74,23 +74,29 @@ EXPORT void fft64_svp_apply_dft_ref(const MODULE* module,                       
 }
 
 // result = ppol * a
-EXPORT void fft64_svp_apply_dft_to_dft_ref(const MODULE* module,                       // N
-                                           const VEC_ZNX_DFT* res, uint64_t res_size,  // output
-                                           const SVP_PPOL* ppol,                       // prepared pol
-                                           const VEC_ZNX_DFT* a, uint64_t a_size       // a
+EXPORT void fft64_svp_apply_dft_to_dft_ref(const MODULE* module,  // N
+                                           const VEC_ZNX_DFT* res, uint64_t res_size,
+                                           uint64_t res_cols,     // output
+                                           const SVP_PPOL* ppol,  // prepared pol
+                                           const VEC_ZNX_DFT* a, uint64_t a_size,
+                                           uint64_t a_cols  // a
 ) {
   const uint64_t nn = module->nn;
+  const uint64_t res_sl = nn * res_cols;
+  const uint64_t a_sl = nn * a_cols;
   double* const dres = (double*)res;
   double* const da = (double*)a;
   double* const dppol = (double*)ppol;
 
   const uint64_t auto_end_idx = res_size < a_size ? res_size : a_size;
   for (uint64_t i = 0; i < auto_end_idx; ++i) {
-    const double* a_ptr = da + i * nn;
-    double* const res_ptr = dres + i * nn;
+    const double* a_ptr = da + i * a_sl;
+    double* const res_ptr = dres + i * res_sl;
     reim_fftvec_mul(module->mod.fft64.mul_fft, res_ptr, a_ptr, dppol);
   }
 
   // then extend with zeros
-  memset(dres + auto_end_idx * nn, 0, (res_size - auto_end_idx) * nn * sizeof(double));
+  for (uint64_t i = auto_end_idx; i < res_size; i++) {
+    memset(dres + i * res_sl, 0, nn * sizeof(double));
+  }
 }

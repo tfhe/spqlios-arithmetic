@@ -312,10 +312,12 @@ EXPORT void fft64_svp_apply_dft_ref(const MODULE* module,                       
 );
 
 /** @brief apply a svp product, result = ppol * a, presented in DFT space  */
-EXPORT void fft64_svp_apply_dft_to_dft_ref(const MODULE* module,                       // N
-                                           const VEC_ZNX_DFT* res, uint64_t res_size,  // output
-                                           const SVP_PPOL* ppol,                       // prepared pol
-                                           const VEC_ZNX_DFT* a, uint64_t a_size       // a
+EXPORT void fft64_svp_apply_dft_to_dft_ref(const MODULE* module,  // N
+                                           const VEC_ZNX_DFT* res, uint64_t res_size,
+                                           uint64_t res_cols,     // output
+                                           const SVP_PPOL* ppol,  // prepared pol
+                                           const VEC_ZNX_DFT* a, uint64_t a_size,
+                                           uint64_t a_cols  // a
 );
 
 /** @brief sets res = k-normalize(a) -- output in int64 coeffs space */
