@@ -359,11 +359,11 @@ EXPORT void fft64_vmp_prepare_row(const MODULE* module,                         
 );
 
 /** @brief applies a vmp product (result in DFT space) adds to res inplace */
-EXPORT void vmp_apply_dft_add(const MODULE* module,                                  // N
-                              VEC_ZNX_DFT* res, uint64_t res_size,                   // res
-                              const int64_t* a, uint64_t a_size, uint64_t a_sl,      // a
-                              const VMP_PMAT* pmat, uint64_t nrows, uint64_t ncols,  // prep matrix
-                              uint8_t* tmp_space                                     // scratch space
+EXPORT void vmp_apply_dft_add(const MODULE* module,                                                       // N
+                              VEC_ZNX_DFT* res, uint64_t res_size,                                        // res
+                              const int64_t* a, uint64_t a_size, uint64_t a_sl,                           // a
+                              const VMP_PMAT* pmat, uint64_t nrows, uint64_t ncols, uint64_t pmat_scale,  // prep matrix
+                              uint8_t* tmp_space  // scratch space
 );
 
 /** @brief applies a vmp product (result in DFT space) */
@@ -394,9 +394,9 @@ EXPORT void vmp_apply_dft_to_dft(const MODULE* module,                       // 
 EXPORT void vmp_apply_dft_to_dft_add(const MODULE* module,                       // N
                                      VEC_ZNX_DFT* res, const uint64_t res_size,  // res
                                      const VEC_ZNX_DFT* a_dft, uint64_t a_size,  // a
-                                     const VMP_PMAT* pmat, const uint64_t nrows,
-                                     const uint64_t ncols,  // prep matrix
-                                     uint8_t* tmp_space     // scratch space (a_size*sizeof(reim4) bytes)
+                                     const VMP_PMAT* pmat, const uint64_t nrows, const uint64_t ncols,
+                                     const uint64_t pmat_scale,  // prep matrix
+                                     uint8_t* tmp_space          // scratch space (a_size*sizeof(reim4) bytes)
 );
 
 /** @brief minimal size of the tmp_space */

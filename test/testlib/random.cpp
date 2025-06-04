@@ -50,6 +50,4 @@ double uniform_f64_bounds(const double lb, const double ub) {
   return dist(randgen());
 }
 
-double uniform_f64_01() {
-  return uniform_f64_bounds(0, 1);
-}
+double uniform_f64_01() { return uniform_f64_bounds(0, 1); }

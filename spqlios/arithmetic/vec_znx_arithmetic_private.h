@@ -541,11 +541,12 @@ EXPORT uint64_t fft64_vmp_extract_tmp_bytes(const MODULE* module,  // N
                                             uint64_t nrows, uint64_t ncols);
 
 /** @brief applies a vmp product (result in DFT space) and adds to res inplace */
-EXPORT void fft64_vmp_apply_dft_add_ref(const MODULE* module,                                  // N
-                                        VEC_ZNX_DFT* res, uint64_t res_size,                   // res
-                                        const int64_t* a, uint64_t a_size, uint64_t a_sl,      // a
-                                        const VMP_PMAT* pmat, uint64_t nrows, uint64_t ncols,  // prep matrix
-                                        uint8_t* tmp_space                                     // scratch space
+EXPORT void fft64_vmp_apply_dft_add_ref(const MODULE* module,                              // N
+                                        VEC_ZNX_DFT* res, uint64_t res_size,               // res
+                                        const int64_t* a, uint64_t a_size, uint64_t a_sl,  // a
+                                        const VMP_PMAT* pmat, uint64_t nrows, uint64_t ncols,
+                                        uint64_t pmat_scale,  // prep matrix
+                                        uint8_t* tmp_space    // scratch space
 );
 
 /** @brief applies a vmp product (result in DFT space) */
@@ -565,11 +566,12 @@ EXPORT void fft64_vmp_apply_dft_avx(const MODULE* module,                       
 );
 
 /** @brief applies a vmp product (result in DFT space) and adds to res inplace*/
-EXPORT void fft64_vmp_apply_dft_add_avx(const MODULE* module,                                  // N
-                                        VEC_ZNX_DFT* res, uint64_t res_size,                   // res
-                                        const int64_t* a, uint64_t a_size, uint64_t a_sl,      // a
-                                        const VMP_PMAT* pmat, uint64_t nrows, uint64_t ncols,  // prep matrix
-                                        uint8_t* tmp_space                                     // scratch space
+EXPORT void fft64_vmp_apply_dft_add_avx(const MODULE* module,                              // N
+                                        VEC_ZNX_DFT* res, uint64_t res_size,               // res
+                                        const int64_t* a, uint64_t a_size, uint64_t a_sl,  // a
+                                        const VMP_PMAT* pmat, uint64_t nrows, uint64_t ncols,
+                                        uint64_t pmat_scale,  // prep matrix
+                                        uint8_t* tmp_space    // scratch space
 );
 
 /** @brief this inner function could be very handy */
@@ -585,9 +587,9 @@ EXPORT void fft64_vmp_apply_dft_to_dft_ref(const MODULE* module,                
 EXPORT void fft64_vmp_apply_dft_to_dft_add_ref(const MODULE* module,                       // N
                                                VEC_ZNX_DFT* res, const uint64_t res_size,  // res
                                                const VEC_ZNX_DFT* a_dft, uint64_t a_size,  // a
-                                               const VMP_PMAT* pmat, const uint64_t nrows,
-                                               const uint64_t ncols,  // prep matrix
-                                               uint8_t* tmp_space     // scratch space (a_size*sizeof(reim4) bytes)
+                                               const VMP_PMAT* pmat, const uint64_t nrows, const uint64_t ncols,
+                                               uint64_t pmat_scale,  // prep matrix
+                                               uint8_t* tmp_space    // scratch space (a_size*sizeof(reim4) bytes)
 );
 
 /** @brief this inner function could be very handy */
@@ -603,9 +605,9 @@ EXPORT void fft64_vmp_apply_dft_to_dft_avx(const MODULE* module,                
 EXPORT void fft64_vmp_apply_dft_to_dft_add_avx(const MODULE* module,                       // N
                                                VEC_ZNX_DFT* res, const uint64_t res_size,  // res
                                                const VEC_ZNX_DFT* a_dft, uint64_t a_size,  // a
-                                               const VMP_PMAT* pmat, const uint64_t nrows,
-                                               const uint64_t ncols,  // prep matrix
-                                               uint8_t* tmp_space     // scratch space (a_size*sizeof(reim4) bytes)
+                                               const VMP_PMAT* pmat, const uint64_t nrows, const uint64_t ncols,
+                                               uint64_t pmat_scale,  // prep matrix
+                                               uint8_t* tmp_space    // scratch space (a_size*sizeof(reim4) bytes)
 );
 
 /** @brief minimal size of the tmp_space */
