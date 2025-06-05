@@ -12,22 +12,22 @@
 
 static int64_t random_automorphism_param() { return uniform_i64() | 1; }
 
-static void test_fft64_vec_znx_dft_automorphism(VEC_ZNX_DFT_AUTOMORPHISM_F func){
+static void test_fft64_vec_znx_dft_automorphism(VEC_ZNX_DFT_AUTOMORPHISM_F func) {
   const uint64_t nn = 128;
   MODULE* module = new_module_info(nn, FFT64);
 
-  uint64_t tmp_space_size = fft64_vec_znx_big_normalize_base2k_tmp_bytes(module) | fft64_vec_znx_dft_automorphism_tmp_bytes(module) | fft64_vec_znx_idft_tmp_bytes(module);
+  uint64_t tmp_space_size = fft64_vec_znx_big_normalize_base2k_tmp_bytes(module) |
+                            fft64_vec_znx_dft_automorphism_tmp_bytes(module) | fft64_vec_znx_idft_tmp_bytes(module);
   uint8_t* tmp_space = (uint8_t*)spqlios_alloc(tmp_space_size);
 
   for (uint64_t cols_a : {3, 5, 8}) {
     for (uint64_t cols_b : {3, 5, 8}) {
-
       int64_t p = random_automorphism_param();
 
       // a
       znx_vec_i64_layout a(nn, cols_a, nn);
       a.fill_random(10);
-      
+
       // a_dft <- AUTO(DFT(a))
       fft64_vec_znx_dft_layout a_dft(nn, cols_a);
       fft64_vec_znx_dft(module, a_dft.data, cols_a, a.data(), cols_a, nn);
@@ -59,7 +59,9 @@ static void test_fft64_vec_znx_dft_automorphism(VEC_ZNX_DFT_AUTOMORPHISM_F func)
   delete_module_info(module);
 }
 
-TEST(vec_znx_dft, fft64_vec_znx_dft_automorphism_ref) { test_fft64_vec_znx_dft_automorphism(fft64_vec_znx_dft_automorphism_ref); }
+TEST(vec_znx_dft, fft64_vec_znx_dft_automorphism_ref) {
+  test_fft64_vec_znx_dft_automorphism(fft64_vec_znx_dft_automorphism_ref);
+}
 
 static void test_fft64_vec_znx_dft(VEC_ZNX_DFT_F dft) {
   for (uint64_t n : {2, 4, 128}) {
@@ -100,10 +102,10 @@ static void test_fft64_vec_dft_add(VEC_DFT_ADD_F dft_add) {
         b.fill_dft_random_log2bound(42);
         std::vector<reim_fft64vec> expect(sr);
         for (uint64_t i = 0; i < sr; ++i) {
-          std::vector<double>v(n);
-          if (i < sa) { 
-            reim_fftvec_add(module->mod.fft64.add_fft, v.data(), ((double*)a.data) + i*n, ((double*)b.data) + i*n);
-          }else { 
+          std::vector<double> v(n);
+          if (i < sa) {
+            reim_fftvec_add(module->mod.fft64.add_fft, v.data(), ((double*)a.data) + i * n, ((double*)b.data) + i * n);
+          } else {
             std::fill(v.begin(), v.end(), 0.0);
           }
           expect[i] = reim_fft64vec(n, v.data());

@@ -141,7 +141,7 @@ mod_q120 mod_q120::from_q120b(const void* addr) {
 }
 
 mod_q120 mod_q120::from_q120c(const void* addr) {
-  //static const uint64_t _mask_2p32 = (uint64_t(1) << 32) - 1;
+  // static const uint64_t _mask_2p32 = (uint64_t(1) << 32) - 1;
   const uint32_t* in = (const uint32_t*)addr;
   mod_q120 r;
   for (uint64_t i = 0, k = 0; i < 8; i += 2, ++k) {
