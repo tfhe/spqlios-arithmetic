@@ -334,14 +334,13 @@ EXPORT void fft64_vmp_apply_dft_to_dft_add_ref(const MODULE* module,            
         for (uint64_t col_res = 0, col_pmat = pmat_scale; col_pmat < col_max - 1; col_res += 2, col_pmat += 2) {
           uint64_t col_offset = col_pmat * (8 * nrows);
           reim4_vec_mat2cols_product_ref(row_max, mat2cols_output, extracted_blk, mat_blk_start + col_offset);
-
           reim4_add_1blk_to_reim_ref(m, blk_i, vec_output + col_res * nn, mat2cols_output);
           reim4_add_1blk_to_reim_ref(m, blk_i, vec_output + (col_res + 1) * nn, mat2cols_output + 8);
         }
       } else {
         uint64_t col_offset = (pmat_scale - 1) * (8 * nrows);
         reim4_vec_mat2cols_product_ref(row_max, mat2cols_output, extracted_blk, mat_blk_start + col_offset);
-        reim4_add_1blk_to_reim_ref(m, blk_i, vec_output, mat2cols_output + 1);
+        reim4_add_1blk_to_reim_ref(m, blk_i, vec_output, mat2cols_output + 8);
 
         // apply mat2cols
         for (uint64_t col_res = 1, col_pmat = pmat_scale + 1; col_pmat < col_max - 1; col_res += 2, col_pmat += 2) {
