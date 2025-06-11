@@ -6,6 +6,7 @@
 typedef struct reim_fft_precomp REIM_FFT_PRECOMP;
 typedef struct reim_ifft_precomp REIM_IFFT_PRECOMP;
 typedef struct reim_add_precomp REIM_FFTVEC_ADD_PRECOMP;
+typedef struct reim_sub_precomp REIM_FFTVEC_SUB_PRECOMP;
 typedef struct reim_mul_precomp REIM_FFTVEC_MUL_PRECOMP;
 typedef struct reim_addmul_precomp REIM_FFTVEC_ADDMUL_PRECOMP;
 typedef struct reim_fftvec_automorphism_precomp REIM_FFTVEC_AUTOMORPHISM_PRECOMP;
@@ -66,6 +67,10 @@ EXPORT void reim_ifft(const REIM_IFFT_PRECOMP* tables, double* data);
 EXPORT REIM_FFTVEC_ADD_PRECOMP* new_reim_fftvec_add_precomp(uint32_t m);
 EXPORT void reim_fftvec_add(const REIM_FFTVEC_ADD_PRECOMP* tables, double* r, const double* a, const double* b);
 #define delete_reim_fftvec_add_precomp free
+
+EXPORT REIM_FFTVEC_SUB_PRECOMP* new_reim_fftvec_sub_precomp(uint32_t m);
+EXPORT void reim_fftvec_sub(const REIM_FFTVEC_SUB_PRECOMP* tables, double* r, const double* a, const double* b);
+#define delete_reim_fftvec_sub_precomp free
 
 EXPORT REIM_FFTVEC_MUL_PRECOMP* new_reim_fftvec_mul_precomp(uint32_t m);
 EXPORT void reim_fftvec_mul(const REIM_FFTVEC_MUL_PRECOMP* tables, double* r, const double* a, const double* b);

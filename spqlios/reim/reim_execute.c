@@ -17,6 +17,10 @@ EXPORT void reim_fftvec_add(const REIM_FFTVEC_ADD_PRECOMP* tables, double* r, co
   tables->function(tables, r, a, b);
 }
 
+EXPORT void reim_fftvec_sub(const REIM_FFTVEC_SUB_PRECOMP* tables, double* r, const double* a, const double* b) {
+  tables->function(tables, r, a, b);
+}
+
 EXPORT void reim_fftvec_mul(const REIM_FFTVEC_MUL_PRECOMP* tables, double* r, const double* a, const double* b) {
   tables->function(tables, r, a, b);
 }

@@ -33,6 +33,7 @@ static void fill_fft64_virtual_table(MODULE* module) {
   module->func.vec_znx_dft = fft64_vec_znx_dft;
   module->func.vec_znx_idft = fft64_vec_znx_idft;
   module->func.vec_dft_add = fft64_vec_dft_add;
+  module->func.vec_dft_sub = fft64_vec_dft_sub;
   module->func.vec_znx_idft_tmp_bytes = fft64_vec_znx_idft_tmp_bytes;
   module->func.vec_znx_idft_tmp_a = fft64_vec_znx_idft_tmp_a;
   module->func.vec_znx_big_add = fft64_vec_znx_big_add;
@@ -117,6 +118,7 @@ static void fill_fft64_precomp(MODULE* module) {
   module->mod.fft64.p_automorphism = new_reim_fftvec_automorphism_precomp(module->m);
   module->mod.fft64.mul_fft = new_reim_fftvec_mul_precomp(module->m);
   module->mod.fft64.add_fft = new_reim_fftvec_add_precomp(module->m);
+  module->mod.fft64.sub_fft = new_reim_fftvec_sub_precomp(module->m);
 }
 static void fill_ntt120_precomp(MODULE* module) {
   // fill any necessary precomp stuff

@@ -35,6 +35,8 @@ struct fft64_module_info_t {
   REIM_FFT_PRECOMP* p_fft;
   // pre-computation for add_fft
   REIM_FFTVEC_ADD_PRECOMP* add_fft;
+  // pre-computation for add_fft
+  REIM_FFTVEC_SUB_PRECOMP* sub_fft;
   // pre-computation for mul_fft
   REIM_FFTVEC_MUL_PRECOMP* mul_fft;
   // pre-computation for reim_from_znx6
@@ -65,6 +67,7 @@ typedef typeof(vec_znx_dft_automorphism_tmp_bytes) VEC_ZNX_DFT_AUTOMORPHISM_TMP_
 typedef typeof(vec_znx_dft_automorphism) VEC_ZNX_DFT_AUTOMORPHISM_F;
 typedef typeof(vec_znx_dft) VEC_ZNX_DFT_F;
 typedef typeof(vec_dft_add) VEC_DFT_ADD_F;
+typedef typeof(vec_dft_sub) VEC_DFT_SUB_F;
 typedef typeof(vec_znx_idft) VEC_ZNX_IDFT_F;
 typedef typeof(vec_znx_idft_tmp_bytes) VEC_ZNX_IDFT_TMP_BYTES_F;
 typedef typeof(vec_znx_idft_tmp_a) VEC_ZNX_IDFT_TMP_A_F;
@@ -118,6 +121,7 @@ struct module_virtual_functions_t {
   VEC_ZNX_ADD_F* vec_znx_add;
   VEC_ZNX_DFT_F* vec_znx_dft;
   VEC_DFT_ADD_F* vec_dft_add;
+  VEC_DFT_SUB_F* vec_dft_sub;
   VEC_ZNX_IDFT_F* vec_znx_idft;
   VEC_ZNX_IDFT_TMP_BYTES_F* vec_znx_idft_tmp_bytes;
   VEC_ZNX_IDFT_TMP_A_F* vec_znx_idft_tmp_a;
@@ -362,6 +366,12 @@ EXPORT void fft64_vec_znx_dft(const MODULE* module,                             
 );
 
 EXPORT void fft64_vec_dft_add(const MODULE* module,                   // N
+                              VEC_ZNX_DFT* res, uint64_t res_size,    // res
+                              const VEC_ZNX_DFT* a, uint64_t a_size,  // a
+                              const VEC_ZNX_DFT* b, uint64_t b_size   // b
+);
+
+EXPORT void fft64_vec_dft_sub(const MODULE* module,                   // N
                               VEC_ZNX_DFT* res, uint64_t res_size,    // res
                               const VEC_ZNX_DFT* a, uint64_t a_size,  // a
                               const VEC_ZNX_DFT* b, uint64_t b_size   // b

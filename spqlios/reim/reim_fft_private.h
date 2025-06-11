@@ -12,6 +12,7 @@ typedef struct reim_bitwiddle_precomp REIM_FFTVEC_BITWIDDLE_PRECOMP;
 typedef void (*FFT_FUNC)(const REIM_FFT_PRECOMP*, double*);
 typedef void (*IFFT_FUNC)(const REIM_IFFT_PRECOMP*, double*);
 typedef void (*FFTVEC_ADD_FUNC)(const REIM_FFTVEC_ADD_PRECOMP*, double*, const double*, const double*);
+typedef void (*FFTVEC_SUB_FUNC)(const REIM_FFTVEC_SUB_PRECOMP*, double*, const double*, const double*);
 typedef void (*FFTVEC_MUL_FUNC)(const REIM_FFTVEC_MUL_PRECOMP*, double*, const double*, const double*);
 typedef void (*FFTVEC_ADDMUL_FUNC)(const REIM_FFTVEC_ADDMUL_PRECOMP*, double*, const double*, const double*);
 typedef void (*FROM_ZNX32_FUNC)(const REIM_FROM_ZNX32_PRECOMP*, void*, const int32_t*);
@@ -54,6 +55,11 @@ typedef struct reim_add_precomp {
   FFTVEC_ADD_FUNC function;
   int64_t m;
 } REIM_FFTVEC_ADD_PRECOMP;
+
+typedef struct reim_sub_precomp {
+  FFTVEC_SUB_FUNC function;
+  int64_t m;
+} REIM_FFTVEC_SUB_PRECOMP;
 
 typedef struct reim_mul_precomp {
   FFTVEC_MUL_FUNC function;

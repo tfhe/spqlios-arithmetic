@@ -146,6 +146,16 @@ EXPORT void reim_fftvec_add_ref(const REIM_FFTVEC_ADD_PRECOMP* precomp, double* 
   }
 }
 
+EXPORT void reim_fftvec_sub_ref(const REIM_FFTVEC_SUB_PRECOMP* precomp, double* r, const double* a, const double* b) {
+  const uint64_t m = precomp->m;
+  for (uint64_t i = 0; i < m; ++i) {
+    double re = a[i] - b[i];
+    double im = a[i + m] - b[i + m];
+    r[i] = re;
+    r[i + m] = im;
+  }
+}
+
 EXPORT void reim_fftvec_mul_ref(const REIM_FFTVEC_MUL_PRECOMP* tables, double* r, const double* a, const double* b) {
   const uint64_t m = tables->m;
   for (uint64_t i = 0; i < m; ++i) {
@@ -182,6 +192,21 @@ EXPORT REIM_FFTVEC_ADD_PRECOMP* new_reim_fftvec_add_precomp(uint32_t m) {
     }
   } else {
     reps->function = reim_fftvec_add_ref;
+  }
+  return reps;
+}
+
+EXPORT REIM_FFTVEC_SUB_PRECOMP* new_reim_fftvec_sub_precomp(uint32_t m) {
+  REIM_FFTVEC_SUB_PRECOMP* reps = malloc(sizeof(REIM_FFTVEC_SUB_PRECOMP));
+  reps->m = m;
+  if (CPU_SUPPORTS("fma")) {
+    if (m >= 4) {
+      reps->function = reim_fftvec_sub_fma;
+    } else {
+      reps->function = reim_fftvec_sub_ref;
+    }
+  } else {
+    reps->function = reim_fftvec_sub_ref;
   }
   return reps;
 }
