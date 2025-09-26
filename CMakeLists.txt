@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.8)
 project(spqlios)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # read the current version from the manifest file
 file(READ "manifest.yaml" manifest)
 string(REGEX MATCH "version: +(([0-9]+)\\.([0-9]+)\\.([0-9]+))" SPQLIOS_VERSION_BLAH ${manifest})
