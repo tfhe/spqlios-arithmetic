@@ -78,7 +78,7 @@ void test_reim4_extract_1blk_from_contiguous_reim(
           reim4_elem el = gaussian_reim4();
           vv.row(j).set_blk(blk, el);
         }
-        reim4_extract_1blk_from_contiguous_reim_ref(m, nrows, blk, w, v);
+        reim4_extract_1blk_from_contiguous_reim(m, nrows, blk, w, v);
         for (uint64_t j = 0; j < nrows; ++j) {
           reim4_elem el = vv.row(j).get_blk(blk);
           reim4_elem actual = ww.get(j);
@@ -100,6 +100,46 @@ TEST(reim4_arithmetic, reim4_extract_1blk_from_contiguous_reim_avx) {
 }
 #endif
 
+typedef typeof(reim4_save_1blk_to_contiguous_reim_ref) reim4_save_1blk_to_contiguous_reim_f;
+void test_reim4_save_1blk_to_contiguous_reim(
+    reim4_extract_1blk_from_contiguous_reim_f reim4_extract_1blk_from_contiguous_reim,
+    reim4_save_1blk_to_contiguous_reim_f reim4_save_1blk_to_contiguous_reim) {
+  static const uint64_t numtrials = 20;
+  for (uint64_t m : {4, 8, 16, 1024, 4096, 32768}) {
+    for (uint64_t nrows : {1, 2, 5, 128}) {
+      double* v = (double*)malloc(2 * m * nrows * sizeof(double));
+      double* wexpect = (double*)malloc(8 * nrows * sizeof(double));
+      double* wactual = (double*)malloc(8 * nrows * sizeof(double));
+      reim_vector_view vv(m, nrows, v);
+      reim4_array_view wwexpect(nrows, wexpect);
+      reim4_array_view wwactual(nrows, wexpect);
+      // generate a vector of random reim4 elements
+      for (uint64_t i = 0; i < numtrials; ++i) {
+        uint64_t blk = rand() % (m / 4);
+        for (uint64_t j = 0; j < nrows; ++j) {
+          reim4_elem el = gaussian_reim4();
+          wwexpect.set(j, el);
+        }
+        // check that saving one bulk of element and extracting it gives back the same bulk
+        reim4_save_1blk_to_contiguous_reim(m, nrows, blk, v, wexpect);
+        reim4_extract_1blk_from_contiguous_reim(m, nrows, blk, wactual, v);
+        for (uint64_t j = 0; j < nrows; ++j) {
+          reim4_elem expect = wwexpect.get(j);
+          reim4_elem actual = wwactual.get(j);
+          ASSERT_EQ(expect, actual);
+        }
+      }
+      free(v);
+      free(wexpect);
+      free(wactual);
+    }
+  }
+}
+
+TEST(reim4_arithmetic, reim4_save_1blk_to_contiguous_reim_ref) {
+  test_reim4_save_1blk_to_contiguous_reim(reim4_extract_1blk_from_contiguous_reim_ref,
+                                          reim4_save_1blk_to_contiguous_reim_ref);
+}
 // test of basic arithmetic functions
 
 TEST(reim4_arithmetic, add) {
