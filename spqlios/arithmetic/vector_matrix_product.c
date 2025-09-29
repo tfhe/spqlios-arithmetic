@@ -17,7 +17,7 @@ EXPORT uint64_t fft64_bytes_of_vmp_pmat(const MODULE* module,           // N
 }
 
 EXPORT VMP_PMAT* new_vmp_pmat(const MODULE* module,           // N
-                                    uint64_t nrows, uint64_t ncols  // dimensions
+                              uint64_t nrows, uint64_t ncols  // dimensions
 ) {
   return spqlios_alloc(bytes_of_vmp_pmat(module, nrows, ncols));
 }
@@ -37,6 +37,51 @@ EXPORT void vmp_prepare_contiguous(const MODULE* module,                        
 EXPORT uint64_t vmp_prepare_contiguous_tmp_bytes(const MODULE* module,  // N
                                                  uint64_t nrows, uint64_t ncols) {
   return module->func.vmp_prepare_contiguous_tmp_bytes(module, nrows, ncols);
+}
+
+/** @brief prepares a convolution vector  */
+EXPORT void fft64_convolution_prepare_contiguous_ref(const MODULE* module,                              // N
+                                                     VEC_ZNX_DFT* pvec, uint64_t nrows,                 // output
+                                                     const int64_t* a, uint64_t a_size, uint64_t a_sl,  // a
+                                                     uint8_t* tmp_space                                 // scratch space
+) {
+  const uint64_t m = module->m;
+  const uint64_t rows = nrows < a_size ? nrows : a_size;
+
+  VEC_ZNX_DFT* a_dft = (VEC_ZNX_DFT*)tmp_space;
+  double* output_vec = (double*)pvec;
+
+  fft64_vec_znx_dft(module, a_dft, rows, a, a_size, a_sl);
+
+  for (uint64_t blk_i = 0; blk_i < m / 4; blk_i++) {
+    reim4_extract_1blk_from_contiguous_reim_ref(m, rows, blk_i, output_vec + blk_i * rows * 8, (const double*)a_dft);
+  }
+}
+
+/** @brief applies a convolution of two prepared vectors  */
+EXPORT void fft64_convolution_apply_dft_ref(const MODULE* module,                                      // N
+                                            VEC_ZNX_DFT* res, uint64_t res_size, uint64_t res_offset,  // output
+                                            const CNV_PVEC_L* a,
+                                            uint64_t a_size,  // left operand and its size (in terms of reim4)
+                                            const CNV_PVEC_R* b,
+                                            uint64_t b_size,    // right operand and its size (in terms of reim4)
+                                            uint8_t* tmp_space  // scratch space
+) {
+  const uint64_t m = module->m;
+  const uint64_t nn = module->nn;
+  uint64_t size = res_size < a_size + b_size - 1 ? res_size : a_size + b_size - 1;
+  uint64_t offset = res_offset < size ? res_offset : size;
+
+  double* dst_tmp = (double*)tmp_space;
+  double* dst = (double*)res;
+  const double* a_double = (const double*)a;
+  const double* b_double = (const double*)b;
+
+  for (uint64_t blk_i = 0; blk_i < m / 4; blk_i++) {
+    reim4_convolution_ref(dst_tmp, size, offset, a_double + blk_i * a_size * 8, a_size, b_double + blk_i * b_size * 8,
+                          b_size);
+    reim4_save_1blk_to_contiguous_reim_ref(m, size, blk_i, dst + offset * nn, dst_tmp);
+  }
 }
 
 /** @brief prepares a vmp matrix (contiguous row-major version) */
