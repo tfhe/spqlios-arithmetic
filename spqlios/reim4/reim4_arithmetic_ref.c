@@ -22,6 +22,21 @@ void reim4_extract_1blk_from_reim_ref(uint64_t m, uint64_t blk,
   dst[7] = src_ptr[3];
 }
 
+EXPORT void reim4_save_1blk_to_contiguous_reim_ref(uint64_t m, uint64_t nrows, uint64_t blk, double* const dst,
+                                                   const double* const src) {
+  assert(blk < (m >> 2));
+
+  double* dst_ptr = dst + (blk << 2);
+  const double* src_ptr = src;
+  for (uint64_t i = 0; i < nrows * 2; ++i) {
+    dst_ptr[0] = src_ptr[0];
+    dst_ptr[1] = src_ptr[1];
+    dst_ptr[2] = src_ptr[2];
+    dst_ptr[3] = src_ptr[3];
+    src_ptr += 4;
+    dst_ptr += m;
+  }
+}
 EXPORT void reim4_extract_1blk_from_contiguous_reim_ref(uint64_t m, uint64_t nrows, uint64_t blk, double* const dst,
                                                         const double* const src) {
   assert(blk < (m >> 2));

@@ -83,6 +83,17 @@ EXPORT void reim4_extract_1blk_from_reim_avx(uint64_t m, uint64_t blk,
  * @param dst the output: nrows reim4's  dst[i] = src[i](blk)
  * @param src the input: nrows reim's
  */
+EXPORT void reim4_save_1blk_to_contiguous_reim_ref(uint64_t m, uint64_t nrows, uint64_t blk, double* const dst,
+                                                   const double* const src);
+
+/**
+ * @brief extract 1 reim4 block from nrows reim vectors of m complexes
+ * @param nrows the number of reim (fft) vectors
+ * @param m the size of each reim
+ * @param blk the block id to extract (<m/4)
+ * @param dst the output: nrows reim4's  dst[i] = src[i](blk)
+ * @param src the input: nrows reim's
+ */
 EXPORT void reim4_extract_1blk_from_contiguous_reim_ref(uint64_t m, uint64_t nrows, uint64_t blk, double* const dst,
                                                         const double* const src);
 EXPORT void reim4_extract_1blk_from_contiguous_reim_avx(uint64_t m, uint64_t nrows, uint64_t blk, double* const dst,
