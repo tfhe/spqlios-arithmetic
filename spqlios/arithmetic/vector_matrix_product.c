@@ -39,9 +39,27 @@ EXPORT uint64_t vmp_prepare_contiguous_tmp_bytes(const MODULE* module,  // N
   return module->func.vmp_prepare_contiguous_tmp_bytes(module, nrows, ncols);
 }
 
+/** @brief prepares the right vector for convolution  */
+EXPORT void fft64_convolution_prepare_right_contiguous_ref(const MODULE* module,                              // N
+                                                           CNV_PVEC_R* pvec, uint64_t nrows,                  // output
+                                                           const int64_t* a, uint64_t a_size, uint64_t a_sl,  // a
+                                                           uint8_t* tmp_space  // scratch space
+) {
+  fft64_convolution_prepare_contiguous_ref(module, (double*)pvec, nrows, a, a_size, a_sl, tmp_space);
+}
+
+/** @brief prepares the left vector for convolution  */
+EXPORT void fft64_convolution_prepare_left_contiguous_ref(const MODULE* module,                              // N
+                                                          CNV_PVEC_L* pvec, uint64_t nrows,                  // output
+                                                          const int64_t* a, uint64_t a_size, uint64_t a_sl,  // a
+                                                          uint8_t* tmp_space  // scratch space
+) {
+  fft64_convolution_prepare_contiguous_ref(module, (double*)pvec, nrows, a, a_size, a_sl, tmp_space);
+}
+
 /** @brief prepares a convolution vector  */
 EXPORT void fft64_convolution_prepare_contiguous_ref(const MODULE* module,                              // N
-                                                     VEC_ZNX_DFT* pvec, uint64_t nrows,                 // output
+                                                     double* pvec, uint64_t nrows,                      // output
                                                      const int64_t* a, uint64_t a_size, uint64_t a_sl,  // a
                                                      uint8_t* tmp_space                                 // scratch space
 ) {
@@ -49,12 +67,11 @@ EXPORT void fft64_convolution_prepare_contiguous_ref(const MODULE* module,      
   const uint64_t rows = nrows < a_size ? nrows : a_size;
 
   VEC_ZNX_DFT* a_dft = (VEC_ZNX_DFT*)tmp_space;
-  double* output_vec = (double*)pvec;
 
   fft64_vec_znx_dft(module, a_dft, rows, a, a_size, a_sl);
 
   for (uint64_t blk_i = 0; blk_i < m / 4; blk_i++) {
-    reim4_extract_1blk_from_contiguous_reim_ref(m, rows, blk_i, output_vec + blk_i * rows * 8, (const double*)a_dft);
+    reim4_extract_1blk_from_contiguous_reim_ref(m, rows, blk_i, pvec + blk_i * rows * 8, (const double*)a_dft);
   }
 }
 

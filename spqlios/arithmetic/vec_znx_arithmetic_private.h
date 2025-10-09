@@ -413,6 +413,26 @@ EXPORT void fft64_znx_small_single_product(const MODULE* module,  // N
 /** @brief tmp bytes required for znx_small_single_product  */
 EXPORT uint64_t fft64_znx_small_single_product_tmp_bytes(const MODULE* module);
 
+/** @brief prepares the right vector for convolution  */
+EXPORT void fft64_convolution_prepare_right_contiguous_ref(const MODULE* module,                              // N
+                                                           CNV_PVEC_R* pvec, uint64_t nrows,                  // output
+                                                           const int64_t* a, uint64_t a_size, uint64_t a_sl,  // a
+                                                           uint8_t* tmp_space  // scratch space
+);
+
+/** @brief prepares the left vector for convolution  */
+EXPORT void fft64_convolution_prepare_left_contiguous_ref(const MODULE* module,                              // N
+                                                          CNV_PVEC_L* pvec, uint64_t nrows,                  // output
+                                                          const int64_t* a, uint64_t a_size, uint64_t a_sl,  // a
+                                                          uint8_t* tmp_space  // scratch space
+);
+
+/** @brief prepares a convolution vector  */
+EXPORT void fft64_convolution_prepare_contiguous_ref(const MODULE* module,                              // N
+                                                     double* pvec, uint64_t nrows,                      // output
+                                                     const int64_t* a, uint64_t a_size, uint64_t a_sl,  // a
+                                                     uint8_t* tmp_space                                 // scratch space
+);
 /** @brief prepares a vmp matrix (contiguous row-major version) */
 EXPORT void fft64_vmp_prepare_contiguous_ref(const MODULE* module,                                // N
                                              VMP_PMAT* pmat,                                      // output
