@@ -166,6 +166,7 @@ reim_fft64vec fft64_vmp_pmat_layout::get_zext(uint64_t row, uint64_t col) const 
   }
   return res;
 }
+
 void fft64_vmp_pmat_layout::set(uint64_t row, uint64_t col, const reim_fft64vec& value) {
   REQUIRE_DRAMATICALLY(row < nrows, "row overflow: " << row << " / " << nrows);
   REQUIRE_DRAMATICALLY(col < ncols, "row overflow: " << col << " / " << ncols);
@@ -188,6 +189,7 @@ void fft64_vmp_pmat_layout::fill_random(double log2bound) {
     }
   }
 }
+
 void fft64_vmp_pmat_layout::fill_dft_random(uint64_t log2bound) {
   for (uint64_t row = 0; row < nrows; ++row) {
     for (uint64_t col = 0; col < ncols; ++col) {
@@ -216,10 +218,30 @@ fft64_cnv_left_layout::fft64_cnv_left_layout(uint64_t n, uint64_t size)
       size(size),
       data((CNV_PVEC_L*)alloc64(size * nn * 8)) {}
 
-reim4_elem fft64_cnv_left_layout::get(uint64_t idx, uint64_t blk) {
+reim4_elem fft64_cnv_left_layout::get(uint64_t idx, uint64_t blk) const {
   REQUIRE_DRAMATICALLY(idx < size, "idx overflow: " << idx << " / " << size);
   REQUIRE_DRAMATICALLY(blk < nn / 8, "block overflow: " << blk << " / " << (nn / 8));
-  return reim4_elem(((double*)data) + blk * size + idx);
+  return reim4_elem(((double*)data) + 8 * (blk * size + idx));
+}
+
+reim_fft64vec fft64_cnv_left_layout::get_zext(uint64_t row) const {
+  if (row >= size) {
+    return reim_fft64vec::zero(nn);
+  }
+  reim_fft64vec res(nn);
+  for (uint64_t blk = 0; blk < nn / 8; ++blk) {
+    reim4_elem v = get(row, blk);
+    res.set_blk(blk, v);
+  }
+  return res;
+}
+
+void fft64_cnv_left_layout::set(const reim_fft64vec& value) { value.save_as((double*)data); }
+
+void fft64_cnv_left_layout::fill_random(double log2bound) {
+  for (uint64_t row = 0; row < size; ++row) {
+    set(reim_fft64vec::random(nn, log2bound));
+  }
 }
 
 fft64_cnv_left_layout::~fft64_cnv_left_layout() { spqlios_free(data); }
@@ -229,10 +251,30 @@ fft64_cnv_right_layout::fft64_cnv_right_layout(uint64_t n, uint64_t size)
       size(size),
       data((CNV_PVEC_R*)alloc64(size * nn * 8)) {}
 
-reim4_elem fft64_cnv_right_layout::get(uint64_t idx, uint64_t blk) {
+reim4_elem fft64_cnv_right_layout::get(uint64_t idx, uint64_t blk) const {
   REQUIRE_DRAMATICALLY(idx < size, "idx overflow: " << idx << " / " << size);
   REQUIRE_DRAMATICALLY(blk < nn / 8, "block overflow: " << blk << " / " << (nn / 8));
-  return reim4_elem(((double*)data) + blk * size + idx);
+  return reim4_elem(((double*)data) + 8 * (blk * size + idx));
+}
+
+reim_fft64vec fft64_cnv_right_layout::get_zext(uint64_t row) const {
+  if (row >= size) {
+    return reim_fft64vec::zero(nn);
+  }
+  reim_fft64vec res(nn);
+  for (uint64_t blk = 0; blk < nn / 8; ++blk) {
+    reim4_elem v = get(row, blk);
+    res.set_blk(blk, v);
+  }
+  return res;
+}
+
+void fft64_cnv_right_layout::set(const reim_fft64vec& value) { value.save_as((double*)data); }
+
+void fft64_cnv_right_layout::fill_random(double log2bound) {
+  for (uint64_t row = 0; row < size; ++row) {
+    set(reim_fft64vec::random(nn, log2bound));
+  }
 }
 
 fft64_cnv_right_layout::~fft64_cnv_right_layout() { spqlios_free(data); }

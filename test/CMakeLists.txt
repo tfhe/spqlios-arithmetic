@@ -84,6 +84,7 @@ set(UNITTEST_FILES
         spqlios_vec_znx_big_test.cpp
         spqlios_znx_small_test.cpp
         spqlios_vmp_product_test.cpp
+        spqlios_convolution_test.cpp
         spqlios_vec_znx_dft_test.cpp
         spqlios_svp_test.cpp
         spqlios_svp_product_test.cpp
