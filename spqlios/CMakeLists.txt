@@ -8,6 +8,7 @@ set(SRCS_GENERIC
         arithmetic/vec_znx.c
         arithmetic/vec_znx_dft.c
         arithmetic/vector_matrix_product.c
+        arithmetic/vec_znx_convolution.c
         cplx/cplx_common.c
         cplx/cplx_conversions.c
         cplx/cplx_fft_asserts.c

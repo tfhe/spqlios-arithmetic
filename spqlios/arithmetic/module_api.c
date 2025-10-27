@@ -51,6 +51,7 @@ static void fill_fft64_virtual_table(MODULE* module) {
   module->func.vmp_apply_dft_tmp_bytes = fft64_vmp_apply_dft_tmp_bytes;
   module->func.vmp_apply_dft_to_dft = fft64_vmp_apply_dft_to_dft_ref;
   module->func.vmp_apply_dft_to_dft_tmp_bytes = fft64_vmp_apply_dft_to_dft_tmp_bytes;
+  module->func.cnv_prepare_right_contiguous = fft64_convolution_prepare_right_contiguous_ref;
   module->func.bytes_of_vec_znx_dft = fft64_bytes_of_vec_znx_dft;
   module->func.bytes_of_vec_znx_dft = fft64_bytes_of_vec_znx_dft;
   module->func.bytes_of_vec_znx_dft = fft64_bytes_of_vec_znx_dft;
