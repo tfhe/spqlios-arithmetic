@@ -434,11 +434,15 @@ EXPORT void fft64_convolution_prepare_right_contiguous_ref(const MODULE* module,
 
 /** @brief minimal scratch space byte-size required for the cnv_prepare_right_contiguous function */
 EXPORT uint64_t fft64_convolution_prepare_right_contiguous_tmp_bytes(const MODULE* module,  // N
-                                                                     uint64_t nrows);
+                                                                     uint64_t nrows,        // size of output
+                                                                     uint64_t a_size        // size of input
+);
 
 /** @brief minimal scratch space byte-size required for the cnv_prepare_left_contiguous function */
 EXPORT uint64_t fft64_convolution_prepare_left_contiguous_tmp_bytes(const MODULE* module,  // N
-                                                                    uint64_t nrows);
+                                                                    uint64_t nrows,        // size of output
+                                                                    uint64_t a_size        // size of input
+);
 
 /** @brief prepares the left vector for convolution  */
 EXPORT void fft64_convolution_prepare_left_contiguous_ref(const MODULE* module,                              // N

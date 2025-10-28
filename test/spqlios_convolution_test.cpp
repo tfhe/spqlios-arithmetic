@@ -16,7 +16,7 @@ static void test_convolution_prepare_contiguous(CNV_PREPARE_RIGHT_CONTIGUOUS_F* 
       znx_vec_i64_layout vec(nn, nrows, nn);
       fft64_cnv_right_layout pvec(nn, nrows);
       vec.fill_random(30);
-      std::vector<uint8_t> tmp_space(tmp_bytes(module, nrows));
+      std::vector<uint8_t> tmp_space(tmp_bytes(module, nrows, nrows));
       thash hash_before = vec.content_hash();
       prepare_contiguous(module, pvec.data, nrows, vec.data(), nrows, nn, tmp_space.data());
       ASSERT_EQ(vec.content_hash(), hash_before);

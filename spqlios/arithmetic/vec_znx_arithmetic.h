@@ -364,7 +364,9 @@ EXPORT void cnv_prepare_right_contiguous(const MODULE* module,                  
 
 /** @brief minimal scratch space byte-size required for the cnv_prepare_right_contiguous function */
 EXPORT uint64_t cnv_prepare_right_contiguous_tmp_bytes(const MODULE* module,  // N
-                                                       uint64_t nrows);
+                                                       uint64_t nrows,        // size of output
+                                                       uint64_t a_size        // size of input
+);
 
 /** @brief prepares the right vector for convolution  */
 EXPORT void cnv_prepare_left_contiguous(const MODULE* module,                              // N
@@ -375,7 +377,9 @@ EXPORT void cnv_prepare_left_contiguous(const MODULE* module,                   
 
 /** @brief minimal scratch space byte-size required for the cnv_prepare_left_contiguous function */
 EXPORT uint64_t cnv_prepare_left_contiguous_tmp_bytes(const MODULE* module,  // N
-                                                      uint64_t nrows);
+                                                      uint64_t nrows,        // size of output
+                                                      uint64_t a_size        // size of input
+);
 
 /** @brief applies a convolution of two prepared vectors  */
 EXPORT void cnv_apply_dft(const MODULE* module,                                      // N
