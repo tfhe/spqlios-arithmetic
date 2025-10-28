@@ -114,7 +114,6 @@ EXPORT void fft64_convolution_apply_dft_ref(const MODULE* module,               
                                             uint8_t* tmp_space  // scratch space
 ) {
   const uint64_t m = module->m;
-  const uint64_t nn = module->nn;
   uint64_t size = res_size < a_size + b_size - 1 ? res_size : a_size + b_size - 1;
   uint64_t offset = res_offset < size ? res_offset : size;
 
@@ -126,7 +125,7 @@ EXPORT void fft64_convolution_apply_dft_ref(const MODULE* module,               
   for (uint64_t blk_i = 0; blk_i < m / 4; blk_i++) {
     reim4_convolution_ref(dst_tmp, size, offset, a_double + blk_i * a_size * 8, a_size, b_double + blk_i * b_size * 8,
                           b_size);
-    reim4_save_1blk_to_contiguous_reim_ref(m, size, blk_i, dst + offset * nn, dst_tmp);
+    reim4_save_1blk_to_contiguous_reim_ref(m, size, blk_i, dst, dst_tmp);
   }
 }
 
@@ -137,6 +136,5 @@ EXPORT uint64_t fft64_convolution_apply_dft_tmp_bytes(const MODULE* module,     
                                                       uint64_t b_size   // size of right operand (in terms of reim4)
 ) {
   uint64_t size = res_size < a_size + b_size - 1 ? res_size : a_size + b_size - 1;
-  uint64_t offset = res_offset < size ? res_offset : size;
-  return sizeof(double) * 8 * (size - offset);
+  return sizeof(double) * 8 * size;
 }

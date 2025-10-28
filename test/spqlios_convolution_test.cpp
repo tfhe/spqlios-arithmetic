@@ -43,32 +43,38 @@ static void test_cnv_apply(CNV_APPLY_DFT_F* apply, CNV_APPLY_DFT_TMP_BYTES_F* tm
     MODULE* module = new_module_info(nn, FFT64);
     for (uint64_t size_l : {1, 4, 7}) {
       for (uint64_t size_r : {1, 4, 7}) {
-        uint64_t out_size = size_l + size_r - 1;
-        uint64_t offset = 0;
-        fft64_cnv_right_layout pvec_right(nn, size_r);
-        fft64_cnv_left_layout pvec_left(nn, size_l);
-        fft64_vec_znx_dft_layout out(nn, out_size);
-        pvec_right.fill_random(0);
-        pvec_left.fill_random(0);
-        // naive computation of the convolution
-        std::vector<reim_fft64vec> expect(out_size, reim_fft64vec(nn));
-        for (uint64_t k = offset; k < out_size; ++k) {
-          uint64_t jmin = k >= size_l ? k + 1 - size_l : 0;
-          uint64_t jmax = k < size_r ? k + 1 : size_r;
-          reim_fft64vec ex = reim_fft64vec::zero(nn);
-          for (uint64_t j = jmin; j < jmax; ++j) {
-            ex += pvec_left.get_zext(k - j) * pvec_right.get_zext(j);
+        for (uint64_t offset : {0, 1, 2}) {
+          uint64_t out_size = size_l + size_r - 1;
+          if (offset > out_size) {
+            continue;
           }
-          expect[k] = ex;
-        }
-        //
-        // apply the convolution
-        std::vector<uint8_t> tmp(tmp_bytes(module, out_size, offset, size_l, size_r));
-        apply(module, out.data, out_size, offset, pvec_left.data, size_l, pvec_right.data, size_r, tmp.data());
-        // check that the output is close from the expectation
-        for (uint64_t col = 0; col < out_size; ++col) {
-          reim_fft64vec actual = out.get_copy_zext(col);
-          ASSERT_LE(infty_dist(actual, expect[col]), 1e-10);
+          fft64_cnv_right_layout pvec_right(nn, size_r);
+          fft64_cnv_left_layout pvec_left(nn, size_l);
+          fft64_vec_znx_dft_layout out(nn, out_size);
+          pvec_right.fill_random(0);
+          pvec_left.fill_random(0);
+          // naive computation of the convolution
+          std::vector<reim_fft64vec> expect(out_size, reim_fft64vec(nn));
+          for (uint64_t k = offset; k < out_size + offset; ++k) {
+            reim_fft64vec ex = reim_fft64vec::zero(nn);
+            if (k < size_r + size_l) {
+              uint64_t jmin = k >= size_l ? k + 1 - size_l : 0;
+              uint64_t jmax = k < size_r ? k + 1 : size_r;
+              for (uint64_t j = jmin; j < jmax; ++j) {
+                ex += pvec_left.get_zext(k - j) * pvec_right.get_zext(j);
+              }
+            }
+            expect[k - offset] = ex;
+          }
+          //
+          // apply the convolution
+          std::vector<uint8_t> tmp(tmp_bytes(module, out_size, offset, size_l, size_r));
+          apply(module, out.data, out_size, offset, pvec_left.data, size_l, pvec_right.data, size_r, tmp.data());
+          // check that the output is close from the expectation
+          for (uint64_t k = 0; k < out_size; ++k) {
+            reim_fft64vec actual = out.get_copy_zext(k);
+            ASSERT_LE(infty_dist(actual, expect[k]), 1e-10);
+          }
         }
       }
     }
