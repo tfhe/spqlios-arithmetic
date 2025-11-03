@@ -83,6 +83,10 @@ EXPORT void fft64_convolution_prepare_contiguous_ref(const MODULE* module,      
 ) {
   const uint64_t m = module->m;
   const uint64_t rows = nrows < a_size ? nrows : a_size;
+  // dimensions where m < 4 are not implemented yet
+  if (m<4) {
+    NOT_IMPLEMENTED()
+  }
 
   VEC_ZNX_DFT* a_dft = (VEC_ZNX_DFT*)tmp_space;
 

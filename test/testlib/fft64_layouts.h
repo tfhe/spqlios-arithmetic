@@ -91,10 +91,11 @@ class fft64_cnv_left_layout {
   const uint64_t size;
   CNV_PVEC_L* const data;
   fft64_cnv_left_layout(uint64_t n, uint64_t size);
-  reim4_elem get(uint64_t idx, uint64_t blk) const;
-  void set(const reim_fft64vec&);
-  reim_fft64vec get_zext(uint64_t row) const;
-  thash content_hash() const;
+  [[nodiscard]] reim4_elem get(uint64_t idx, uint64_t blk) const;
+  void set(uint64_t idx, uint64_t blk, const reim4_elem& v);
+  void set(uint64_t idx, const reim_fft64vec&);
+  [[nodiscard]] reim_fft64vec get_zext(uint64_t idx) const;
+  [[nodiscard]] thash content_hash() const;
   /** @brief fill with random double values (unstructured) */
   void fill_random(double log2bound);
   ~fft64_cnv_left_layout();
@@ -107,10 +108,11 @@ class fft64_cnv_right_layout {
   const uint64_t size;
   CNV_PVEC_R* const data;
   fft64_cnv_right_layout(uint64_t n, uint64_t size);
-  reim4_elem get(uint64_t idx, uint64_t blk) const;
-  void set(const reim_fft64vec&);
-  reim_fft64vec get_zext(uint64_t row) const;
-  thash content_hash() const;
+  [[nodiscard]] reim4_elem get(uint64_t idx, uint64_t blk) const;
+  void set(uint64_t idx, uint64_t blk, const reim4_elem& v);
+  void set(uint64_t idx, const reim_fft64vec&);
+  [[nodiscard]] reim_fft64vec get_zext(uint64_t idx) const;
+  [[nodiscard]] thash content_hash() const;
   /** @brief fill with random double values (unstructured) */
   void fill_random(double log2bound);
   ~fft64_cnv_right_layout();

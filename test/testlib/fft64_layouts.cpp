@@ -224,6 +224,12 @@ reim4_elem fft64_cnv_left_layout::get(uint64_t idx, uint64_t blk) const {
   return reim4_elem(((double*)data) + 8 * (blk * size + idx));
 }
 
+void fft64_cnv_left_layout::set(uint64_t idx, uint64_t blk, const reim4_elem& v) {
+  REQUIRE_DRAMATICALLY(idx < size, "idx overflow: " << idx << " / " << size);
+  REQUIRE_DRAMATICALLY(blk < nn / 8, "block overflow: " << blk << " / " << (nn / 8));
+  v.save_as(((double*)data) + 8 * (blk * size + idx));
+}
+
 reim_fft64vec fft64_cnv_left_layout::get_zext(uint64_t row) const {
   if (row >= size) {
     return reim_fft64vec::zero(nn);
@@ -236,11 +242,16 @@ reim_fft64vec fft64_cnv_left_layout::get_zext(uint64_t row) const {
   return res;
 }
 
-void fft64_cnv_left_layout::set(const reim_fft64vec& value) { value.save_as((double*)data); }
+void fft64_cnv_left_layout::set(uint64_t idx, const reim_fft64vec& value) {
+  REQUIRE_DRAMATICALLY(idx < size, "idx overflow: " << idx << " / " << size);
+  for (uint64_t blk = 0; blk < nn / 8; ++blk) {
+    set(idx, blk, value.get_blk(blk));
+  }
+}
 
 void fft64_cnv_left_layout::fill_random(double log2bound) {
   for (uint64_t row = 0; row < size; ++row) {
-    set(reim_fft64vec::random(nn, log2bound));
+    set(row, reim_fft64vec::random(nn, log2bound));
   }
 }
 
@@ -257,6 +268,12 @@ reim4_elem fft64_cnv_right_layout::get(uint64_t idx, uint64_t blk) const {
   return reim4_elem(((double*)data) + 8 * (blk * size + idx));
 }
 
+void fft64_cnv_right_layout::set(uint64_t idx, uint64_t blk, const reim4_elem& v) {
+  REQUIRE_DRAMATICALLY(idx < size, "idx overflow: " << idx << " / " << size);
+  REQUIRE_DRAMATICALLY(blk < nn / 8, "block overflow: " << blk << " / " << (nn / 8));
+  v.save_as(((double*)data) + 8 * (blk * size + idx));
+}
+
 reim_fft64vec fft64_cnv_right_layout::get_zext(uint64_t row) const {
   if (row >= size) {
     return reim_fft64vec::zero(nn);
@@ -269,11 +286,16 @@ reim_fft64vec fft64_cnv_right_layout::get_zext(uint64_t row) const {
   return res;
 }
 
-void fft64_cnv_right_layout::set(const reim_fft64vec& value) { value.save_as((double*)data); }
+void fft64_cnv_right_layout::set(uint64_t idx, const reim_fft64vec& value) {
+  REQUIRE_DRAMATICALLY(idx < size, "idx overflow: " << idx << " / " << size);
+  for (uint64_t blk = 0; blk < nn / 8; ++blk) {
+    set(idx, blk, value.get_blk(blk));
+  }
+}
 
 void fft64_cnv_right_layout::fill_random(double log2bound) {
   for (uint64_t row = 0; row < size; ++row) {
-    set(reim_fft64vec::random(nn, log2bound));
+    set(row, reim_fft64vec::random(nn, log2bound));
   }
 }
 
