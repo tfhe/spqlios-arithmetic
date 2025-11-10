@@ -281,9 +281,17 @@ TEST(reim4_arithmetic, reim4_vec_convolution_ref) {
         ASSERT_LE(infty_dist(reim4_elem(dest + 8), vexpect[k + 1]), 1e-10);
       }
       // actual convolution
-      reim4_convolution_ref(actual.data(), sizea + sizeb - 1, 0, a.data(), sizea, b.data(), sizeb);
-      for (uint64_t k = 0; k < sizea + sizeb - 1; ++k) {
-        ASSERT_LE(infty_dist(vactual.get(k), vexpect[k]), 1e-10) << k;
+      for (uint64_t offset : {0, 1, 2}) {
+        for (uint64_t out_size : {0, 1, 2, 3, 4, 5, 6, 7, 8, 13, 14, 15}) {
+          std::vector<double> actual(8 * out_size);
+          reim4_array_view vactual(out_size, actual.data());
+          reim4_convolution_ref(actual.data(), out_size, offset, a.data(), sizea, b.data(), sizeb);
+          for (uint64_t k = 0; k < out_size; ++k) {
+            if (k + offset < sizea + sizeb - 1) {
+              ASSERT_LE(infty_dist(vactual.get(k), vexpect[k + offset]), 1e-10) << k;
+            }
+          }
+        }
       }
     }
   }
