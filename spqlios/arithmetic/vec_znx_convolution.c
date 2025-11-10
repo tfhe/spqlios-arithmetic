@@ -63,7 +63,7 @@ EXPORT uint64_t fft64_convolution_prepare_right_contiguous_tmp_bytes(const MODUL
 ) {
   uint64_t nn = module->nn;
   const uint64_t rows = nrows < a_size ? nrows : a_size;
-  return nn * sizeof(uint64_t) * rows;
+  return nn * sizeof(double) * rows;
 }
 
 /** @brief prepares the left vector for convolution  */
@@ -84,7 +84,7 @@ EXPORT void fft64_convolution_prepare_contiguous_ref(const MODULE* module,      
   const uint64_t m = module->m;
   const uint64_t rows = nrows < a_size ? nrows : a_size;
   // dimensions where m < 4 are not implemented yet
-  if (m<4) {
+  if (m < 4) {
     NOT_IMPLEMENTED()
   }
 
@@ -93,7 +93,8 @@ EXPORT void fft64_convolution_prepare_contiguous_ref(const MODULE* module,      
   fft64_vec_znx_dft(module, a_dft, rows, a, a_size, a_sl);
 
   for (uint64_t blk_i = 0; blk_i < m / 4; blk_i++) {
-    reim4_extract_1blk_from_contiguous_reim_ref(m, rows, blk_i, pvec + blk_i * rows * 8, (const double*)a_dft);
+    reim4_extract_1blk_from_contiguous_reim_ref(m, rows, blk_i, pvec + blk_i * nrows * 8, (const double*)a_dft);
+    memset(pvec + blk_i * nrows * 8 + rows * 8, 0, (nrows - rows) * 8 * sizeof(double));
   }
 }
 
@@ -128,8 +129,9 @@ EXPORT void fft64_convolution_apply_dft_ref(const MODULE* module,               
                                             uint8_t* tmp_space  // scratch space
 ) {
   const uint64_t m = module->m;
+  const uint64_t nn = module->nn;
   uint64_t size = res_size < a_size + b_size - 1 ? res_size : a_size + b_size - 1;
-  uint64_t offset = res_offset < size ? res_offset : size;
+  uint64_t offset = res_offset < a_size + b_size - 1 ? res_offset : a_size + b_size - 1;
 
   double* dst_tmp = (double*)tmp_space;
   double* dst = (double*)res;
@@ -141,6 +143,7 @@ EXPORT void fft64_convolution_apply_dft_ref(const MODULE* module,               
                           b_size);
     reim4_save_1blk_to_contiguous_reim_ref(m, size, blk_i, dst, dst_tmp);
   }
+  memset(dst + size * nn, 0, (res_size - size) * nn * sizeof(double));
 }
 
 /** @brief minimal scratch space byte-size required for the cnv_apply_dft function */
