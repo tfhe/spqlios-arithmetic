@@ -354,4 +354,47 @@ EXPORT uint64_t vmp_apply_dft_to_dft_tmp_bytes(const MODULE* module,           /
                                                uint64_t a_size,                // a
                                                uint64_t nrows, uint64_t ncols  // prep matrix
 );
+
+/** @brief prepares the right vector for convolution  */
+EXPORT void cnv_prepare_right_contiguous(const MODULE* module,                              // N
+                                         CNV_PVEC_R* pvec, uint64_t nrows,                  // output
+                                         const int64_t* a, uint64_t a_size, uint64_t a_sl,  // a
+                                         uint8_t* tmp_space                                 // scratch space
+);
+
+/** @brief minimal scratch space byte-size required for the cnv_prepare_right_contiguous function */
+EXPORT uint64_t cnv_prepare_right_contiguous_tmp_bytes(const MODULE* module,  // N
+                                                       uint64_t nrows,        // size of output
+                                                       uint64_t a_size        // size of input
+);
+
+/** @brief prepares the right vector for convolution  */
+EXPORT void cnv_prepare_left_contiguous(const MODULE* module,                              // N
+                                        CNV_PVEC_L* pvec, uint64_t nrows,                  // output
+                                        const int64_t* a, uint64_t a_size, uint64_t a_sl,  // a
+                                        uint8_t* tmp_space                                 // scratch space
+);
+
+/** @brief minimal scratch space byte-size required for the cnv_prepare_left_contiguous function */
+EXPORT uint64_t cnv_prepare_left_contiguous_tmp_bytes(const MODULE* module,  // N
+                                                      uint64_t nrows,        // size of output
+                                                      uint64_t a_size        // size of input
+);
+
+/** @brief applies a convolution of two prepared vectors  */
+EXPORT void cnv_apply_dft(const MODULE* module,                                      // N
+                          VEC_ZNX_DFT* res, uint64_t res_size, uint64_t res_offset,  // output
+                          const CNV_PVEC_L* a,
+                          uint64_t a_size,  // left operand and its size (in terms of reim4)
+                          const CNV_PVEC_R* b,
+                          uint64_t b_size,    // right operand and its size (in terms of reim4)
+                          uint8_t* tmp_space  // scratch space
+);
+
+/** @brief minimal scratch space byte-size required for the cnv_apply_dft function */
+EXPORT uint64_t cnv_apply_dft_tmp_bytes(const MODULE* module,                    // N
+                                        uint64_t res_size, uint64_t res_offset,  // output
+                                        uint64_t a_size,                         // size of left operand
+                                        uint64_t b_size                          // size of right operand
+);
 #endif  // SPQLIOS_VEC_ZNX_ARITHMETIC_H

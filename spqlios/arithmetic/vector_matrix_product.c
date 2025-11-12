@@ -17,7 +17,7 @@ EXPORT uint64_t fft64_bytes_of_vmp_pmat(const MODULE* module,           // N
 }
 
 EXPORT VMP_PMAT* new_vmp_pmat(const MODULE* module,           // N
-                                    uint64_t nrows, uint64_t ncols  // dimensions
+                              uint64_t nrows, uint64_t ncols  // dimensions
 ) {
   return spqlios_alloc(bytes_of_vmp_pmat(module, nrows, ncols));
 }

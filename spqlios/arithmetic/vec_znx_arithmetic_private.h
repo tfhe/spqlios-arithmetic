@@ -85,6 +85,12 @@ typedef typeof(znx_small_single_product) ZNX_SMALL_SINGLE_PRODUCT_F;
 typedef typeof(znx_small_single_product_tmp_bytes) ZNX_SMALL_SINGLE_PRODUCT_TMP_BYTES_F;
 typedef typeof(vmp_prepare_contiguous) VMP_PREPARE_CONTIGUOUS_F;
 typedef typeof(vmp_prepare_contiguous_tmp_bytes) VMP_PREPARE_CONTIGUOUS_TMP_BYTES_F;
+typedef typeof(cnv_apply_dft) CNV_APPLY_DFT_F;
+typedef typeof(cnv_apply_dft_tmp_bytes) CNV_APPLY_DFT_TMP_BYTES_F;
+typedef typeof(cnv_prepare_left_contiguous) CNV_PREPARE_LEFT_CONTIGUOUS_F;
+typedef typeof(cnv_prepare_left_contiguous_tmp_bytes) CNV_PREPARE_LEFT_CONTIGUOUS_TMP_BYTES_F;
+typedef typeof(cnv_prepare_right_contiguous) CNV_PREPARE_RIGHT_CONTIGUOUS_F;
+typedef typeof(cnv_prepare_right_contiguous_tmp_bytes) CNV_PREPARE_RIGHT_CONTIGUOUS_TMP_BYTES_F;
 typedef typeof(vmp_apply_dft) VMP_APPLY_DFT_F;
 typedef typeof(vmp_apply_dft_tmp_bytes) VMP_APPLY_DFT_TMP_BYTES_F;
 typedef typeof(vmp_apply_dft_to_dft) VMP_APPLY_DFT_TO_DFT_F;
@@ -132,6 +138,12 @@ struct module_virtual_functions_t {
   VMP_APPLY_DFT_TMP_BYTES_F* vmp_apply_dft_tmp_bytes;
   VMP_APPLY_DFT_TO_DFT_F* vmp_apply_dft_to_dft;
   VMP_APPLY_DFT_TO_DFT_TMP_BYTES_F* vmp_apply_dft_to_dft_tmp_bytes;
+  CNV_APPLY_DFT_F* cnv_apply_dft;
+  CNV_APPLY_DFT_TMP_BYTES_F* cnv_apply_dft_tmp_bytes;
+  CNV_PREPARE_LEFT_CONTIGUOUS_F* cnv_prepare_left_contiguous;
+  CNV_PREPARE_LEFT_CONTIGUOUS_TMP_BYTES_F* cnv_prepare_left_contiguous_tmp_bytes;
+  CNV_PREPARE_RIGHT_CONTIGUOUS_F* cnv_prepare_right_contiguous;
+  CNV_PREPARE_RIGHT_CONTIGUOUS_TMP_BYTES_F* cnv_prepare_right_contiguous_tmp_bytes;
   BYTES_OF_VEC_ZNX_DFT_F* bytes_of_vec_znx_dft;
   BYTES_OF_VEC_ZNX_BIG_F* bytes_of_vec_znx_big;
   BYTES_OF_SVP_PPOL_F* bytes_of_svp_ppol;
@@ -412,6 +424,55 @@ EXPORT void fft64_znx_small_single_product(const MODULE* module,  // N
 
 /** @brief tmp bytes required for znx_small_single_product  */
 EXPORT uint64_t fft64_znx_small_single_product_tmp_bytes(const MODULE* module);
+
+/** @brief prepares the right vector for convolution  */
+EXPORT void fft64_convolution_prepare_right_contiguous_ref(const MODULE* module,                              // N
+                                                           CNV_PVEC_R* pvec, uint64_t nrows,                  // output
+                                                           const int64_t* a, uint64_t a_size, uint64_t a_sl,  // a
+                                                           uint8_t* tmp_space  // scratch space
+);
+
+/** @brief minimal scratch space byte-size required for the cnv_prepare_right_contiguous function */
+EXPORT uint64_t fft64_convolution_prepare_right_contiguous_tmp_bytes(const MODULE* module,  // N
+                                                                     uint64_t nrows,        // size of output
+                                                                     uint64_t a_size        // size of input
+);
+
+/** @brief minimal scratch space byte-size required for the cnv_prepare_left_contiguous function */
+EXPORT uint64_t fft64_convolution_prepare_left_contiguous_tmp_bytes(const MODULE* module,  // N
+                                                                    uint64_t nrows,        // size of output
+                                                                    uint64_t a_size        // size of input
+);
+
+/** @brief prepares the left vector for convolution  */
+EXPORT void fft64_convolution_prepare_left_contiguous_ref(const MODULE* module,                              // N
+                                                          CNV_PVEC_L* pvec, uint64_t nrows,                  // output
+                                                          const int64_t* a, uint64_t a_size, uint64_t a_sl,  // a
+                                                          uint8_t* tmp_space  // scratch space
+);
+
+/** @brief prepares a convolution vector  */
+EXPORT void fft64_convolution_prepare_contiguous_ref(const MODULE* module,                              // N
+                                                     double* pvec, uint64_t nrows,                      // output
+                                                     const int64_t* a, uint64_t a_size, uint64_t a_sl,  // a
+                                                     uint8_t* tmp_space                                 // scratch space
+);
+
+EXPORT uint64_t fft64_convolution_apply_dft_tmp_bytes(const MODULE* module,                    // N
+                                                      uint64_t res_size, uint64_t res_offset,  // output
+                                                      uint64_t a_size,  // size of left operand (in terms of reim4)
+                                                      uint64_t b_size   // size of right operand (in terms of reim4)
+);
+
+/** @brief applies a convolution of two prepared vectors  */
+EXPORT void fft64_convolution_apply_dft_ref(const MODULE* module,                                      // N
+                                            VEC_ZNX_DFT* res, uint64_t res_size, uint64_t res_offset,  // output
+                                            const CNV_PVEC_L* a,
+                                            uint64_t a_size,  // left operand and its size (in terms of reim4)
+                                            const CNV_PVEC_R* b,
+                                            uint64_t b_size,    // right operand and its size (in terms of reim4)
+                                            uint8_t* tmp_space  // scratch space
+);
 
 /** @brief prepares a vmp matrix (contiguous row-major version) */
 EXPORT void fft64_vmp_prepare_contiguous_ref(const MODULE* module,                                // N
