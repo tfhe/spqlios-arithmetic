@@ -53,7 +53,7 @@ EXPORT uint64_t fft64_convolution_prepare_left_contiguous_tmp_bytes(const MODULE
 ) {
   const uint64_t nn = module->nn;
   const uint64_t rows = nrows < a_size ? nrows : a_size;
-  return nn * sizeof(int64_t) * rows;
+  return nn * sizeof(double) * rows;
 }
 
 /** @brief minimal scratch space byte-size required for the cnv_prepare_right_contiguous function */
