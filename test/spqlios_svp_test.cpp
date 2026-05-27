@@ -45,3 +45,45 @@ void test_fft64_svp_apply_dft(SVP_APPLY_DFT_F svp) {
 
 TEST(fft64_svp_apply_dft, svp_apply_dft) { test_fft64_svp_apply_dft(svp_apply_dft); }
 TEST(fft64_svp_apply_dft, fft64_svp_apply_dft_ref) { test_fft64_svp_apply_dft(fft64_svp_apply_dft_ref); }
+
+void test_fft64_svp_apply_dft_to_dft(SVP_APPLY_DFT_TO_DFT_F svp_dft) {
+  for (uint64_t n : {2, 4, 8, 64, 128}) {
+    MODULE* module = new_module_info(n, FFT64);
+    // poly 1 to multiply - create and prepare
+    fft64_svp_ppol_layout ppol(n);
+    ppol.fill_random(1.);
+    for (uint64_t sa : {3, 5, 8}) {
+      for (uint64_t sr : {3, 5, 8}) {
+        // poly 2 to multiply
+        fft64_vec_znx_dft_layout a_dft(n, sa);
+        a_dft.fill_dft_random_log2bound(19);
+        // original operation result
+        fft64_vec_znx_dft_layout res(n, sr);
+        thash hash_a_before = a_dft.content_hash();
+        thash hash_ppol_before = ppol.content_hash();
+        svp_dft(module, res.data, sr, ppol.data, a_dft.data, sa);
+        ASSERT_EQ(a_dft.content_hash(), hash_a_before);
+        ASSERT_EQ(ppol.content_hash(), hash_ppol_before);
+        // create expected value
+        reim_fft64vec ppo = ppol.get_copy();
+        std::vector<reim_fft64vec> expect(sr);
+        for (uint64_t i = 0; i < sr; ++i) {
+          expect[i] = ppo * a_dft.get_copy_zext(i);
+        }
+        // this is the largest precision we can safely expect
+        double prec_expect = n * pow(2., 19 - 52);
+        for (uint64_t i = 0; i < sr; ++i) {
+          reim_fft64vec actual = res.get_copy_zext(i);
+          ASSERT_LE(infty_dist(actual, expect[i]), prec_expect);
+        }
+      }
+    }
+
+    delete_module_info(module);
+  }
+}
+
+TEST(fft64_svp_apply_dft_to_dft, svp_apply_dft_to_dft) { test_fft64_svp_apply_dft_to_dft(svp_apply_dft_to_dft); }
+TEST(fft64_svp_apply_dft_to_dft, fft64_svp_apply_dft_to_dft_ref) {
+  test_fft64_svp_apply_dft_to_dft(fft64_svp_apply_dft_to_dft_ref);
+}
