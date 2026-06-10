@@ -118,4 +118,21 @@ class fft64_cnv_right_layout {
   ~fft64_cnv_right_layout();
 };
 
+/** @brief test layout for the VMP_PVEC */
+class fft64_vmp_pvec_layout {
+ public:
+  const uint64_t nn;
+  const uint64_t size;
+  VMP_PVEC* const data;
+  fft64_vmp_pvec_layout(uint64_t n, uint64_t size);
+  [[nodiscard]] reim4_elem get(uint64_t idx, uint64_t blk) const;
+  void set(uint64_t idx, uint64_t blk, const reim4_elem& v);
+  void set(uint64_t idx, const reim_fft64vec&);
+  [[nodiscard]] reim_fft64vec get_zext(uint64_t idx) const;
+  [[nodiscard]] thash content_hash() const;
+  /** @brief fill with random double values (unstructured) */
+  void fill_random(double log2bound);
+  ~fft64_vmp_pvec_layout();
+};
+
 #endif  // SPQLIOS_FFT64_LAYOUTS_H

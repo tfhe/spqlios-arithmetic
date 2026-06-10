@@ -135,3 +135,58 @@ EXPORT void fft64_vmp_apply_dft_to_dft_avx(const MODULE* module,                
   // zero out remaining bytes
   memset(vec_output + col_max * nn, 0, (res_size - col_max) * nn * sizeof(double));
 }
+
+EXPORT void fft64_vmp_apply_prepared_to_dft_avx(const MODULE* module,                       // N
+                                                VEC_ZNX_DFT* res, const uint64_t res_size,  // res
+                                                const VMP_PVEC* a_prep, uint64_t a_size,    // a
+                                                const VMP_PMAT* pmat, const uint64_t nrows,
+                                                const uint64_t ncols,  // prep matrix
+                                                uint8_t* tmp_space     // scratch space (a_size*sizeof(reim4) bytes)
+) {
+  const uint64_t m = module->m;
+  const uint64_t nn = module->nn;
+
+  double* mat2cols_output = (double*)tmp_space;  // 128 bytes
+
+  double* mat_input = (double*)pmat;
+  double* vec_output = (double*)res;
+
+  const uint64_t row_max = nrows < a_size ? nrows : a_size;
+  const uint64_t col_max = ncols < res_size ? ncols : res_size;
+
+  if (nn >= 8) {
+    for (uint64_t blk_i = 0; blk_i < m / 4; blk_i++) {
+      double* mat_blk_start = mat_input + blk_i * (8 * nrows * ncols);
+
+      double* extracted_blk = (double*)a_prep + 4l * 2 * a_size * blk_i;
+      // apply mat2cols
+      for (uint64_t col_i = 0; col_i < col_max - 1; col_i += 2) {
+        uint64_t col_offset = col_i * (8 * nrows);
+        reim4_vec_mat2cols_product_avx2(row_max, mat2cols_output, extracted_blk, mat_blk_start + col_offset);
+
+        reim4_save_1blk_to_reim_avx(m, blk_i, vec_output + col_i * nn, mat2cols_output);
+        reim4_save_1blk_to_reim_avx(m, blk_i, vec_output + (col_i + 1) * nn, mat2cols_output + 8);
+      }
+
+      // check if col_max is odd, then special case
+      if (col_max % 2 == 1) {
+        uint64_t last_col = col_max - 1;
+        uint64_t col_offset = last_col * (8 * nrows);
+
+        // the last column is alone in the pmat: vec_mat1col
+        if (ncols == col_max)
+          reim4_vec_mat1col_product_avx2(row_max, mat2cols_output, extracted_blk, mat_blk_start + col_offset);
+        else {
+          // the last column is part of a colpair in the pmat: vec_mat2cols and ignore the second position
+          reim4_vec_mat2cols_product_avx2(row_max, mat2cols_output, extracted_blk, mat_blk_start + col_offset);
+        }
+        reim4_save_1blk_to_reim_avx(m, blk_i, vec_output + last_col * nn, mat2cols_output);
+      }
+    }
+  } else {
+    NOT_IMPLEMENTED()
+  }
+
+  // zero out remaining bytes
+  memset(vec_output + col_max * nn, 0, (res_size - col_max) * nn * sizeof(double));
+}
