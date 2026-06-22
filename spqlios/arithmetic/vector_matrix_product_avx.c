@@ -136,12 +136,12 @@ EXPORT void fft64_vmp_apply_dft_to_dft_avx(const MODULE* module,                
   memset(vec_output + col_max * nn, 0, (res_size - col_max) * nn * sizeof(double));
 }
 
-EXPORT void fft64_vmp_apply_prepared_to_dft_avx(const MODULE* module,                       // N
-                                                VEC_ZNX_DFT* res, const uint64_t res_size,  // res
-                                                const VMP_PVEC* a_prep, uint64_t a_size,    // a
-                                                const VMP_PMAT* pmat, const uint64_t nrows,
-                                                const uint64_t ncols,  // prep matrix
-                                                uint8_t* tmp_space     // scratch space (a_size*sizeof(reim4) bytes)
+EXPORT void fft64_vmp_apply_pvec_to_dft_avx(const MODULE* module,                       // N
+                                            VEC_ZNX_DFT* res, const uint64_t res_size,  // res
+                                            const VMP_PVEC* a_prep, uint64_t a_size,    // a
+                                            const VMP_PMAT* pmat, const uint64_t nrows,
+                                            const uint64_t ncols,  // prep matrix
+                                            uint8_t* tmp_space     // scratch space (a_size*sizeof(reim4) bytes)
 ) {
   const uint64_t m = module->m;
   const uint64_t nn = module->nn;

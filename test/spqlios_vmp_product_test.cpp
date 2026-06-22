@@ -120,8 +120,8 @@ TEST(vec_znx, fft64_vmp_apply_dft_to_dft_avx) {
 }
 #endif
 
-static void test_vmp_prepare_contiguous_vec(VMP_PREPARE_CONTIGUOUS_VEC_F* prepare_contiguous,
-                                            VMP_PREPARE_CONTIGUOUS_VEC_TMP_BYTES_F* tmp_bytes) {
+static void test_vmp_prepare_vector(VMP_PREPARE_VECTOR_F* prepare_contiguous,
+                                    VMP_PREPARE_VECTOR_TMP_BYTES_F* tmp_bytes) {
   // tests when n >= 8
   for (uint64_t nn : {8, 32}) {
     MODULE* module = new_module_info(nn, FFT64);
@@ -151,11 +151,11 @@ static void test_vmp_prepare_contiguous_vec(VMP_PREPARE_CONTIGUOUS_VEC_F* prepar
   }
 }
 
-TEST(vec_znx, fft64_vmp_prepare_contiguous_vec_ref) {
-  test_vmp_prepare_contiguous_vec(fft64_vmp_prepare_contiguous_vec_ref, fft64_vmp_prepare_contiguous_vec_tmp_bytes);
+TEST(vec_znx, fft64_vmp_prepare_vector_ref) {
+  test_vmp_prepare_vector(fft64_vmp_prepare_vector_ref, fft64_vmp_prepare_vector_tmp_bytes);
 }
 
-static void test_vmp_pvec_apply(VMP_APPLY_PREPARED_TO_DFT_F* apply, VMP_APPLY_PREPARED_TO_DFT_TMP_BYTES_F* tmp_bytes) {
+static void test_vmp_pvec_apply(VMP_APPLY_PVEC_TO_DFT_F* apply, VMP_APPLY_PVEC_TO_DFT_TMP_BYTES_F* tmp_bytes) {
   for (uint64_t nn : {8, 64}) {  // Preparation not possible for nn < 8 due to convolution not implementing it yet
     MODULE* module = new_module_info(nn, FFT64);
     for (uint64_t mat_nrows : {1, 4, 7}) {
@@ -167,14 +167,14 @@ static void test_vmp_pvec_apply(VMP_APPLY_PREPARED_TO_DFT_F* apply, VMP_APPLY_PR
             fft64_vec_znx_dft_layout in_dft(nn, in_size);
             fft64_vmp_pmat_layout pmat(nn, mat_nrows, mat_ncols);
             fft64_vec_znx_dft_layout out(nn, out_size);
-            std::vector<uint8_t> tmp_space(fft64_vmp_prepare_contiguous_vec_tmp_bytes(module, in_size, in_size));
+            std::vector<uint8_t> tmp_space(fft64_vmp_prepare_vector_tmp_bytes(module, in_size, in_size));
 
             in.fill_random(0);
             pmat.fill_random(0);
             vec_znx_dft(module, in_dft.data, in_size, in.data(), in_size, nn);
-            fft64_vmp_prepare_contiguous_vec_ref(module,              //
-                                                 pvec.data, in_size,  //
-                                                 in.data(), in_size, nn, tmp_space.data());
+            fft64_vmp_prepare_vector_ref(module,              //
+                                         pvec.data, in_size,  //
+                                         in.data(), in_size, nn, tmp_space.data());
             // naive computation of the product
             std::vector<reim_fft64vec> expect(out_size, reim_fft64vec(nn));
             for (uint64_t col = 0; col < out_size; ++col) {
@@ -200,12 +200,12 @@ static void test_vmp_pvec_apply(VMP_APPLY_PREPARED_TO_DFT_F* apply, VMP_APPLY_PR
   }
 }
 
-TEST(vec_znx, fft64_vmp_apply_prepared_to_dft_ref) {
-  test_vmp_pvec_apply(fft64_vmp_apply_prepared_to_dft_ref, fft64_vmp_apply_prepared_to_dft_tmp_bytes);
+TEST(vec_znx, fft64_vmp_apply_pvec_to_dft_ref) {
+  test_vmp_pvec_apply(fft64_vmp_apply_pvec_to_dft_ref, fft64_vmp_apply_pvec_to_dft_tmp_bytes);
 }
 
 #ifdef __x86_64__
-TEST(vec_znx, fft64_vmp_apply_prepared_to_dft_avx) {
-  test_vmp_pvec_apply(fft64_vmp_apply_prepared_to_dft_avx, fft64_vmp_apply_prepared_to_dft_tmp_bytes);
+TEST(vec_znx, fft64_vmp_apply_pvec_to_dft_avx) {
+  test_vmp_pvec_apply(fft64_vmp_apply_pvec_to_dft_avx, fft64_vmp_apply_pvec_to_dft_tmp_bytes);
 }
 #endif

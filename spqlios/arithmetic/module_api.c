@@ -47,15 +47,15 @@ static void fill_fft64_virtual_table(MODULE* module) {
   module->func.znx_small_single_product = fft64_znx_small_single_product;
   module->func.znx_small_single_product_tmp_bytes = fft64_znx_small_single_product_tmp_bytes;
   module->func.vmp_prepare_contiguous = fft64_vmp_prepare_contiguous_ref;
-  module->func.vmp_prepare_contiguous_vec = fft64_vmp_prepare_contiguous_vec_ref;
+  module->func.vmp_prepare_vector = fft64_vmp_prepare_vector_ref;
   module->func.vmp_prepare_contiguous_tmp_bytes = fft64_vmp_prepare_contiguous_tmp_bytes;
-  module->func.vmp_prepare_contiguous_vec_tmp_bytes = fft64_vmp_prepare_contiguous_vec_tmp_bytes;
+  module->func.vmp_prepare_vector_tmp_bytes = fft64_vmp_prepare_vector_tmp_bytes;
   module->func.vmp_apply_dft = fft64_vmp_apply_dft_ref;
   module->func.vmp_apply_dft_tmp_bytes = fft64_vmp_apply_dft_tmp_bytes;
   module->func.vmp_apply_dft_to_dft = fft64_vmp_apply_dft_to_dft_ref;
-  module->func.vmp_apply_prepared_to_dft = fft64_vmp_apply_prepared_to_dft_ref;
+  module->func.vmp_apply_pvec_to_dft = fft64_vmp_apply_pvec_to_dft_ref;
   module->func.vmp_apply_dft_to_dft_tmp_bytes = fft64_vmp_apply_dft_to_dft_tmp_bytes;
-  module->func.vmp_apply_prepared_to_dft_tmp_bytes = fft64_vmp_apply_prepared_to_dft_tmp_bytes;
+  module->func.vmp_apply_pvec_to_dft_tmp_bytes = fft64_vmp_apply_pvec_to_dft_tmp_bytes;
   module->func.cnv_prepare_right_contiguous_tmp_bytes = fft64_convolution_prepare_right_contiguous_tmp_bytes;
   module->func.cnv_prepare_left_contiguous_tmp_bytes = fft64_convolution_prepare_left_contiguous_tmp_bytes;
   module->func.cnv_prepare_right_contiguous = fft64_convolution_prepare_right_contiguous_ref;
@@ -74,7 +74,7 @@ static void fill_fft64_virtual_table(MODULE* module) {
     module->func.vmp_prepare_contiguous = fft64_vmp_prepare_contiguous_avx;
     module->func.vmp_apply_dft = fft64_vmp_apply_dft_avx;
     module->func.vmp_apply_dft_to_dft = fft64_vmp_apply_dft_to_dft_avx;
-    module->func.vmp_apply_prepared_to_dft = fft64_vmp_apply_prepared_to_dft_avx;
+    module->func.vmp_apply_pvec_to_dft = fft64_vmp_apply_pvec_to_dft_avx;
   }
 }
 
