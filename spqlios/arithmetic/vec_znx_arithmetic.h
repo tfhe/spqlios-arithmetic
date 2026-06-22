@@ -25,6 +25,8 @@ typedef struct module_info_t MODULE;
 typedef struct vmp_pmat_t VMP_PMAT;
 /** @brief opaque type that represents a vector of znx in DFT space */
 typedef struct vec_znx_dft_t VEC_ZNX_DFT;
+/** @brief opaque type that represents a vector of znx in prepared for vmp DFT space */
+typedef struct vmp_pvec_t VMP_PVEC;
 /** @brief opaque type that represents a vector of znx in large coeffs space */
 typedef struct vec_znx_bigcoeff_t VEC_ZNX_BIG;
 /** @brief opaque type that represents a prepared scalar vector product */
@@ -148,6 +150,13 @@ EXPORT void vmp_prepare_contiguous(const MODULE* module,                        
                                    VMP_PMAT* pmat,                                      // output
                                    const int64_t* mat, uint64_t nrows, uint64_t ncols,  // a
                                    uint8_t* tmp_space                                   // scratch space
+);
+
+/** @brief prepares a vmp vector */
+EXPORT void vmp_prepare_vector(const MODULE* module,                              // N
+                               VMP_PVEC* pvec, uint64_t nrows,                    // output
+                               const int64_t* a, uint64_t a_size, uint64_t a_sl,  // a
+                               uint8_t* tmp_space                                 // scratch space
 );
 
 /** @brief prepares a vmp matrix (mat[row*ncols+col] points to the item) */
@@ -330,6 +339,10 @@ EXPORT void vmp_prepare_contiguous(const MODULE* module,                        
 EXPORT uint64_t vmp_prepare_contiguous_tmp_bytes(const MODULE* module,  // N
                                                  uint64_t nrows, uint64_t ncols);
 
+/** @brief minimal scratch space byte-size required for the vmp_prepare_vec function */
+EXPORT uint64_t vmp_prepare_vector_tmp_bytes(const MODULE* module,  // N
+                                             uint64_t nrows, uint64_t a_size);
+
 /** @brief applies a vmp product (result in DFT space) */
 EXPORT void vmp_apply_dft(const MODULE* module,                                  // N
                           VEC_ZNX_DFT* res, uint64_t res_size,                   // res
@@ -353,13 +366,26 @@ EXPORT void vmp_apply_dft_to_dft(const MODULE* module,                       // 
                                  const uint64_t ncols,  // prep matrix
                                  uint8_t* tmp_space     // scratch space (a_size*sizeof(reim4) bytes)
 );
-;
+
+EXPORT void vmp_apply_pvec_to_dft(const MODULE* module,                       // N
+                                  VEC_ZNX_DFT* res, const uint64_t res_size,  // res
+                                  const VMP_PVEC* a_prep, uint64_t a_size,    // a
+                                  const VMP_PMAT* pmat, const uint64_t nrows,
+                                  const uint64_t ncols,  // prep matrix
+                                  uint8_t* tmp_space     // scratch space (a_size*sizeof(reim4) bytes)
+);
 
 /** @brief minimal size of the tmp_space */
 EXPORT uint64_t vmp_apply_dft_to_dft_tmp_bytes(const MODULE* module,           // N
                                                uint64_t res_size,              // res
                                                uint64_t a_size,                // a
                                                uint64_t nrows, uint64_t ncols  // prep matrix
+);
+
+EXPORT uint64_t vmp_apply_pvec_to_dft_tmp_bytes(const MODULE* module,           // N
+                                                uint64_t res_size,              // res
+                                                uint64_t a_size,                // a
+                                                uint64_t nrows, uint64_t ncols  // prep matrix
 );
 
 /** @brief prepares the right vector for convolution  */

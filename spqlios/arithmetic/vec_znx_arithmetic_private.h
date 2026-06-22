@@ -85,7 +85,9 @@ typedef typeof(svp_apply_dft_to_dft) SVP_APPLY_DFT_TO_DFT_F;
 typedef typeof(znx_small_single_product) ZNX_SMALL_SINGLE_PRODUCT_F;
 typedef typeof(znx_small_single_product_tmp_bytes) ZNX_SMALL_SINGLE_PRODUCT_TMP_BYTES_F;
 typedef typeof(vmp_prepare_contiguous) VMP_PREPARE_CONTIGUOUS_F;
+typedef typeof(vmp_prepare_vector) VMP_PREPARE_VECTOR_F;
 typedef typeof(vmp_prepare_contiguous_tmp_bytes) VMP_PREPARE_CONTIGUOUS_TMP_BYTES_F;
+typedef typeof(vmp_prepare_vector_tmp_bytes) VMP_PREPARE_VECTOR_TMP_BYTES_F;
 typedef typeof(cnv_apply_dft) CNV_APPLY_DFT_F;
 typedef typeof(cnv_apply_dft_tmp_bytes) CNV_APPLY_DFT_TMP_BYTES_F;
 typedef typeof(cnv_prepare_left_contiguous) CNV_PREPARE_LEFT_CONTIGUOUS_F;
@@ -95,7 +97,9 @@ typedef typeof(cnv_prepare_right_contiguous_tmp_bytes) CNV_PREPARE_RIGHT_CONTIGU
 typedef typeof(vmp_apply_dft) VMP_APPLY_DFT_F;
 typedef typeof(vmp_apply_dft_tmp_bytes) VMP_APPLY_DFT_TMP_BYTES_F;
 typedef typeof(vmp_apply_dft_to_dft) VMP_APPLY_DFT_TO_DFT_F;
+typedef typeof(vmp_apply_pvec_to_dft) VMP_APPLY_PVEC_TO_DFT_F;
 typedef typeof(vmp_apply_dft_to_dft_tmp_bytes) VMP_APPLY_DFT_TO_DFT_TMP_BYTES_F;
+typedef typeof(vmp_apply_pvec_to_dft_tmp_bytes) VMP_APPLY_PVEC_TO_DFT_TMP_BYTES_F;
 typedef typeof(bytes_of_vec_znx_dft) BYTES_OF_VEC_ZNX_DFT_F;
 typedef typeof(bytes_of_vec_znx_big) BYTES_OF_VEC_ZNX_BIG_F;
 typedef typeof(bytes_of_svp_ppol) BYTES_OF_SVP_PPOL_F;
@@ -135,11 +139,15 @@ struct module_virtual_functions_t {
   ZNX_SMALL_SINGLE_PRODUCT_F* znx_small_single_product;
   ZNX_SMALL_SINGLE_PRODUCT_TMP_BYTES_F* znx_small_single_product_tmp_bytes;
   VMP_PREPARE_CONTIGUOUS_F* vmp_prepare_contiguous;
+  VMP_PREPARE_VECTOR_F* vmp_prepare_vector;
   VMP_PREPARE_CONTIGUOUS_TMP_BYTES_F* vmp_prepare_contiguous_tmp_bytes;
+  VMP_PREPARE_VECTOR_TMP_BYTES_F* vmp_prepare_vector_tmp_bytes;
   VMP_APPLY_DFT_F* vmp_apply_dft;
   VMP_APPLY_DFT_TMP_BYTES_F* vmp_apply_dft_tmp_bytes;
   VMP_APPLY_DFT_TO_DFT_F* vmp_apply_dft_to_dft;
+  VMP_APPLY_PVEC_TO_DFT_F* vmp_apply_pvec_to_dft;
   VMP_APPLY_DFT_TO_DFT_TMP_BYTES_F* vmp_apply_dft_to_dft_tmp_bytes;
+  VMP_APPLY_PVEC_TO_DFT_TMP_BYTES_F* vmp_apply_pvec_to_dft_tmp_bytes;
   CNV_APPLY_DFT_F* cnv_apply_dft;
   CNV_APPLY_DFT_TMP_BYTES_F* cnv_apply_dft_tmp_bytes;
   CNV_PREPARE_LEFT_CONTIGUOUS_F* cnv_prepare_left_contiguous;
@@ -501,6 +509,15 @@ EXPORT void fft64_vmp_prepare_contiguous_avx(const MODULE* module,              
 EXPORT uint64_t fft64_vmp_prepare_contiguous_tmp_bytes(const MODULE* module,  // N
                                                        uint64_t nrows, uint64_t ncols);
 
+EXPORT uint64_t fft64_vmp_prepare_vector_tmp_bytes(const MODULE* module,  // N
+                                                   uint64_t nrows, uint64_t a_size);
+
+EXPORT void fft64_vmp_prepare_vector_ref(const MODULE* module,                              // N
+                                         VMP_PVEC* pvec, uint64_t nrows,                    // output
+                                         const int64_t* a, uint64_t a_size, uint64_t a_sl,  // a
+                                         uint8_t* tmp_space                                 // scratch space
+);
+
 /** @brief applies a vmp product (result in DFT space) */
 EXPORT void fft64_vmp_apply_dft_ref(const MODULE* module,                                  // N
                                     VEC_ZNX_DFT* res, uint64_t res_size,                   // res
@@ -535,6 +552,22 @@ EXPORT void fft64_vmp_apply_dft_to_dft_avx(const MODULE* module,                
                                            uint8_t* tmp_space     // scratch space (a_size*sizeof(reim4) bytes)
 );
 
+EXPORT void fft64_vmp_apply_pvec_to_dft_ref(const MODULE* module,                       // N
+                                            VEC_ZNX_DFT* res, const uint64_t res_size,  // res
+                                            const VMP_PVEC* a_prep, uint64_t a_size,    // a
+                                            const VMP_PMAT* pmat, const uint64_t nrows,
+                                            const uint64_t ncols,  // prep matrix
+                                            uint8_t* tmp_space     // scratch space (128 bytes)
+);
+
+EXPORT void fft64_vmp_apply_pvec_to_dft_avx(const MODULE* module,                       // N
+                                            VEC_ZNX_DFT* res, const uint64_t res_size,  // res
+                                            const VMP_PVEC* a_prep, uint64_t a_size,    // a
+                                            const VMP_PMAT* pmat, const uint64_t nrows,
+                                            const uint64_t ncols,  // prep matrix
+                                            uint8_t* tmp_space     // scratch space (128 bytes)
+);
+
 /** @brief minimal size of the tmp_space */
 EXPORT uint64_t fft64_vmp_apply_dft_tmp_bytes(const MODULE* module,           // N
                                               uint64_t res_size,              // res
@@ -547,5 +580,11 @@ EXPORT uint64_t fft64_vmp_apply_dft_to_dft_tmp_bytes(const MODULE* module,      
                                                      uint64_t res_size,              // res
                                                      uint64_t a_size,                // a
                                                      uint64_t nrows, uint64_t ncols  // prep matrix
+);
+
+EXPORT uint64_t fft64_vmp_apply_pvec_to_dft_tmp_bytes(const MODULE* module,           // N
+                                                      uint64_t res_size,              // res
+                                                      uint64_t a_size,                // a
+                                                      uint64_t nrows, uint64_t ncols  // prep matrix
 );
 #endif  // SPQLIOS_VEC_ZNX_ARITHMETIC_PRIVATE_H
